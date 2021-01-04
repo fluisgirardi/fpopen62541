@@ -5,7 +5,7 @@
  * The plugins, as well as the server and client examples are in the public domain (CC0 license).
  * They can be reused under any license and changes do not have to be published.
  *
- * Version 1.0 released on 26 Sep 2019
+ * Version 1.1 released on 13 Jun 2020
  *)
 unit open62541;
 
@@ -55,6 +55,7 @@ interface
 { ---------------- }
 { --- config.h --- }
 { ---------------- }
+{$DEFINE UA_ENABLE_METHODCALLS}
 {$DEFINE UA_ENABLE_SUBSCRIPTIONS}
 {$DEFINE UA_ENABLE_STATUSCODE_DESCRIPTIONS}
 {$DEFINE UA_ENABLE_TYPEDESCRIPTION}
@@ -74,6 +75,9 @@ type
   DWord = LongWord; // FixedUInt 32-bit
   size_t = NativeUInt; // DWord on 32-bit platforms, QWord on 64-bit platforms
   {$ENDIF}
+  {$IF NOT DECLARED(size_t)}
+  size_t = NativeUInt;
+  {$IFEND}
 
   UA_Client = record end;
   PUA_Client = ^UA_Client;
@@ -199,11 +203,11 @@ type
        * according to the rules of the printf command. Use the convenience macros
        * below that take the minimum log-level defined in ua_config.h into
        * account. *)
-      log: procedure(logContext: Pointer; level:UA_LogLevel; category:UA_LogCategory; msg: PAnsiChar{; va_list args});
+      log: procedure(logContext: Pointer; level:UA_LogLevel; category:UA_LogCategory; msg: PAnsiChar; args: {va_list}array of const); cdecl;
 
       context: Pointer; (* Logger state *)
 
-      clear: procedure(context: Pointer); (* Clean up the logger plugin *)
+      clear: procedure(context: Pointer); cdecl; (* Clean up the logger plugin *)
   end;
   PUA_Logger  = ^UA_Logger;
 
@@ -234,6 +238,17 @@ type
           end;
   end;
   PUA_NodeId = ^UA_NodeId;
+
+  (**
+   * ExpandedNodeId
+   * ^^^^^^^^^^^^^^
+   * A NodeId that allows the namespace URI to be specified instead of an index. *)
+  UA_ExpandedNodeId = record
+      nodeId: UA_NodeId;
+      namespaceUri: UA_String;
+      serverIndex: UA_UInt32;
+  end;
+  PUA_ExpandedNodeId = ^UA_ExpandedNodeId;
 
   (**
    * .. _qualifiedname:
@@ -272,6 +287,7 @@ type
       dimensionsSize: size_t;
       dimensions: ^UA_NumericRangeDimension;
   end;
+  PUA_NumericRange = ^UA_NumericRange;
 
 
   PUA_DataType = ^UA_DataType;
@@ -371,7 +387,7 @@ type
       sourcePicoseconds: UA_UInt16;
       serverPicoseconds: UA_UInt16;
       status: UA_StatusCode;
-      flag: UA_Boolean;
+      flag: UA_Byte;
 {     UA_Boolean    hasValue             : 1;
       UA_Boolean    hasStatus            : 1;
       UA_Boolean    hasSourceTimestamp   : 1;
@@ -546,7 +562,7 @@ type
   end;
   PUA_VariableAttributes = ^UA_VariableAttributes;
 
- (**
+  (**
    * MessageSecurityMode
    * ^^^^^^^^^^^^^^^^^^^
    * The type of security to use on a message. *)
@@ -559,7 +575,7 @@ type
   );
   {$IF SizeOf(UA_MessageSecurityMode) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
- (**
+  (**
    * ApplicationDescription
    * ^^^^^^^^^^^^^^^^^^^^^^
    * Describes an application and how to find it. *)
@@ -572,6 +588,106 @@ type
       discoveryProfileUri: UA_String;
       discoveryUrlsSize: size_t;
       discoveryUrls: PUA_String;
+  end;
+
+  (**
+   * BrowseResultMask
+   * ^^^^^^^^^^^^^^^^
+   * A bit mask which specifies what should be returned in a browse response. *)
+  UA_BrowseResultMask = (
+      UA_BROWSERESULTMASK_NONE = 0,
+      UA_BROWSERESULTMASK_REFERENCETYPEID = 1,
+      UA_BROWSERESULTMASK_ISFORWARD = 2,
+      UA_BROWSERESULTMASK_REFERENCETYPEINFO = 3,
+      UA_BROWSERESULTMASK_NODECLASS = 4,
+      UA_BROWSERESULTMASK_BROWSENAME = 8,
+      UA_BROWSERESULTMASK_DISPLAYNAME = 16,
+      UA_BROWSERESULTMASK_TYPEDEFINITION = 32,
+      UA_BROWSERESULTMASK_TARGETINFO = 60,
+      UA_BROWSERESULTMASK_ALL = 63,
+      __UA_BROWSERESULTMASK_FORCE32BIT = $7fffffff
+  );
+  {$IF SizeOf(UA_BrowseResultMask) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+  (**
+   * RequestHeader
+   * ^^^^^^^^^^^^^
+   * The header passed with every server request. *)
+  UA_RequestHeader = record
+      authenticationToken: UA_NodeId;
+      timestamp: UA_DateTime;
+      requestHandle: UA_UInt32;
+      returnDiagnostics: UA_UInt32;
+      auditEntryId: UA_String;
+      timeoutHint: UA_UInt32;
+      additionalHeader: UA_ExtensionObject;
+  end;
+
+  (**
+   * ResponseHeader
+   * ^^^^^^^^^^^^^^
+   * The header passed with every server response. *)
+  UA_ResponseHeader = record
+      timestamp: UA_DateTime;
+      requestHandle: UA_UInt32;
+      serviceResult: UA_StatusCode;
+      serviceDiagnostics: UA_DiagnosticInfo;
+      stringTableSize: size_t;
+      stringTable: PUA_String;
+      additionalHeader: UA_ExtensionObject;
+  end;
+
+  (**
+   * ReadResponse
+   * ^^^^^^^^^^^^
+   *)
+  UA_ReadResponse = record
+      responseHeader: UA_ResponseHeader;
+      resultsSize: size_t;
+      results: PUA_DataValue;
+      diagnosticInfosSize: size_t;
+      diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+
+  UA_TimestampsToReturn = (
+      UA_TIMESTAMPSTORETURN_SOURCE = 0,
+      UA_TIMESTAMPSTORETURN_SERVER = 1,
+      UA_TIMESTAMPSTORETURN_BOTH = 2,
+      UA_TIMESTAMPSTORETURN_NEITHER = 3,
+      UA_TIMESTAMPSTORETURN_INVALID = 4,
+      __UA_TIMESTAMPSTORETURN_FORCE32BIT = $7fffffff
+  );
+  {$IF SizeOf(UA_TimestampsToReturn) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+  UA_NodeClass = (
+      UA_NODECLASS_UNSPECIFIED = 0,
+      UA_NODECLASS_OBJECT = 1,
+      UA_NODECLASS_VARIABLE = 2,
+      UA_NODECLASS_METHOD = 4,
+      UA_NODECLASS_OBJECTTYPE = 8,
+      UA_NODECLASS_VARIABLETYPE = 16,
+      UA_NODECLASS_REFERENCETYPE = 32,
+      UA_NODECLASS_DATATYPE = 64,
+      UA_NODECLASS_VIEW = 128,
+      __UA_NODECLASS_FORCE32BIT = $7fffffff
+  );
+  {$IF SizeOf(UA_NodeClass) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+  UA_ReadValueId = record
+      nodeId: UA_NodeId;
+      attributeId: UA_UInt32;
+      indexRange: UA_String;
+      dataEncoding: UA_QualifiedName;
+  end;
+
+  (**
+   * ViewDescription
+   * ^^^^^^^^^^^^^^^
+   * The view to browse. *)
+  UA_ViewDescription = record
+      viewId: UA_NodeId;
+      timestamp: UA_DateTime;
+      viewVersion: UA_UInt32;
   end;
 
   (*
@@ -637,32 +753,19 @@ type
   PUA_NodeAttributes = ^UA_NodeAttributes;
 
   (**
-   * RequestHeader
-   * ^^^^^^^^^^^^^
-   * The header passed with every server request. *)
-  UA_RequestHeader = record
-      authenticationToken: UA_NodeId;
-      timestamp: UA_DateTime;
-      requestHandle: UA_UInt32;
-      returnDiagnostics: UA_UInt32;
-      auditEntryId: UA_String;
-      timeoutHint: UA_UInt32;
-      additionalHeader: UA_ExtensionObject;
+   * ReferenceDescription
+   * ^^^^^^^^^^^^^^^^^^^^
+   * The description of a reference. *)
+  UA_ReferenceDescription = record
+      referenceTypeId: UA_NodeId;
+      isForward: UA_Boolean;
+      nodeId: UA_ExpandedNodeId;
+      browseName: UA_QualifiedName;
+      displayName: UA_LocalizedText;
+      nodeClass: UA_NodeClass;
+      typeDefinition: UA_ExpandedNodeId;
   end;
-
-  (**
-   * ResponseHeader
-   * ^^^^^^^^^^^^^^
-   * The header passed with every server response. *)
-  UA_ResponseHeader = record
-      timestamp: UA_DateTime;
-      requestHandle: UA_UInt32;
-      serviceResult: UA_StatusCode;
-      serviceDiagnostics: UA_DiagnosticInfo;
-      stringTableSize: size_t;
-      stringTable: PUA_String;
-      additionalHeader: UA_ExtensionObject;
-  end;
+  PUA_ReferenceDescription = ^UA_ReferenceDescription;
 
   UA_CreateSubscriptionRequest = record
       requestHeader: UA_RequestHeader;
@@ -702,13 +805,6 @@ type
   end;
   PUA_StatusChangeNotification = ^UA_StatusChangeNotification;
 
-  UA_ReadValueId = record
-      nodeId: UA_NodeId;
-      attributeId: UA_UInt32;
-      indexRange: UA_String;
-      dataEncoding: UA_QualifiedName;
-  end;
-
   UA_MonitoringMode = (
       UA_MONITORINGMODE_DISABLED = 0,
       UA_MONITORINGMODE_SAMPLING = 1,
@@ -739,30 +835,6 @@ type
       filterResult: UA_ExtensionObject;
   end;
 
-  UA_TimestampsToReturn = (
-      UA_TIMESTAMPSTORETURN_SOURCE = 0,
-      UA_TIMESTAMPSTORETURN_SERVER = 1,
-      UA_TIMESTAMPSTORETURN_BOTH = 2,
-      UA_TIMESTAMPSTORETURN_NEITHER = 3,
-      UA_TIMESTAMPSTORETURN_INVALID = 4,
-      __UA_TIMESTAMPSTORETURN_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_TimestampsToReturn) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
- UA_NodeClass = (
-     UA_NODECLASS_UNSPECIFIED = 0,
-     UA_NODECLASS_OBJECT = 1,
-     UA_NODECLASS_VARIABLE = 2,
-     UA_NODECLASS_METHOD = 4,
-     UA_NODECLASS_OBJECTTYPE = 8,
-     UA_NODECLASS_VARIABLETYPE = 16,
-     UA_NODECLASS_REFERENCETYPE = 32,
-     UA_NODECLASS_DATATYPE = 64,
-     UA_NODECLASS_VIEW = 128,
-     __UA_NODECLASS_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_NodeClass) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
   UA_CreateMonitoredItemsRequest = record
       requestHeader: UA_RequestHeader;
       subscriptionId: UA_UInt32;
@@ -778,6 +850,83 @@ type
       diagnosticInfosSize: size_t;
       diagnosticInfos: ^UA_DiagnosticInfo;
   end;
+
+  (**
+   * ReadRequest
+   * ^^^^^^^^^^^
+   *)
+  UA_ReadRequest = record
+    requestHeader: UA_RequestHeader;
+    maxAge: UA_Double;
+    timestampsToReturn: UA_TimestampsToReturn;
+    nodesToReadSize: size_t;
+    nodesToRead: ^UA_ReadValueId;
+  end;
+
+  (**
+   * BrowseDirection
+   * ^^^^^^^^^^^^^^^
+   * The directions of the references to return. *)
+  UA_BrowseDirection = (
+      UA_BROWSEDIRECTION_FORWARD = 0,
+      UA_BROWSEDIRECTION_INVERSE = 1,
+      UA_BROWSEDIRECTION_BOTH = 2,
+      UA_BROWSEDIRECTION_INVALID = 3,
+      __UA_BROWSEDIRECTION_FORCE32BIT = $7fffffff
+  );
+  {$IF SizeOf(UA_BrowseDirection) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+  (**
+   * BrowseDescription
+   * ^^^^^^^^^^^^^^^^^
+   * A request to browse the the references from a node. *)
+  UA_BrowseDescription = record
+      nodeId: UA_NodeId;
+      browseDirection: UA_BrowseDirection;
+      referenceTypeId: UA_NodeId;
+      includeSubtypes: UA_Boolean;
+      nodeClassMask: UA_NodeClass;
+      resultMask: UA_BrowseResultMask;
+  end;
+  PUA_BrowseDescription = ^UA_BrowseDescription;
+
+  (**
+   * BrowseRequest
+   * ^^^^^^^^^^^^^
+   * Browse the references for one or more nodes from the server address space. *)
+  UA_BrowseRequest = record
+      requestHeader: UA_RequestHeader;
+      view: UA_ViewDescription;
+      requestedMaxReferencesPerNode: UA_UInt32;
+      nodesToBrowseSize: size_t;
+      nodesToBrowse: PUA_BrowseDescription;
+  end;
+  PUA_BrowseRequest = ^UA_BrowseRequest;
+
+  (**
+   * BrowseResult
+   * ^^^^^^^^^^^^
+   * The result of a browse operation. *)
+  UA_BrowseResult = record
+      statusCode: UA_StatusCode;
+      continuationPoint: UA_ByteString;
+      referencesSize: size_t;
+      references: PUA_ReferenceDescription;
+  end;
+  PUA_BrowseResult = ^UA_BrowseResult;
+
+  (**
+   * BrowseResponse
+   * ^^^^^^^^^^^^^^
+   * Browse the references for one or more nodes from the server address space. *)
+  UA_BrowseResponse = record
+      responseHeader: UA_ResponseHeader;
+      resultsSize: size_t;
+      results: PUA_BrowseResult;
+      diagnosticInfosSize: size_t;
+      diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_BrowseResponse = ^UA_BrowseResponse;
 
 
   { ---------------- }
@@ -1167,6 +1316,9 @@ const
   UA_TYPES_DOUBLE = 10;
   UA_TYPES_STRING = 11;
   UA_TYPES_DATETIME = 12;
+  UA_TYPES_GUID = 13;
+  UA_TYPES_BYTESTRING = 14;
+  UA_TYPES_XMLELEMENT = 15;
   UA_TYPES_NODEID = 16;
   UA_TYPES_STATUSCODE = 18;
   UA_TYPES_QUALIFIEDNAME = 19;
@@ -1181,22 +1333,30 @@ const
   UA_TYPES_MONITORINGMODE = 50;
   UA_TYPES_REQUESTHEADER = 53;
   UA_TYPES_CREATESUBSCRIPTIONRESPONSE = 57;
+  UA_TYPES_READRESPONSE = 62;
   UA_TYPES_TIMESTAMPSTORETURN = 64;
   UA_TYPES_NODECLASS = 65;
+  UA_TYPES_BROWSEDESCRIPTION = 74;
   UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 88;
   UA_TYPES_MONITORINGPARAMETERS = 97;
   UA_TYPES_READVALUEID = 100;
+  UA_TYPES_VIEWDESCRIPTION = 112;
   UA_TYPES_STATUSCHANGENOTIFICATION = 119;
   UA_TYPES_MONITOREDITEMCREATEREQUEST = 123;
   UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 135;
   UA_TYPES_USERNAMEIDENTITYTOKEN = 139;
   UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 147;
+  UA_TYPES_REFERENCEDESCRIPTION = 148;
+  UA_TYPES_BROWSERESULT = 159;
   UA_TYPES_CREATEMONITOREDITEMSREQUEST = 162;
+  UA_TYPES_READREQUEST = 166;
+  UA_TYPES_BROWSEREQUEST = 170;
+  UA_TYPES_BROWSERESPONSE = 182;
 
 {$IFDEF LOAD_DYNAMICALLY}
 var
   UA_TYPES: PUA_DataType;
-  UA_VariableAttributes_default: PUA_VariableAttributes;
+  UA_VariableAttributes_default: UA_VariableAttributes;
 
   UA_Client_new: function (): PUA_Client; cdecl;
   UA_Client_newWithConfig: function(const config: PUA_ClientConfig): PUA_Client; cdecl;
@@ -1207,6 +1367,7 @@ var
   UA_Client_delete: procedure(client: PUA_Client); cdecl;
   UA_Client_connect: function(client: PUA_Client; endpointUrl: PAnsiChar): UA_StatusCode; cdecl;
   UA_Client_disconnect: function(client: PUA_Client): UA_StatusCode; cdecl;
+  __UA_Client_Service: procedure(client: PUA_Client; const request: Pointer; const requestType: PUA_DataType; response: Pointer; const responseType: PUA_DataType); cdecl;
   UA_Client_run_iterate: function(client: PUA_Client; timeout: UA_UInt32): UA_StatusCode; cdecl;
 
   UA_StatusCode_name: function(code: UA_StatusCode): PAnsiChar; cdecl;
@@ -1214,6 +1375,7 @@ var
   UA_String_equal: function(const s1, s2: PUA_String): UA_Boolean; cdecl;
   UA_NodeId_isNull: function (p: PUA_NodeId): UA_Boolean; cdecl;
   UA_NodeId_print: function(id: PUA_NodeId; output: PUA_String): UA_StatusCode; cdecl;
+  UA_NumericRange_parse: function(range: PUA_NumericRange; const str: UA_String): UA_StatusCode; cdecl;
   UA_Variant_setScalar: procedure(v: PUA_Variant; p: Pointer; _type: PUA_DataType); cdecl;
   UA_Variant_setScalarCopy: function(v: PUA_Variant; p: Pointer; _type: PUA_DataType): UA_StatusCode; cdecl;
   UA_Variant_setArray: procedure(v: PUA_Variant; arrayData: Pointer; arraySize: size_t; _type: PUA_DataType); cdecl;
@@ -1223,14 +1385,19 @@ var
   UA_findDataType: function(typeId: PUA_NodeId): PUA_DataType; cdecl;
 
   UA_new: function(const _type: PUA_DataType): Pointer; cdecl;
+  UA_copy: function(src,dst: Pointer; const _type: PUA_DataType): UA_StatusCode; cdecl;
   UA_clear: procedure(p: Pointer; const _type: PUA_DataType); cdecl;
   UA_delete: procedure(p: Pointer; const _type: PUA_DataType); cdecl;
+  UA_Array_delete: procedure(p: Pointer; size: size_t; const _type: PUA_DataType); cdecl;
 
   __UA_Client_readAttribute: function(client: PUA_Client; const nodeId: PUA_NodeId; attributeId: UA_AttributeId; _out: Pointer; outDataType: PUA_DataType): UA_StatusCode; cdecl;
   UA_Client_readArrayDimensionsAttribute: function(client: PUA_Client; const nodeId: UA_NodeId; out outArrayDimensionsSize: size_t; out outArrayDimensions: PUA_UInt32): UA_StatusCode; cdecl;
 
   __UA_Client_writeAttribute: function(client: PUA_Client; const nodeId: PUA_NodeId; attributeId: UA_AttributeId; _in: Pointer; inDataType: PUA_DataType): UA_StatusCode; cdecl;
   UA_Client_writeArrayDimensionsAttribute: function(client: PUA_Client; const nodeId: UA_NodeId; newArrayDimensionsSize: size_t; newArrayDimensions: PUA_UInt32): UA_StatusCode;
+  {$IFDEF UA_ENABLE_METHODCALLS}
+  UA_Client_call: function(client: PUA_Client; const objectId, methodId: UA_NodeId; inputSize: size_t; input: PUA_Variant; out outputSize: size_t; out output: PUA_Variant): UA_StatusCode; cdecl;
+  {$ENDIF}
 
   UA_Client_Subscriptions_create: function(client: PUA_Client; const request: UA_CreateSubscriptionRequest; subscriptionContext: Pointer; statusChangeCallback: UA_Client_StatusChangeNotificationCallback; deleteCallback: UA_Client_DeleteSubscriptionCallback): UA_CreateSubscriptionResponse; cdecl;
   UA_Client_Subscriptions_delete: function(client: PUA_Client; const request: UA_DeleteSubscriptionsRequest): UA_DeleteSubscriptionsResponse; cdecl;
@@ -1325,6 +1492,18 @@ function UA_Client_connect(client: PUA_Client; endpointUrl: PAnsiChar): UA_Statu
 (* Disconnect and close a connection to the selected server *)
 function UA_Client_disconnect(client: PUA_Client): UA_StatusCode; cdecl; external libopen62541;
 
+(**
+ * .. _client-services:
+ *
+ * Services
+ * --------
+ *
+ * The raw OPC UA services are exposed to the client. But most of them time, it
+ * is better to use the convenience functions from ``ua_client_highlevel.h``
+ * that wrap the raw services. *)
+(* Don't use this function. Use the type versions below instead. *)
+procedure __UA_Client_Service(client: PUA_Client; const request: Pointer; const requestType: PUA_DataType; response: Pointer; const responseType: PUA_DataType); cdecl; external libopen62541;
+
 (*
  * Asynchronous Services
  * ---------------------
@@ -1335,6 +1514,7 @@ function UA_Client_disconnect(client: PUA_Client): UA_StatusCode; cdecl; externa
   * background. Internal housekeeping, renewal of SecureChannels and subscription
   * management is done as well. *)
 function UA_Client_run_iterate(client: PUA_Client; timeout: UA_UInt32): UA_StatusCode; cdecl; external libopen62541;
+
 
 { --------------- }
 { --- types.h --- }
@@ -1353,6 +1533,7 @@ function UA_String_equal(const s1, s2: PUA_String): UA_Boolean; cdecl; external 
 function UA_NodeId_isNull(p: PUA_NodeId): UA_Boolean; cdecl; external libopen62541;
 (* Print the NodeId in the human-readable format *)
 function UA_NodeId_print(id: PUA_NodeId; output: PUA_String): UA_StatusCode; cdecl; external libopen62541;
+function UA_NumericRange_parse(range: PUA_NumericRange; const str: UA_String): UA_StatusCode; cdecl; external libopen62541;
 (* Set the variant to a scalar value that already resides in memory. The value takes on the lifecycle of the variant and is deleted with it. *)
 procedure UA_Variant_setScalar(v: PUA_Variant; p: Pointer; _type: PUA_DataType); cdecl; external libopen62541;
 (* Set the variant to a scalar value that is copied from an existing variable. *)
@@ -1375,6 +1556,8 @@ function UA_findDataType(typeId: PUA_NodeId): PUA_DataType; cdecl; external libo
 
 (* Allocates and initializes a variable of type dataType *)
 function UA_new(const _type: PUA_DataType): Pointer; cdecl; external libopen62541;
+(* Copies the content of two variables. *)
+function UA_copy(src,dst: Pointer; const _type: PUA_DataType): UA_StatusCode; cdecl; external libopen62541;
 (* Deletes the dynamically allocated content of a variable (e.g. resets all
  * arrays to undefined arrays). Afterwards, the variable can be safely deleted
  * without causing memory leaks. But the variable is not initialized and may
@@ -1382,6 +1565,8 @@ function UA_new(const _type: PUA_DataType): Pointer; cdecl; external libopen6254
 procedure UA_clear(p: Pointer; const _type: PUA_DataType); cdecl; external libopen62541;
 (* Frees a variable and all of its content. *)
 procedure UA_delete(p: Pointer; const _type: PUA_DataType); cdecl; external libopen62541;
+(* Deletes an array. *)
+procedure UA_Array_delete(p: Pointer; size: size_t; const _type: PUA_DataType); cdecl; external libopen62541;
 
 { -------------------------- }
 { --- client_highlevel.h --- }
@@ -1391,6 +1576,9 @@ function UA_Client_readArrayDimensionsAttribute(client: PUA_Client; const nodeId
 
 function __UA_Client_writeAttribute(client: PUA_Client; const nodeId: PUA_NodeId; attributeId: UA_AttributeId; _in: Pointer; inDataType: PUA_DataType): UA_StatusCode; cdecl; external libopen62541;
 function UA_Client_writeArrayDimensionsAttribute(client: PUA_Client; const nodeId: UA_NodeId; newArrayDimensionsSize: size_t; newArrayDimensions: PUA_UInt32): UA_StatusCode; cdecl; external libopen62541;
+{$IFDEF UA_ENABLE_METHODCALLS}
+function UA_Client_call(client: PUA_Client; const objectId, methodId: UA_NodeId; inputSize: size_t; input: PUA_Variant; out outputSize: size_t; out output: PUA_Variant): UA_StatusCode; cdecl; external libopen62541;
+{$ENDIF}
 
 { ------------------------------- }
 { --- plugin/securitypolicy.h --- }
@@ -1504,7 +1692,10 @@ function _UA_STRING_ALLOC(chars: PAnsiChar): UA_String; inline;
 function _UA_BYTESTRING(chars: PAnsiChar): UA_ByteString; inline;
 function _UA_BYTESTRING_ALLOC(chars: PAnsiChar): UA_ByteString; inline;
 function _UA_QUALIFIEDNAME(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName;
+function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName; inline;
 function _UA_LOCALIZEDTEXT(locale, text: PAnsiChar): UA_LocalizedText;
+function _UA_LOCALIZEDTEXT_ALLOC(locale, text: PAnsiChar): UA_LocalizedText; inline;
+function _UA_NUMERICRANGE(s: PAnsiChar): UA_NumericRange;
 function _UA_String_equal(const s1: UA_String; const s2: AnsiString):boolean; overload;
 
 (* my helper functions *)
@@ -1512,6 +1703,7 @@ function UA_StringToStr(const s: UA_String): AnsiString;
 function UA_LocalizedTextToStr(const t: UA_LocalizedText): AnsiString;
 function UA_NodeIdToStr(const id: UA_NodeId): AnsiString;
 function UA_DataTypeToStr(typeId: UA_NodeId): AnsiString;
+function UA_Client_readValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; const indexRange: AnsiString; out outValue: UA_Variant): UA_StatusCode; overload;
 
 (* Returns true if the variant has no value defined (contains neither an array nor a scalar value). *)
 function UA_Variant_isEmpty(const v: PUA_Variant): Boolean;
@@ -1565,6 +1757,8 @@ procedure UA_MonitoredItemCreateRequest_init(out p: UA_MonitoredItemCreateReques
 { ---------------- }
 function UA_Client_connect_username(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode; deprecated;
 function UA_Client_connectUsername(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode;
+function UA_Client_Service_read(client: PUA_Client; const request: UA_ReadRequest): UA_ReadResponse;
+function UA_Client_Service_browse(client: PUA_Client; const request: UA_BrowseRequest): UA_BrowseResponse;
 
 { -------------------------- }
 { --- client_highlevel.h --- }
@@ -1633,6 +1827,10 @@ function UnloadLibrary(Lib: THandle): Boolean; inline;
 begin
   Result := Windows.FreeLibrary(Lib);
 end;
+function GetLoadErrorStr: string; inline;
+begin
+  Result := SysErrorMessage(GetLastError);
+end;
 {$ENDIF}
 
 procedure LoadOpen62541();
@@ -1643,11 +1841,11 @@ begin
     if open62541LibHandle = 0 then begin
       RefCount := 0;
       raise EInOutError.CreateFmt('Can not load library "%s". Check your installation.'+sLineBreak+'%s',
-                                  [libopen62541, SysErrorMessage(GetLastError)]);
+                                  [libopen62541, GetLoadErrorStr()]);
     end;
 
-    pointer(UA_TYPES) := GetProcedureAddress(open62541LibHandle,'UA_TYPES'); // external variable name
-    pointer(UA_VariableAttributes_default) := GetProcedureAddress(open62541LibHandle,'UA_VariableAttributes_default');
+    UA_TYPES := PUA_DataType(GetProcedureAddress(open62541LibHandle,'UA_TYPES')); // external variable name
+    UA_VariableAttributes_default := PUA_VariableAttributes(GetProcedureAddress(open62541LibHandle,'UA_VariableAttributes_default'))^;
 
     @UA_Client_new := GetProcedureAddress(open62541LibHandle,'UA_Client_new');
     @UA_Client_newWithConfig := GetProcedureAddress(open62541LibHandle,'UA_Client_newWithConfig');
@@ -1659,12 +1857,14 @@ begin
     @UA_StatusCode_name := GetProcedureAddress(open62541LibHandle,'UA_StatusCode_name');
     @UA_Client_connect := GetProcedureAddress(open62541LibHandle,'UA_Client_connect');
     @UA_Client_disconnect := GetProcedureAddress(open62541LibHandle,'UA_Client_disconnect');
+    @__UA_Client_Service := GetProcedureAddress(open62541LibHandle,'__UA_Client_Service');
     @UA_Client_run_iterate := GetProcedureAddress(open62541LibHandle,'UA_Client_run_iterate');
 
     @UA_String_fromChars := GetProcedureAddress(open62541LibHandle,'UA_String_fromChars');
     @UA_String_equal := GetProcedureAddress(open62541LibHandle,'UA_String_equal');
     @UA_NodeId_isNull := GetProcedureAddress(open62541LibHandle,'UA_NodeId_isNull');
     @UA_NodeId_print := GetProcedureAddress(open62541LibHandle,'UA_NodeId_print');
+    @UA_NumericRange_parse := GetProcedureAddress(open62541LibHandle,'UA_NumericRange_parse');
     @UA_Variant_setScalar := GetProcedureAddress(open62541LibHandle,'UA_Variant_setScalar');
     @UA_Variant_setScalarCopy := GetProcedureAddress(open62541LibHandle,'UA_Variant_setScalarCopy');
     @UA_Variant_setArray := GetProcedureAddress(open62541LibHandle,'UA_Variant_setArray');
@@ -1674,14 +1874,16 @@ begin
     @UA_findDataType := GetProcedureAddress(open62541LibHandle,'UA_findDataType');
 
     @UA_new := GetProcedureAddress(open62541LibHandle,'UA_new');
+    @UA_copy := GetProcedureAddress(open62541LibHandle,'UA_copy');
     @UA_clear := GetProcedureAddress(open62541LibHandle,'UA_clear');
     @UA_delete := GetProcedureAddress(open62541LibHandle,'UA_delete');
+    @UA_Array_delete := GetProcedureAddress(open62541LibHandle, 'UA_Array_delete');
 
     @__UA_Client_readAttribute := GetProcedureAddress(open62541LibHandle,'__UA_Client_readAttribute');
     @UA_Client_readArrayDimensionsAttribute := GetProcedureAddress(open62541LibHandle,'UA_Client_readArrayDimensionsAttribute');
-
     @__UA_Client_writeAttribute := GetProcedureAddress(open62541LibHandle,'__UA_Client_writeAttribute');
     @UA_Client_writeArrayDimensionsAttribute := GetProcedureAddress(open62541LibHandle,'UA_Client_writeArrayDimensionsAttribute');
+    @UA_Client_call := GetProcedureAddress(open62541LibHandle,'UA_Client_call');
 
     @UA_Client_Subscriptions_create := GetProcedureAddress(open62541LibHandle,'UA_Client_Subscriptions_create');
     @UA_Client_Subscriptions_delete := GetProcedureAddress(open62541LibHandle,'UA_Client_Subscriptions_delete');
@@ -1767,10 +1969,29 @@ begin
   Result.name := _UA_STRING(chars);
 end;
 
+function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName;
+begin
+  Result.namespaceIndex := nsIndex;
+  Result.name := _UA_STRING_ALLOC(chars);
+end;
+
 function _UA_LOCALIZEDTEXT(locale, text: PAnsiChar): UA_LocalizedText;
 begin
   Result.locale := _UA_STRING(locale);
   Result.text := _UA_STRING(text);
+end;
+
+function _UA_LOCALIZEDTEXT_ALLOC(locale, text: PAnsiChar): UA_LocalizedText;
+begin
+  Result.locale := _UA_STRING_ALLOC(locale);
+  Result.text := _UA_STRING_ALLOC(text)
+end;
+
+function _UA_NUMERICRANGE(s: PAnsiChar): UA_NumericRange;
+begin
+  Result.dimensionsSize := 0;
+  Result.dimensions := nil;
+  UA_NumericRange_parse(@Result, _UA_STRING(s));
 end;
 
 function _UA_String_equal(const s1: UA_String; const s2: AnsiString):boolean; overload;
@@ -1793,6 +2014,7 @@ end;
 function UA_NodeIdToStr(const id: UA_NodeId): AnsiString;
 var output: UA_String;
 begin
+  output := UA_STRING_NULL;
   UA_NodeId_print(@id, @output);
   SetString(Result, PAnsiChar(output.data), output.length);
   UA_String_Clear(output);
@@ -1986,9 +2208,61 @@ begin
   end;
 end;
 
+function UA_Client_Service_read(client: PUA_Client; const request: UA_ReadRequest): UA_ReadResponse;
+begin
+  __UA_Client_Service(client, @request, @UA_TYPES[UA_TYPES_READREQUEST], @Result, @UA_TYPES[UA_TYPES_READRESPONSE]);
+end;
+
+function UA_Client_Service_browse(client: PUA_Client; const request: UA_BrowseRequest): UA_BrowseResponse;
+begin
+  __UA_Client_Service(client, @request, @UA_TYPES[UA_TYPES_BROWSEREQUEST], @Result, @UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
 function UA_Client_readValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; out outValue: UA_Variant): UA_StatusCode; overload;
 begin
   Result := __UA_Client_readAttribute(client, @nodeId, UA_ATTRIBUTEID_VALUE, @outValue, @UA_TYPES[UA_TYPES_VARIANT]);
+end;
+
+// taken from ua_client_highlevel.c: __UA_Client_readAttribute()
+// (use to read subrange of array variable)
+function UA_Client_readValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; const indexRange: AnsiString; out outValue: UA_Variant): UA_StatusCode; overload;
+var
+  item: UA_ReadValueId;
+  request: UA_ReadRequest;
+  response: UA_ReadResponse;
+begin
+  FillChar(item, sizeof(UA_ReadValueId), #0);
+  item.nodeId := nodeId;
+  item.attributeId := ord(UA_ATTRIBUTEID_VALUE);
+  item.indexRange := _UA_STRING(PAnsiChar(indexRange));
+  FillChar(request, sizeof(UA_ReadRequest), #0);
+  request.nodesToRead := @item;
+  request.nodesToReadSize := 1;
+  response := UA_Client_Service_read(client, request);
+  Result := response.responseHeader.serviceResult;
+  if Result = UA_STATUSCODE_GOOD then begin
+    if response.resultsSize = 1 then
+      Result := response.results[0].status
+    else
+      Result := UA_STATUSCODE_BADUNEXPECTEDERROR;
+  end;
+
+  if Result = UA_STATUSCODE_GOOD then begin
+    (* Set the StatusCode *)
+    if response.results^.flag and 2 <> 0 then
+      Result :=  response.results^.status;
+
+    (* Return early of no value is given *)
+    if response.results^.flag and 1 <> 0 then begin
+      (* Copy value into out *)
+       outValue := response.results^.value;
+       UA_Variant_init(response.results^.value);
+    end
+    else
+      Result := UA_STATUSCODE_BADUNEXPECTEDERROR;
+  end;
+
+  UA_clear(@response, @UA_TYPES[UA_TYPES_READRESPONSE]);
 end;
 
 function UA_Client_readValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; out outValue: Byte): UA_StatusCode;

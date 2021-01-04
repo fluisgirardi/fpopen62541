@@ -13,10 +13,13 @@ uses
   ExtCtrls;
 
 type
+  {$IF NOT DECLARED(PtrInt)}
+  PtrInt = NativeInt;
+  {$IFEND}
 
-  { TForm1 }
+  { TTestOpcUaForm }
 
-  TForm1 = class(TForm)
+  TTestOpcUaForm = class(TForm)
     btnConnect: TButton;
     btnReadVariable: TButton;
     btnWriteVariable: TButton;
@@ -55,13 +58,13 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
     procedure CheckConnection;
-    procedure SubscriptionCallback(Data: NativeInt);
+    procedure SubscriptionCallback(Data: PtrInt);
   public
 
   end;
 
 var
-  Form1: TForm1;
+  TestOpcUaForm: TTestOpcUaForm;
 
 implementation
 
@@ -75,11 +78,11 @@ var
   server: PUA_Server;
   server_running: UA_Boolean;
 
-procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TTestOpcUaForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if client <> nil then
     UA_Client_delete(client); // Disconnects the client internally
-
+                              //  UA_Client_delete() -> UA_ClientConfig_clear() -> UA_ApplicationDescription_clear() -> UA_clear() ... -> UA_Array_delete() -> UA_free
   server_running := False;
   if server <> nil then
     UA_Server_delete(server);
@@ -87,27 +90,27 @@ begin
   UnloadOpen62541();
 end;
 
-procedure TForm1.CheckConnection;
+procedure TTestOpcUaForm.CheckConnection;
 begin
   if client = nil then raise Exception.Create('Application is not connected to OPC UA Server!');
 end;
 
-procedure TForm1.SubscriptionCallback(Data: NativeInt);
+procedure TTestOpcUaForm.SubscriptionCallback(Data: PtrInt);
 begin
   Memo1.Lines.Append(Format('Main thread Subscription Callback: %d',[Data]));
 end;
 
 // callback
 procedure handler_TheAnswerChanged(client:PUA_Client; subId: UA_UInt32; subContext: Pointer; monId: UA_UInt32; monContext: Pointer; value: PUA_DataValue); cdecl;
-var i: NativeInt;
+var i: PtrInt;
 begin
   if UA_Variant_hasScalarType(@(value^.value), @UA_TYPES[UA_TYPES_INT32]) then
     i := UA_Variant_getInteger(value^.value)
   else
     i := 0;
-  Form1.Memo2.Lines.Append(Format('Subscription Callback: %d',[i]));
+  TestOpcUaForm.Memo2.Lines.Append(Format('Subscription Callback: %d',[i]));
 {$IFDEF FPC}
-  Application.QueueAsyncCall(@Form1.SubscriptionCallback, i);
+  Application.QueueAsyncCall(@TestOpcUaForm.SubscriptionCallback, i);
 {$ENDIF}
 end;
 
@@ -127,11 +130,10 @@ const
     (memberName: 'z'; memberTypeIndex: {ns=3;i=}3014{STRING}; padding:8; flag:0{namespaceZero=0})
   );
 
-  MyStructTypeName1 = 'MyStructTypeName';            // untyped constant for for Length()
-  MyStructTypeName2: AnsiString = MyStructTypeName1; // typed constant for @
+  MyStructTypeName: array[0..15] of AnsiChar = 'MyStructTypeName';
   MyStructType: UA_DataType = (
     typeName: 'MyStructType';
-    typeId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_STRING; identifier:(_string:(length:Length(MyStructTypeName1);data:{$IFDEF FPC}@MyStructTypeName2[1]{$ELSE}nil{$ENDIF}))); (* .typeId *) // MUST BE ONLY "UA_NODEIDTYPE_NUMERIC"
+    typeId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_STRING; identifier:(_string:(length:Length(MyStructTypeName);data:{$IFDEF FPC}@MyStructTypeName{$ELSE}nil{$ENDIF}))); (* .typeId *) // MUST BE ONLY "UA_NODEIDTYPE_NUMERIC"
     memSize: SizeOf(MyStruct);
     typeIndex: 0;                            (* .typeIndex, in the array of custom types *)
     flags: ord(UA_DATATYPEKIND_STRUCTURE) +  (* .typeKind:6 *)
@@ -152,7 +154,7 @@ const
   );
 
 
-procedure TForm1.btnConnectClick(Sender: TObject);
+procedure TTestOpcUaForm.btnConnectClick(Sender: TObject);
 var
   res: UA_StatusCode;
   channelState: UA_SecureChannelState;
@@ -180,7 +182,7 @@ begin
   client := UA_Client_new();
   conf := UA_Client_getConfig(client);
 
-  conf^.clientDescription.applicationName := _UA_LOCALIZEDTEXT('en-US','My Test Application');
+  conf^.clientDescription.applicationName := _UA_LOCALIZEDTEXT_ALLOC('en-US','My Test Application');
   UA_ClientConfig_setDefault(conf);
 
   conf^.customDataTypes := @MyCustomDataTypes;
@@ -321,7 +323,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TForm1.btnReadVariableClick(Sender: TObject);
+procedure TTestOpcUaForm.btnReadVariableClick(Sender: TObject);
 type
   TMyCustomType=packed record
     x: UA_Int32;
@@ -417,12 +419,14 @@ begin
       raise Exception.CreateFmt('Error reading value of variable "%s"! (%s)', [eNodeId.Text, AnsiString(UA_StatusCode_name(res))]);
   end;
 
-  Memo1.Lines.Append(Format('Node "%s" read value: %s (Size=%d, Type=%s (%d); Result=%x)', [eNodeId.Text, eNodeValue.Text, value._type^.memSize, value._type^.typeName, value._type^.typeIndex, res]));
+  Memo1.Lines.Append(Format('Node "%s" read value: %s (Size=%d, Type=%s (typeId=%s,typeIndex=%d); Result=%x)', [eNodeId.Text, eNodeValue.Text, value._type^.memSize, value._type^.typeName, UA_NodeIdToStr(value._type^.typeId), value._type^.typeIndex, res]));
+  //pDataType := value._type;
+  //Memo1.Lines.Append(Format('Data Type: typeName=%s, typeId=%s, memSize=%d, typeIndex=%d, flags=%d, binaryEncodingId=%d, members=%p', [pDataType^.typeName, UA_NodeIdToStr(pDataType^.typeId), pDataType^.memSize, pDataType^.typeIndex, pDataType^.flags, pDataType^.binaryEncodingId, pDataType^.members]));
 
   UA_NodeId_clear(nodeId);
 end;
 
-procedure TForm1.btnWriteVariableClick(Sender: TObject);
+procedure TTestOpcUaForm.btnWriteVariableClick(Sender: TObject);
 var
   nodeId, dataType: UA_NodeId;
   res: UA_StatusCode;
@@ -472,7 +476,7 @@ begin
 end;
 
 
-procedure TForm1.btnServerStartClick(Sender: TObject);
+procedure TTestOpcUaForm.btnServerStartClick(Sender: TObject);
 var
   res: UA_StatusCode;
 begin
@@ -502,7 +506,7 @@ begin
   Memo1.Lines.Append(Format('Server shutdown (Result=%x)', [res]));
 end;
 
-procedure TForm1.btnServerAddVariableClick(Sender: TObject);
+procedure TTestOpcUaForm.btnServerAddVariableClick(Sender: TObject);
 var
   attr: UA_VariableAttributes;
   intVariable: UA_Int32;
@@ -511,7 +515,7 @@ var
   res: UA_StatusCode;
 begin
   (* Define the attribute of the myInteger variable node *)
-  attr := UA_VariableAttributes_default^;
+  attr := UA_VariableAttributes_default;
   intVariable := StrToInt(eServerVariableValue.Text);
   UA_Variant_setScalar(@attr.value, @intVariable, @UA_TYPES[UA_TYPES_INT32]);
   attr.description := _UA_LOCALIZEDTEXT('en-US', PAnsiChar(eServerVariableName.Text));
@@ -530,7 +534,7 @@ begin
   Memo1.Lines.Append(Format('Server add variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
 end;
 
-procedure TForm1.btnServerWriteVariableClick(Sender: TObject);
+procedure TTestOpcUaForm.btnServerWriteVariableClick(Sender: TObject);
 var
   intVariableNodeId: UA_NodeId;
   value: UA_Variant;
