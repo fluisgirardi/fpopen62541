@@ -1221,7 +1221,10 @@ type
   { --- server_config.h --- }
   { ----------------------- }
   UA_ServerConfig = record
+      nThreads:UA_UInt16; //only if multithreading is enabled
+      logger:UA_Logger;
   {
+    FIXME define the remaining fields
   }
   end;
   PUA_ServerConfig = ^UA_ServerConfig;
@@ -1365,7 +1368,7 @@ var
   UA_ClientConfig_setDefault: function(config: PUA_ClientConfig): UA_StatusCode; cdecl;
   UA_ClientConfig_setDefaultEncryption: function(config: PUA_ClientConfig; localCertificate, privateKey: UA_ByteString; trustList: PUA_ByteString; trustListSize: size_t; revocationList: PUA_ByteString; revocationListSize: size_t): UA_StatusCode; cdecl;
   UA_Client_delete: procedure(client: PUA_Client); cdecl;
-  UA_Client_connect: function(client: PUA_Client; endpointUrl: PAnsiChar): UA_StatusCode; cdecl;
+  UA_Client_connect: function(client: PUA_Client; const endpointUrl: AnsiString): UA_StatusCode; cdecl;
   UA_Client_disconnect: function(client: PUA_Client): UA_StatusCode; cdecl;
   __UA_Client_Service: procedure(client: PUA_Client; const request: Pointer; const requestType: PUA_DataType; response: Pointer; const responseType: PUA_DataType); cdecl;
   UA_Client_run_iterate: function(client: PUA_Client; timeout: UA_UInt32): UA_StatusCode; cdecl;
@@ -1486,7 +1489,7 @@ procedure UA_Client_delete(client: PUA_Client); cdecl; external libopen62541;
  * @param client to use
  * @param endpointURL to connect (for example "opc.tcp://localhost:4840")
  * @return Indicates whether the operation succeeded or returns an error code *)
-function UA_Client_connect(client: PUA_Client; endpointUrl: PAnsiChar): UA_StatusCode; cdecl; external libopen62541;
+function UA_Client_connect(client: PUA_Client; const endpointUrl: AnsiString): UA_StatusCode; cdecl; external libopen62541;
 (* Connect to the selected server with the given username and password *)
 //function UA_Client_connect_username(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode; cdecl; external libopen62541; deprecated;
 (* Disconnect and close a connection to the selected server *)
@@ -1686,16 +1689,19 @@ function __UA_Server_write(server: PUA_Server; const nodeId: PUA_NodeId; const a
 { --------------- }
 { --- types.h --- }
 { --------------- }
+{ the non allocating versions use 'var' to emphasize that not a copy but the
+  original value is used (and it shouldn't be changed)  and to make it
+  impossible to use a property as an actual parameter }
 function _UA_StatusCode_Name(code: UA_StatusCode): AnsiString;
-function _UA_STRING(chars: PAnsiChar): UA_String;
-function _UA_STRING_ALLOC(chars: PAnsiChar): UA_String; inline;
-function _UA_BYTESTRING(chars: PAnsiChar): UA_ByteString; inline;
-function _UA_BYTESTRING_ALLOC(chars: PAnsiChar): UA_ByteString; inline;
-function _UA_QUALIFIEDNAME(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName;
-function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName; inline;
-function _UA_LOCALIZEDTEXT(locale, text: PAnsiChar): UA_LocalizedText;
-function _UA_LOCALIZEDTEXT_ALLOC(locale, text: PAnsiChar): UA_LocalizedText; inline;
-function _UA_NUMERICRANGE(s: PAnsiChar): UA_NumericRange;
+function _UA_STRING(var chars: AnsiString): UA_String; inline;
+function _UA_STRING_ALLOC(const chars: AnsiString): UA_String; inline;
+function _UA_BYTESTRING(var chars: AnsiString): UA_ByteString; inline;
+function _UA_BYTESTRING_ALLOC(const chars: AnsiString): UA_ByteString; inline;
+function _UA_QUALIFIEDNAME(nsIndex: UA_UInt16; var chars: AnsiString): UA_QualifiedName;
+function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_QualifiedName; inline;
+function _UA_LOCALIZEDTEXT(var locale, text: AnsiString): UA_LocalizedText;
+function _UA_LOCALIZEDTEXT_ALLOC(const locale, text: AnsiString): UA_LocalizedText; inline;
+function _UA_NUMERICRANGE(const s: AnsiString): UA_NumericRange;
 function _UA_String_equal(const s1: UA_String; const s2: AnsiString):boolean; overload;
 
 (* my helper functions *)
@@ -1726,15 +1732,15 @@ procedure UA_Variant_setByte(out v: UA_Variant; i: Byte);
 procedure UA_Variant_setSmallint(out v: UA_Variant; i: Smallint);
 procedure UA_Variant_setInteger(out v: UA_Variant; i: Integer);
 procedure UA_Variant_setInt64(out v: UA_Variant; i: Int64);
-procedure UA_Variant_setString(out v: UA_Variant; s: AnsiString);
+procedure UA_Variant_setString(out v: UA_Variant; const s: AnsiString);
 
 (* The following functions are shorthand for creating NodeIds. *)
 function UA_NODEID_NUMERIC(nsIndex: UA_UInt16; identifier: UA_UInt32): UA_NodeId;
-function UA_NODEID_STRING(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
-function UA_NODEID_STRING_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_STRING(nsIndex: UA_UInt16; var chars: AnsiString): UA_NodeId;
+function UA_NODEID_STRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_NodeId;
 function UA_NODEID_GUID(nsIndex: UA_UInt16; guid: UA_Guid): UA_NodeId;
-function UA_NODEID_BYTESTRING(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
-function UA_NODEID_BYTESTRING_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_BYTESTRING(nsIndex: UA_UInt16; var chars: AnsiString): UA_NodeId;
+function UA_NODEID_BYTESTRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_NodeId;
 
 (* Test if the data type is a numeric builtin data type. This includes Boolean,
  * integers and floating point numbers. Not included are DateTime and StatusCode. *)
@@ -1752,11 +1758,32 @@ procedure UA_NodeId_clear(var p: UA_NodeId);
 procedure UA_CreateSubscriptionRequest_init(out p: UA_CreateSubscriptionRequest);
 procedure UA_MonitoredItemCreateRequest_init(out p: UA_MonitoredItemCreateRequest);
 
+procedure UA_BrowseRequest_init(out p: UA_BrowseRequest);
+function UA_BrowseRequest_new:PUA_BrowseRequest;
+function UA_BrowseRequest_copy(const src: UA_BrowseRequest; out dst:UA_BrowseRequest): UA_StatusCode;
+procedure UA_BrowseRequest_deleteMembers(var p: UA_BrowseRequest);
+procedure UA_BrowseRequest_clear(var p: UA_BrowseRequest);
+procedure UA_BrowseRequest_delete(p: PUA_BrowseRequest);
+
+procedure UA_BrowseResponse_init(out p: UA_BrowseResponse);
+function UA_BrowseResponse_new:PUA_BrowseResponse;
+function UA_BrowseResponse_copy(const src: UA_BrowseResponse; out dst:UA_BrowseResponse): UA_StatusCode;
+procedure UA_BrowseResponse_deleteMembers(var p: UA_BrowseResponse);
+procedure UA_BrowseResponse_clear(var p: UA_BrowseResponse);
+procedure UA_BrowseResponse_delete(p: PUA_BrowseResponse);
+
+procedure UA_BrowseDescription_init(out p: UA_BrowseDescription);
+function UA_BrowseDescription_new:PUA_BrowseDescription;
+function UA_BrowseDescription_copy(const src: UA_BrowseDescription; out dst:UA_BrowseDescription): UA_StatusCode;
+procedure UA_BrowseDescription_deleteMembers(var p: UA_BrowseDescription);
+procedure UA_BrowseDescription_clear(var p: UA_BrowseDescription);
+procedure UA_BrowseDescription_delete(p: PUA_BrowseDescription);
+
 { ---------------- }
 { --- client.h --- }
 { ---------------- }
-function UA_Client_connect_username(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode; deprecated;
-function UA_Client_connectUsername(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode;
+function UA_Client_connect_username(client: PUA_Client; const endpointUrl, username, password: AnsiString): UA_StatusCode; deprecated;
+function UA_Client_connectUsername(client: PUA_Client; const endpointUrl, username, password: AnsiString): UA_StatusCode;
 function UA_Client_Service_read(client: PUA_Client; const request: UA_ReadRequest): UA_ReadResponse;
 function UA_Client_Service_browse(client: PUA_Client; const request: UA_BrowseRequest): UA_BrowseResponse;
 
@@ -1844,7 +1871,7 @@ begin
                                   [libopen62541, GetLoadErrorStr()]);
     end;
 
-    UA_TYPES := PUA_DataType(GetProcedureAddress(open62541LibHandle,'UA_TYPES')); // external variable name
+    pointer(UA_TYPES) := GetProcedureAddress(open62541LibHandle,'UA_TYPES'); // external variable name
     UA_VariableAttributes_default := PUA_VariableAttributes(GetProcedureAddress(open62541LibHandle,'UA_VariableAttributes_default'))^;
 
     @UA_Client_new := GetProcedureAddress(open62541LibHandle,'UA_Client_new');
@@ -1929,76 +1956,86 @@ end;
  * ``UA_STRING`` returns a string pointing to the original char-array.
  * ``UA_STRING_ALLOC`` is shorthand for ``UA_String_fromChars`` and makes a copy
  * of the char-array. *)
-function _UA_STRING(chars: PAnsiChar): UA_String;
+function _UA_STRING(var chars: AnsiString): UA_String; inline;
 begin
-  if chars=nil then begin
+  if chars='' then begin
     Result.length := 0;
     Result.data := nil;
   end
   else begin
-    Result.length := StrLen(chars);
-    Result.data := PUA_Byte(chars);
+    Result.length := Length(chars);
+    Result.data := @chars[1];
   end;
 end;
 
-function _UA_STRING_ALLOC(chars: PAnsiChar): UA_String; inline;
+function _UA_STRING_ALLOC(const chars: AnsiString): UA_String; inline;
+var bs:UA_BYTESTRING;
 begin
-  Result := UA_String_fromChars(chars);
-end;
-
-function _UA_BYTESTRING(chars: PAnsiChar): UA_ByteString;
+  if chars='' then
 begin
-  if chars=nil then begin
-    Result.length := 0;
-    Result.data := nil;
-  end
-  else begin
-    Result.length := StrLen(chars);
-    Result.data := PUA_Byte(chars);
+    result.length:=0;
+    result.data:=Nil;
+  end else
+  begin
+    //this contortion is necessary in order to let the library allocate the memory
+    //(the C and pascal alloc/free cannot be mixed)
+    bs.length:=length(chars);
+    bs.data:=@chars[1];
+    UA_copy(@bs, @result, @UA_TYPES[UA_TYPES_BYTESTRING]);
   end;
 end;
 
-function _UA_BYTESTRING_ALLOC(chars: PAnsiChar): UA_ByteString;
+function _UA_BYTESTRING(var chars: AnsiString): UA_ByteString;
 begin
-  Result := UA_String_fromChars(chars);
+  result:=UA_ByteString(_UA_STRING(chars));
 end;
 
-function _UA_QUALIFIEDNAME(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName;
+function _UA_BYTESTRING_ALLOC(const chars: AnsiString): UA_ByteString; inline;
+begin
+  result:=UA_ByteString(_UA_STRING_ALLOC(chars));
+end;
+
+function _UA_QUALIFIEDNAME(nsIndex: UA_UInt16; var chars: AnsiString): UA_QualifiedName;
 begin
   Result.namespaceIndex := nsIndex;
   Result.name := _UA_STRING(chars);
 end;
 
-function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_QualifiedName;
+function _UA_QUALIFIEDNAME_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_QualifiedName;
 begin
   Result.namespaceIndex := nsIndex;
   Result.name := _UA_STRING_ALLOC(chars);
 end;
 
-function _UA_LOCALIZEDTEXT(locale, text: PAnsiChar): UA_LocalizedText;
+function _UA_LOCALIZEDTEXT(var locale, text: AnsiString): UA_LocalizedText;
 begin
   Result.locale := _UA_STRING(locale);
   Result.text := _UA_STRING(text);
 end;
 
-function _UA_LOCALIZEDTEXT_ALLOC(locale, text: PAnsiChar): UA_LocalizedText;
+function _UA_LOCALIZEDTEXT_ALLOC(const locale, text: AnsiString): UA_LocalizedText;
 begin
   Result.locale := _UA_STRING_ALLOC(locale);
   Result.text := _UA_STRING_ALLOC(text)
 end;
 
-function _UA_NUMERICRANGE(s: PAnsiChar): UA_NumericRange;
+function _UA_NUMERICRANGE(const s: AnsiString): UA_NumericRange;
+var
+  uas:UA_String;
 begin
   Result.dimensionsSize := 0;
   Result.dimensions := nil;
-  UA_NumericRange_parse(@Result, _UA_STRING(s));
+  uas:=_UA_STRING_ALLOC(s);
+  UA_NumericRange_parse(@Result, uas);
+  UA_String_clear(uas);
 end;
 
 function _UA_String_equal(const s1: UA_String; const s2: AnsiString):boolean; overload;
 var s: UA_String;
 begin
-  s := _UA_STRING(PAnsiChar(s2));
+  s := _UA_STRING_ALLOC(s2);
   Result:=UA_String_equal(@s1,@s);
+  UA_String_clear(s);
 end;
 
 function UA_StringToStr(const s: UA_String): AnsiString;
@@ -2055,6 +2092,99 @@ end;
 procedure UA_MonitoredItemCreateRequest_init(out p: UA_MonitoredItemCreateRequest);
 begin
   FillChar(p, SizeOf(p), #0);
+end;
+
+procedure UA_BrowseRequest_init(out p: UA_BrowseRequest);
+begin
+  FillChar(p, SizeOf(p), #0);
+end;
+
+function UA_BrowseRequest_new: PUA_BrowseRequest;
+begin
+  result:= UA_new(@UA_TYPES[UA_TYPES_BROWSEREQUEST]);
+end;
+
+function UA_BrowseRequest_copy(const src: UA_BrowseRequest; out
+  dst: UA_BrowseRequest): UA_StatusCode;
+begin
+  result:=UA_copy(@src, @dst, @UA_TYPES[UA_TYPES_BROWSEREQUEST]);
+end;
+
+procedure UA_BrowseRequest_deleteMembers(var p: UA_BrowseRequest);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSEREQUEST]);
+end;
+
+procedure UA_BrowseRequest_clear(var p: UA_BrowseRequest);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSEREQUEST]);
+end;
+
+procedure UA_BrowseRequest_delete(p: PUA_BrowseRequest);
+begin
+  UA_delete(p, @UA_TYPES[UA_TYPES_BROWSEREQUEST]);
+end;
+
+procedure UA_BrowseResponse_init(out p: UA_BrowseResponse);
+begin
+  FillChar(p, SizeOf(p), #0);
+end;
+
+function UA_BrowseResponse_new: PUA_BrowseResponse;
+begin
+  result:= UA_new(@UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
+function UA_BrowseResponse_copy(const src: UA_BrowseResponse; out
+  dst: UA_BrowseResponse): UA_StatusCode;
+begin
+  result:=UA_copy(@src, @dst, @UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
+procedure UA_BrowseResponse_deleteMembers(var p: UA_BrowseResponse);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
+procedure UA_BrowseResponse_clear(var p: UA_BrowseResponse);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
+procedure UA_BrowseResponse_delete(p: PUA_BrowseResponse);
+begin
+  UA_delete(p, @UA_TYPES[UA_TYPES_BROWSERESPONSE]);
+end;
+
+procedure UA_BrowseDescription_init(out p: UA_BrowseDescription);
+begin
+  FillChar(p, SizeOf(p), #0);
+end;
+
+function UA_BrowseDescription_new: PUA_BrowseDescription;
+begin
+  result:= UA_new(@UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
+end;
+
+function UA_BrowseDescription_copy(const src: UA_BrowseDescription; out
+  dst: UA_BrowseDescription): UA_StatusCode;
+begin
+  result:=UA_copy(@src, @dst, @UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
+end;
+
+procedure UA_BrowseDescription_deleteMembers(var p: UA_BrowseDescription);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
+end;
+
+procedure UA_BrowseDescription_clear(var p: UA_BrowseDescription);
+begin
+  UA_clear(@p, @UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
+end;
+
+procedure UA_BrowseDescription_delete(p: PUA_BrowseDescription);
+begin
+  UA_delete(p, @UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
 end;
 
 function UA_Variant_isEmpty(const v: PUA_Variant): Boolean;
@@ -2129,11 +2259,12 @@ procedure UA_Variant_setInt64(out v: UA_Variant; i: Int64);
 begin
   UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_INT64]);
 end;
-procedure UA_Variant_setString(out v: UA_Variant; s: AnsiString);
+procedure UA_Variant_setString(out v: UA_Variant; const s: AnsiString);
 var uas: UA_STRING;
 begin
-  uas := _UA_STRING(PAnsiChar(s));
+  uas := _UA_STRING_ALLOC(s);
   UA_Variant_setScalarCopy(@v, @uas, @UA_TYPES[UA_TYPES_STRING]);
+  UA_String_clear(uas);
 end;
 
 function UA_NODEID_NUMERIC(nsIndex: UA_UInt16; identifier: UA_UInt32): UA_NodeId;
@@ -2143,13 +2274,13 @@ begin
   Result.identifier.numeric := identifier;
 end;
 
-function UA_NODEID_STRING(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_STRING(nsIndex: UA_UInt16; var chars: AnsiString): UA_NodeId;
 begin
   Result.namespaceIndex := nsIndex;
   Result.identifierType := UA_NODEIDTYPE_STRING;
   Result.identifier._string := _UA_STRING(chars);
 end;
-function UA_NODEID_STRING_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_STRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_NodeId;
 begin
   Result.namespaceIndex := nsIndex;
   Result.identifierType := UA_NODEIDTYPE_STRING;
@@ -2163,13 +2294,13 @@ begin
   Result.identifier.guid := guid;
 end;
 
-function UA_NODEID_BYTESTRING(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_BYTESTRING(nsIndex: UA_UInt16; var chars: AnsiString): UA_NodeId;
 begin
   Result.namespaceIndex := nsIndex;
   Result.identifierType := UA_NODEIDTYPE_BYTESTRING;
   Result.identifier.byteString := _UA_BYTESTRING(chars);
 end;
-function UA_NODEID_BYTESTRING_ALLOC(nsIndex: UA_UInt16; chars: PAnsiChar): UA_NodeId;
+function UA_NODEID_BYTESTRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_NodeId;
 begin
   Result.namespaceIndex := nsIndex;
   Result.identifierType := UA_NODEIDTYPE_BYTESTRING;
@@ -2181,14 +2312,14 @@ begin
   FillChar(p^, _type^.memSize, #0);
 end;
 
-function UA_Client_connect_username(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode;
+function UA_Client_connect_username(client: PUA_Client; const endpointUrl, username, password: AnsiString): UA_StatusCode;
 begin
   Result := UA_Client_connectUsername(client, endpointUrl, username, password);
 end;
 (* Connect to the server and create+activate a Session with the given username
  * and password. This first set the UserIdentityToken in the client config and
  * then calls the regular connect method. *)
-function UA_Client_connectUsername(client: PUA_Client; endpointUrl: PAnsiChar; username, password: PAnsiChar): UA_StatusCode;
+function UA_Client_connectUsername(client: PUA_Client; const endpointUrl, username, password: AnsiString): UA_StatusCode;
 var
   identityToken: PUA_UserNameIdentityToken;
   cc: PUA_ClientConfig;
@@ -2234,7 +2365,7 @@ begin
   FillChar(item, sizeof(UA_ReadValueId), #0);
   item.nodeId := nodeId;
   item.attributeId := ord(UA_ATTRIBUTEID_VALUE);
-  item.indexRange := _UA_STRING(PAnsiChar(indexRange));
+  item.indexRange := _UA_STRING_ALLOC(indexRange);
   FillChar(request, sizeof(UA_ReadRequest), #0);
   request.nodesToRead := @item;
   request.nodesToReadSize := 1;
@@ -2263,6 +2394,7 @@ begin
   end;
 
   UA_clear(@response, @UA_TYPES[UA_TYPES_READRESPONSE]);
+  UA_String_clear(item.indexRange);
 end;
 
 function UA_Client_readValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; out outValue: Byte): UA_StatusCode;
@@ -2371,9 +2503,10 @@ end;
 function UA_Client_writeValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; const newValue: AnsiString): UA_StatusCode;
 var uav: UA_Variant; uas: UA_String;
 begin
-  uas := _UA_STRING(PAnsiChar(newValue));
+  uas := _UA_STRING_ALLOC(newValue);
   UA_Variant_setScalar(@uav, @uas, @UA_TYPES[UA_TYPES_STRING]);
   Result := UA_Client_writeValueAttribute(client, nodeId, uav);
+  UA_String_clear(uas);
 end;
 
 function UA_Client_writeValueAttribute(client: PUA_Client; const nodeId: UA_NodeId; const newValues: array of AnsiString): UA_StatusCode;
@@ -2381,9 +2514,11 @@ var uav: UA_Variant; uas: array of UA_String; i: integer;
 begin
   SetLength(uas, Length(newValues));
   for i:=Low(newValues) to High(newValues) do
-    uas[i] := _UA_STRING(PAnsiChar(newValues[i]));
+    uas[i] := _UA_STRING_ALLOC(newValues[i]);
   UA_Variant_setArray(@uav, @uas[0], Length(uas), @UA_TYPES[UA_TYPES_STRING]);
   Result := UA_Client_writeValueAttribute(client, nodeId, uav);
+  for i:=Low(newValues) to High(newValues) do
+    UA_String_clear(uas[i]);
 end;
 
 function UA_Client_writeDescriptionAttribute(client: PUA_Client; const nodeId: UA_NodeId; {$IFDEF FPC}constref{$ELSE}const{$ENDIF} newDescription: UA_LocalizedText): UA_StatusCode;

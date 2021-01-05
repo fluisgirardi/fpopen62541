@@ -10,12 +10,27 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls;
+  ExtCtrls, open62541;
 
 type
   {$IF NOT DECLARED(PtrInt)}
   PtrInt = NativeInt;
   {$IFEND}
+
+  TTestOpcUaForm = class;
+
+  { TServerThread }
+
+  TServerThread = class(TThread)
+    running:UA_Boolean;
+    server:PUA_Server;
+    FOwner:TTestOpcUaForm;
+    constructor create(owner:TTestOpcUaForm);
+    destructor destroy;override;
+    procedure execute;override;
+  private
+    procedure Log(const msg: string);
+  end;
 
   { TTestOpcUaForm }
 
@@ -56,9 +71,14 @@ type
     procedure btnServerWriteVariableClick(Sender: TObject);
     procedure btnWriteVariableClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    FServer: TServerThread;
     procedure CheckConnection;
     procedure SubscriptionCallback(Data: PtrInt);
+    procedure LogClient(const msg:string);
+    procedure LogServer(data:ptrint);
   public
 
   end;
@@ -68,26 +88,111 @@ var
 
 implementation
 
-uses
-  open62541;
-
 {$R *.lfm}
+
+type
+  TLogFunction =
+   procedure (logContext: Pointer; level: UA_LogLevel;
+     category: UA_LogCategory; msg: PAnsiChar);cdecl;
+
+const
+{$IFDEF WINDOWS}
+  libpascallog='ua_pascallog.dll';
+{$ELSE}
+  libpascallog='libua_pascallog.so';
+{$ENDIF}
+
+
+var UA_Pascal_logger:  function(context: pointer; func:TLogFunction):UA_logger;cdecl=nil;
+    LoggerLibHandle: TLibHandle;
+
+procedure LoadLogLibrary;
+begin
+  LoggerLibHandle := LoadLibrary(libpascallog);
+  if LoggerLibHandle=NilHandle then
+  begin
+    exit;
+  end;
+  pointer(UA_Pascal_logger) := GetProcedureAddress(LoggerLibHandle,'UA_Pascal_logger');
+end;
+
+procedure UnloadLogLibrary;
+begin
+  if LoggerLibHandle<>NilHandle then
+    UnloadLibrary(LoggerLibHandle);
+end;
 
 var
   client: PUA_Client;
-  server: PUA_Server;
-  server_running: UA_Boolean;
+
+{ TServerThread }
+
+procedure client_log_cb(logContext: Pointer; level: UA_LogLevel;
+  category: UA_LogCategory; msg: PAnsiChar); cdecl;
+begin
+  TTestOpcUaForm(logContext).LogClient(msg);
+end;
+
+procedure server_log_cb(logContext: Pointer; level: UA_LogLevel;
+  category: UA_LogCategory; msg: PAnsiChar); cdecl;
+begin
+  TServerThread(logContext).Log(msg);
+end;
+
+constructor TServerThread.create(owner:TTestOpcUaForm);
+begin
+  LoadOpen62541();
+  FOwner:=Owner;
+  inherited create(false);
+end;
+
+destructor TServerThread.destroy;
+begin
+  running:=false;
+  inherited destroy;
+  UnloadOpen62541();
+end;
+
+procedure TServerThread.Log(const msg:string);
+var
+  s: PString;
+begin
+  new(s);
+  s^:=msg;
+  Application.QueueAsyncCall(@FOwner.LogServer,ptrint(s));
+end;
+
+procedure TServerThread.execute;
+var
+  res: UA_StatusCode;
+  conf: PUA_ServerConfig;
+begin
+  server:=UA_Server_new();
+  conf:=UA_Server_getConfig(server);
+  if UA_Pascal_logger<>nil then
+    conf^.logger:=UA_Pascal_logger(self, @server_log_cb);
+  res:=UA_ServerConfig_setDefault(conf);
+  running:=true;
+  res:=UA_Server_run(server, @running);
+end;
 
 procedure TTestOpcUaForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if client <> nil then
     UA_Client_delete(client); // Disconnects the client internally
                               //  UA_Client_delete() -> UA_ClientConfig_clear() -> UA_ApplicationDescription_clear() -> UA_clear() ... -> UA_Array_delete() -> UA_free
-  server_running := False;
-  if server <> nil then
-    UA_Server_delete(server);
-
+  FreeAndNil(FServer);
   UnloadOpen62541();
+end;
+
+procedure TTestOpcUaForm.FormCreate(Sender: TObject);
+begin
+  LoadLogLibrary;
+end;
+
+procedure TTestOpcUaForm.FormDestroy(Sender: TObject);
+begin
+  UnloadLogLibrary;
 end;
 
 procedure TTestOpcUaForm.CheckConnection;
@@ -98,6 +203,17 @@ end;
 procedure TTestOpcUaForm.SubscriptionCallback(Data: PtrInt);
 begin
   Memo1.Lines.Append(Format('Main thread Subscription Callback: %d',[Data]));
+end;
+
+procedure TTestOpcUaForm.LogClient(const msg: string);
+begin
+  Memo1.Lines.Add('(client) '+msg);
+end;
+
+procedure TTestOpcUaForm.LogServer(data:ptrint);
+begin
+  Memo1.Lines.Add('(server) '+PString(data)^);
+  Dispose(PString(data));
 end;
 
 // callback
@@ -185,6 +301,9 @@ begin
   conf^.clientDescription.applicationName := _UA_LOCALIZEDTEXT_ALLOC('en-US','My Test Application');
   UA_ClientConfig_setDefault(conf);
 
+  if UA_Pascal_logger<>nil then
+    conf^.logger:=UA_Pascal_logger(self, @client_log_cb);
+
   conf^.customDataTypes := @MyCustomDataTypes;
 
   (*** Get the client connection status ***)
@@ -194,7 +313,7 @@ begin
 
 
   (*** Connection - Anonymous user, Security None ***)
-  res := UA_Client_connect(client, PAnsiChar(cbServer.Text));
+  res := UA_Client_connect(client, cbServer.Text);
   //res := UA_Client_connectUsername(client, PAnsiChar(cbServer.Text),'test','test');
   if res <> UA_STATUSCODE_GOOD then begin
     Memo1.Lines.Append(Format('Fail status code: %x %s', [res, AnsiString(UA_StatusCode_name(res))]));
@@ -346,7 +465,7 @@ begin
 
   case cbNodeType.ItemIndex of
     0:   NodeId := UA_NODEID_NUMERIC(StrToInt(cbNS.Text), StrToInt(eNodeId.Text));
-    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), PAnsiChar(AnsiString(eNodeId.Text)));
+    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), eNodeId.Text);
   end;
 
   // get data type of requested variable
@@ -437,7 +556,7 @@ begin
 
   case cbNodeType.ItemIndex of
     0:   NodeId := UA_NODEID_NUMERIC(StrToInt(cbNS.Text), StrToInt(eNodeId.Text));
-    else NodeId := UA_NODEID_STRING(StrToInt(cbNS.Text), PAnsiChar(eNodeId.Text));
+    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), eNodeId.Text);
   end;
 
   // check varible Data Type on server
@@ -475,35 +594,19 @@ begin
   UA_NodeId_clear(nodeId);
 end;
 
-
 procedure TTestOpcUaForm.btnServerStartClick(Sender: TObject);
 var
   res: UA_StatusCode;
 begin
-  if server_running = True then begin
-    server_running := False;
+  if Assigned(FServer) then begin
+    FreeAndNil(FServer);
     btnServerStart.Checked := False;
-    Exit;
+    Memo1.Lines.Add('stopped');
+  end else
+  begin
+    FServer:=TServerThread.create(self);
+    Memo1.Lines.Add('started');
   end;
-
-  if server = nil then begin
-    LoadOpen62541();
-    server := UA_Server_new();
-    UA_ServerConfig_setDefault(UA_Server_getConfig(server));
-  end;
-
-  // Start OPC UA Server
-  server_running := True;
-  //res := UA_Server_run(server, @server_running); // call does not return until global variable "server_running" is set to false
-  res := UA_Server_run_startup(server);
-  btnServerStart.Checked := res=UA_STATUSCODE_GOOD;
-  Memo1.Lines.Append(Format('Server run opc.tcp://localhost:4840/ (Result=%x)', [res]));
-  repeat
-    sleep(UA_Server_run_iterate(server, True));
-    Application.ProcessMessages;
-  until server_running=False;
-  res := UA_Server_run_shutdown(server);
-  Memo1.Lines.Append(Format('Server shutdown (Result=%x)', [res]));
 end;
 
 procedure TTestOpcUaForm.btnServerAddVariableClick(Sender: TObject);
@@ -513,22 +616,31 @@ var
   intVariableNodeId, parentNodeId, parentReferenceNodeId: UA_NodeId;
   intVariableName: UA_QualifiedName;
   res: UA_StatusCode;
+  varlang:AnsiString;
+  varname:AnsiString;
 begin
+  if not assigned(FServer) then
+  begin
+      Memo1.Lines.Append('server not connected');
+     exit;
+  end;
+  varlang:='en-US';
+  varname:=eServerVariableName.Text;
   (* Define the attribute of the myInteger variable node *)
   attr := UA_VariableAttributes_default;
   intVariable := StrToInt(eServerVariableValue.Text);
   UA_Variant_setScalar(@attr.value, @intVariable, @UA_TYPES[UA_TYPES_INT32]);
-  attr.description := _UA_LOCALIZEDTEXT('en-US', PAnsiChar(eServerVariableName.Text));
-  attr.displayName := _UA_LOCALIZEDTEXT('en-US', PAnsiChar(eServerVariableName.Text));
+  attr.description := _UA_LOCALIZEDTEXT(varlang, varname);
+  attr.displayName := _UA_LOCALIZEDTEXT(varlang, varname);
   attr.dataType := UA_TYPES[UA_TYPES_INT32].typeId;
   attr.accessLevel := UA_ACCESSLEVELMASK_READ or UA_ACCESSLEVELMASK_WRITE;
 
   (* Add the variable node to the information model *)
-  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, PAnsiChar(eServerVariableName.Text));
-  intVariableName := _UA_QUALIFIEDNAME(StrToInt(cbServerNS.Text), PAnsiChar(eServerVariableName.Text));
+  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, varname);
+  intVariableName := _UA_QUALIFIEDNAME(StrToInt(cbServerNS.Text), varname);
   parentNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   parentReferenceNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
-  res := UA_Server_addVariableNode(server, intVariableNodeId, parentNodeId,
+  res := UA_Server_addVariableNode(FServer.server, intVariableNodeId, parentNodeId,
                              parentReferenceNodeId, intVariableName,
                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nil, nil);
   Memo1.Lines.Append(Format('Server add variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
@@ -540,11 +652,17 @@ var
   value: UA_Variant;
   res: UA_StatusCode;
 begin
-  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, PAnsiChar(eServerVariableName.Text));
+  if not assigned(FServer) then
+  begin
+      Memo1.Lines.Append('server not connected');
+     exit;
+  end;
+  intVariableNodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbServerNS.Text){name space index}, eServerVariableName.Text);
   UA_Variant_init(value);
   UA_Variant_setInteger(value, StrToInt(eServerVariableValue.Text));
-  res := UA_Server_writeValue(server, intVariableNodeId, value);
+  res := UA_Server_writeValue(Fserver.server, intVariableNodeId, value);
   Memo1.Lines.Append(Format('Server write to variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
+  UA_NodeId_clear(intVariableNodeId);
 end;
 
 end.

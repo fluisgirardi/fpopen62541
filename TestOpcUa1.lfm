@@ -7,7 +7,9 @@ object TestOpcUaForm: TTestOpcUaForm
   ClientHeight = 525
   ClientWidth = 541
   OnClose = FormClose
-  LCLVersion = '2.0.6.0'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '2.0.10.0'
   object Memo1: TMemo
     Left = 8
     Height = 170
@@ -22,7 +24,7 @@ object TestOpcUaForm: TTestOpcUaForm
     Height = 66
     Top = 448
     Width = 521
-    Anchors = [akTop, akLeft, akRight]
+    Anchors = [akLeft, akRight, akBottom]
     ScrollBars = ssVertical
     TabOrder = 1
   end
@@ -37,22 +39,22 @@ object TestOpcUaForm: TTestOpcUaForm
     TabOrder = 2
     object tabClient: TTabSheet
       Caption = 'OPC UA Client'
-      ClientHeight = 228
+      ClientHeight = 230
       ClientWidth = 517
       object Label1: TLabel
         Left = 8
-        Height = 15
+        Height = 13
         Top = 16
-        Width = 78
+        Width = 73
         Caption = 'OPC UA Server'
         ParentColor = False
       end
       object cbServer: TComboBox
         Left = 96
-        Height = 23
+        Height = 21
         Top = 12
         Width = 324
-        ItemHeight = 15
+        ItemHeight = 13
         Items.Strings = (
           'opc.tcp://localhost:53530/OPCUA/SimulationServer'
           'opc.tcp://localhost:4840/'
@@ -76,23 +78,23 @@ object TestOpcUaForm: TTestOpcUaForm
         Top = 48
         Width = 513
         Caption = 'Variables'
-        ClientHeight = 156
+        ClientHeight = 158
         ClientWidth = 509
         TabOrder = 2
         object lNamespace: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 16
-          Width = 62
+          Width = 55
           Caption = 'Namespace'
           ParentColor = False
         end
         object cbNS: TComboBox
           Left = 96
-          Height = 23
+          Height = 21
           Top = 8
           Width = 48
-          ItemHeight = 15
+          ItemHeight = 13
           ItemIndex = 1
           Items.Strings = (
             '1'
@@ -106,18 +108,18 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lNodeType: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 40
-          Width = 71
+          Width = 65
           Caption = 'Node Id Type'
           ParentColor = False
         end
         object cbNodeType: TComboBox
           Left = 96
-          Height = 23
+          Height = 21
           Top = 32
           Width = 72
-          ItemHeight = 15
+          ItemHeight = 13
           ItemIndex = 1
           Items.Strings = (
             'numeric'
@@ -129,15 +131,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lNodeId: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 68
-          Width = 42
+          Width = 38
           Caption = 'Node Id'
           ParentColor = False
         end
         object eNodeId: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 60
           Width = 312
           TabOrder = 2
@@ -162,15 +164,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lNodeValue: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 96
-          Width = 29
+          Width = 26
           Caption = 'Value'
           ParentColor = False
         end
         object eNodeValue: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 88
           Width = 312
           TabOrder = 3
@@ -179,7 +181,7 @@ object TestOpcUaForm: TTestOpcUaForm
     end
     object tabServer: TTabSheet
       Caption = 'OPC UA Server'
-      ClientHeight = 228
+      ClientHeight = 230
       ClientWidth = 517
       object btnServerStart: TToggleBox
         Left = 434
@@ -196,23 +198,23 @@ object TestOpcUaForm: TTestOpcUaForm
         Top = 48
         Width = 513
         Caption = 'Variable'
-        ClientHeight = 156
+        ClientHeight = 158
         ClientWidth = 509
         TabOrder = 1
         object lNamespace1: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 16
-          Width = 62
+          Width = 55
           Caption = 'Namespace'
           ParentColor = False
         end
         object cbServerNS: TComboBox
           Left = 96
-          Height = 23
+          Height = 21
           Top = 8
           Width = 48
-          ItemHeight = 15
+          ItemHeight = 13
           ItemIndex = 0
           Items.Strings = (
             '1'
@@ -223,15 +225,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lVariableName: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 40
-          Width = 75
+          Width = 67
           Caption = 'Variable name'
           ParentColor = False
         end
         object eServerVariableName: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 32
           Width = 312
           TabOrder = 1
@@ -239,15 +241,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lNodeValue1: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 96
-          Width = 29
+          Width = 26
           Caption = 'Value'
           ParentColor = False
         end
         object eServerVariableValue: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 88
           Width = 312
           TabOrder = 3
