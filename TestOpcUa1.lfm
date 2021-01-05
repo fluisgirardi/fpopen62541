@@ -7,6 +7,8 @@ object TestOpcUaForm: TTestOpcUaForm
   ClientHeight = 525
   ClientWidth = 541
   OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   LCLVersion = '2.0.10.0'
   object Memo1: TMemo
     Left = 8
@@ -22,7 +24,7 @@ object TestOpcUaForm: TTestOpcUaForm
     Height = 66
     Top = 448
     Width = 521
-    Anchors = [akTop, akLeft, akRight]
+    Anchors = [akLeft, akRight, akBottom]
     ScrollBars = ssVertical
     TabOrder = 1
   end
@@ -179,7 +181,7 @@ object TestOpcUaForm: TTestOpcUaForm
     end
     object tabServer: TTabSheet
       Caption = 'OPC UA Server'
-      ClientHeight = 228
+      ClientHeight = 230
       ClientWidth = 517
       object btnServerStart: TToggleBox
         Left = 434
@@ -201,9 +203,9 @@ object TestOpcUaForm: TTestOpcUaForm
         TabOrder = 1
         object lNamespace1: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 16
-          Width = 62
+          Width = 55
           Caption = 'Namespace'
           ParentColor = False
         end
@@ -223,15 +225,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lVariableName: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 40
-          Width = 75
+          Width = 67
           Caption = 'Variable name'
           ParentColor = False
         end
         object eServerVariableName: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 32
           Width = 312
           TabOrder = 1
@@ -239,15 +241,15 @@ object TestOpcUaForm: TTestOpcUaForm
         end
         object lNodeValue1: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 96
-          Width = 29
+          Width = 26
           Caption = 'Value'
           ParentColor = False
         end
         object eServerVariableValue: TEdit
           Left = 96
-          Height = 23
+          Height = 21
           Top = 88
           Width = 312
           TabOrder = 3

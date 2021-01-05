@@ -17,14 +17,19 @@ type
   PtrInt = NativeInt;
   {$IFEND}
 
+  TTestOpcUaForm = class;
+
   { TServerThread }
 
   TServerThread = class(TThread)
     running:UA_Boolean;
     server:PUA_Server;
-    constructor create;
+    FOwner:TTestOpcUaForm;
+    constructor create(owner:TTestOpcUaForm);
     destructor destroy;override;
     procedure execute;override;
+  private
+    procedure Log(const msg: string);
   end;
 
   { TTestOpcUaForm }
@@ -66,10 +71,14 @@ type
     procedure btnServerWriteVariableClick(Sender: TObject);
     procedure btnWriteVariableClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FServer: TServerThread;
     procedure CheckConnection;
     procedure SubscriptionCallback(Data: PtrInt);
+    procedure LogClient(const msg:string);
+    procedure LogServer(data:ptrint);
   public
 
   end;
@@ -81,14 +90,59 @@ implementation
 
 {$R *.lfm}
 
+type
+  TLogFunction =
+   procedure (logContext: Pointer; level: UA_LogLevel;
+     category: UA_LogCategory; msg: PAnsiChar);cdecl;
+
+const
+{$IFDEF WINDOWS}
+  libpascallog='ua_pascallog.dll';
+{$ELSE}
+  libpascallog='libua_pascallog.so';
+{$ENDIF}
+
+
+var UA_Pascal_logger:  function(context: pointer; func:TLogFunction):UA_logger;cdecl=nil;
+    LoggerLibHandle: TLibHandle;
+
+procedure LoadLogLibrary;
+begin
+  LoggerLibHandle := LoadLibrary(libpascallog);
+  if LoggerLibHandle=NilHandle then
+  begin
+    exit;
+  end;
+  pointer(UA_Pascal_logger) := GetProcedureAddress(LoggerLibHandle,'UA_Pascal_logger');
+end;
+
+procedure UnloadLogLibrary;
+begin
+  if LoggerLibHandle<>NilHandle then
+    UnloadLibrary(LoggerLibHandle);
+end;
+
 var
   client: PUA_Client;
 
 { TServerThread }
 
-constructor TServerThread.create;
+procedure client_log_cb(logContext: Pointer; level: UA_LogLevel;
+  category: UA_LogCategory; msg: PAnsiChar); cdecl;
+begin
+  TTestOpcUaForm(logContext).LogClient(msg);
+end;
+
+procedure server_log_cb(logContext: Pointer; level: UA_LogLevel;
+  category: UA_LogCategory; msg: PAnsiChar); cdecl;
+begin
+  TServerThread(logContext).Log(msg);
+end;
+
+constructor TServerThread.create(owner:TTestOpcUaForm);
 begin
   LoadOpen62541();
+  FOwner:=Owner;
   inherited create(false);
 end;
 
@@ -99,12 +153,25 @@ begin
   UnloadOpen62541();
 end;
 
+procedure TServerThread.Log(const msg:string);
+var
+  s: PString;
+begin
+  new(s);
+  s^:=msg;
+  Application.QueueAsyncCall(@FOwner.LogServer,ptrint(s));
+end;
+
 procedure TServerThread.execute;
 var
   res: UA_StatusCode;
+  conf: PUA_ServerConfig;
 begin
   server:=UA_Server_new();
-  res:=UA_ServerConfig_setDefault(UA_Server_getConfig(server));
+  conf:=UA_Server_getConfig(server);
+  if UA_Pascal_logger<>nil then
+    conf^.logger:=UA_Pascal_logger(self, @server_log_cb);
+  res:=UA_ServerConfig_setDefault(conf);
   running:=true;
   res:=UA_Server_run(server, @running);
 end;
@@ -118,6 +185,16 @@ begin
   UnloadOpen62541();
 end;
 
+procedure TTestOpcUaForm.FormCreate(Sender: TObject);
+begin
+  LoadLogLibrary;
+end;
+
+procedure TTestOpcUaForm.FormDestroy(Sender: TObject);
+begin
+  UnloadLogLibrary;
+end;
+
 procedure TTestOpcUaForm.CheckConnection;
 begin
   if client = nil then raise Exception.Create('Application is not connected to OPC UA Server!');
@@ -126,6 +203,17 @@ end;
 procedure TTestOpcUaForm.SubscriptionCallback(Data: PtrInt);
 begin
   Memo1.Lines.Append(Format('Main thread Subscription Callback: %d',[Data]));
+end;
+
+procedure TTestOpcUaForm.LogClient(const msg: string);
+begin
+  Memo1.Lines.Add('(client) '+msg);
+end;
+
+procedure TTestOpcUaForm.LogServer(data:ptrint);
+begin
+  Memo1.Lines.Add('(server) '+PString(data)^);
+  Dispose(PString(data));
 end;
 
 // callback
@@ -212,6 +300,9 @@ begin
 
   conf^.clientDescription.applicationName := _UA_LOCALIZEDTEXT_ALLOC('en-US','My Test Application');
   UA_ClientConfig_setDefault(conf);
+
+  if UA_Pascal_logger<>nil then
+    conf^.logger:=UA_Pascal_logger(self, @client_log_cb);
 
   conf^.customDataTypes := @MyCustomDataTypes;
 
@@ -513,10 +604,9 @@ begin
     Memo1.Lines.Add('stopped');
   end else
   begin
-    FServer:=TServerThread.create;
+    FServer:=TServerThread.create(self);
     Memo1.Lines.Add('started');
   end;
-
 end;
 
 procedure TTestOpcUaForm.btnServerAddVariableClick(Sender: TObject);

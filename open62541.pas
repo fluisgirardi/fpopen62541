@@ -1221,7 +1221,10 @@ type
   { --- server_config.h --- }
   { ----------------------- }
   UA_ServerConfig = record
+      nThreads:UA_UInt16; //only if multithreading is enabled
+      logger:UA_Logger;
   {
+    FIXME define the remaining fields
   }
   end;
   PUA_ServerConfig = ^UA_ServerConfig;
