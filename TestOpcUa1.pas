@@ -10,12 +10,22 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls;
+  ExtCtrls, open62541;
 
 type
   {$IF NOT DECLARED(PtrInt)}
   PtrInt = NativeInt;
   {$IFEND}
+
+  { TServerThread }
+
+  TServerThread = class(TThread)
+    running:UA_Boolean;
+    server:PUA_Server;
+    constructor create;
+    destructor destroy;override;
+    procedure execute;override;
+  end;
 
   { TTestOpcUaForm }
 
@@ -57,6 +67,7 @@ type
     procedure btnWriteVariableClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
+    FServer: TServerThread;
     procedure CheckConnection;
     procedure SubscriptionCallback(Data: PtrInt);
   public
@@ -68,25 +79,42 @@ var
 
 implementation
 
-uses
-  open62541;
-
 {$R *.lfm}
 
 var
   client: PUA_Client;
-  server: PUA_Server;
-  server_running: UA_Boolean;
+
+{ TServerThread }
+
+constructor TServerThread.create;
+begin
+  LoadOpen62541();
+  inherited create(false);
+end;
+
+destructor TServerThread.destroy;
+begin
+  running:=false;
+  inherited destroy;
+  UnloadOpen62541();
+end;
+
+procedure TServerThread.execute;
+var
+  res: UA_StatusCode;
+begin
+  server:=UA_Server_new();
+  res:=UA_ServerConfig_setDefault(UA_Server_getConfig(server));
+  running:=true;
+  res:=UA_Server_run(server, @running);
+end;
 
 procedure TTestOpcUaForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if client <> nil then
     UA_Client_delete(client); // Disconnects the client internally
                               //  UA_Client_delete() -> UA_ClientConfig_clear() -> UA_ApplicationDescription_clear() -> UA_clear() ... -> UA_Array_delete() -> UA_free
-  server_running := False;
-  if server <> nil then
-    UA_Server_delete(server);
-
+  FreeAndNil(FServer);
   UnloadOpen62541();
 end;
 
@@ -475,35 +503,20 @@ begin
   UA_NodeId_clear(nodeId);
 end;
 
-
 procedure TTestOpcUaForm.btnServerStartClick(Sender: TObject);
 var
   res: UA_StatusCode;
 begin
-  if server_running = True then begin
-    server_running := False;
+  if Assigned(FServer) then begin
+    FreeAndNil(FServer);
     btnServerStart.Checked := False;
-    Exit;
+    Memo1.Lines.Add('stopped');
+  end else
+  begin
+    FServer:=TServerThread.create;
+    Memo1.Lines.Add('started');
   end;
 
-  if server = nil then begin
-    LoadOpen62541();
-    server := UA_Server_new();
-    UA_ServerConfig_setDefault(UA_Server_getConfig(server));
-  end;
-
-  // Start OPC UA Server
-  server_running := True;
-  //res := UA_Server_run(server, @server_running); // call does not return until global variable "server_running" is set to false
-  res := UA_Server_run_startup(server);
-  btnServerStart.Checked := res=UA_STATUSCODE_GOOD;
-  Memo1.Lines.Append(Format('Server run opc.tcp://localhost:4840/ (Result=%x)', [res]));
-  repeat
-    sleep(UA_Server_run_iterate(server, True));
-    Application.ProcessMessages;
-  until server_running=False;
-  res := UA_Server_run_shutdown(server);
-  Memo1.Lines.Append(Format('Server shutdown (Result=%x)', [res]));
 end;
 
 procedure TTestOpcUaForm.btnServerAddVariableClick(Sender: TObject);
@@ -516,6 +529,11 @@ var
   varlang:AnsiString;
   varname:AnsiString;
 begin
+  if not assigned(FServer) then
+  begin
+      Memo1.Lines.Append('server not connected');
+     exit;
+  end;
   varlang:='en-US';
   varname:=eServerVariableName.Text;
   (* Define the attribute of the myInteger variable node *)
@@ -532,7 +550,7 @@ begin
   intVariableName := _UA_QUALIFIEDNAME(StrToInt(cbServerNS.Text), varname);
   parentNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   parentReferenceNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
-  res := UA_Server_addVariableNode(server, intVariableNodeId, parentNodeId,
+  res := UA_Server_addVariableNode(FServer.server, intVariableNodeId, parentNodeId,
                              parentReferenceNodeId, intVariableName,
                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nil, nil);
   Memo1.Lines.Append(Format('Server add variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
@@ -544,10 +562,15 @@ var
   value: UA_Variant;
   res: UA_StatusCode;
 begin
+  if not assigned(FServer) then
+  begin
+      Memo1.Lines.Append('server not connected');
+     exit;
+  end;
   intVariableNodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbServerNS.Text){name space index}, eServerVariableName.Text);
   UA_Variant_init(value);
   UA_Variant_setInteger(value, StrToInt(eServerVariableValue.Text));
-  res := UA_Server_writeValue(server, intVariableNodeId, value);
+  res := UA_Server_writeValue(Fserver.server, intVariableNodeId, value);
   Memo1.Lines.Append(Format('Server write to variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
   UA_NodeId_clear(intVariableNodeId);
 end;
