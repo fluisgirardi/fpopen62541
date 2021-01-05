@@ -194,7 +194,7 @@ begin
 
 
   (*** Connection - Anonymous user, Security None ***)
-  res := UA_Client_connect(client, PAnsiChar(cbServer.Text));
+  res := UA_Client_connect(client, cbServer.Text);
   //res := UA_Client_connectUsername(client, PAnsiChar(cbServer.Text),'test','test');
   if res <> UA_STATUSCODE_GOOD then begin
     Memo1.Lines.Append(Format('Fail status code: %x %s', [res, AnsiString(UA_StatusCode_name(res))]));
@@ -346,7 +346,7 @@ begin
 
   case cbNodeType.ItemIndex of
     0:   NodeId := UA_NODEID_NUMERIC(StrToInt(cbNS.Text), StrToInt(eNodeId.Text));
-    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), PAnsiChar(AnsiString(eNodeId.Text)));
+    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), eNodeId.Text);
   end;
 
   // get data type of requested variable
@@ -437,7 +437,7 @@ begin
 
   case cbNodeType.ItemIndex of
     0:   NodeId := UA_NODEID_NUMERIC(StrToInt(cbNS.Text), StrToInt(eNodeId.Text));
-    else NodeId := UA_NODEID_STRING(StrToInt(cbNS.Text), PAnsiChar(eNodeId.Text));
+    else NodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbNS.Text), eNodeId.Text);
   end;
 
   // check varible Data Type on server
@@ -513,19 +513,23 @@ var
   intVariableNodeId, parentNodeId, parentReferenceNodeId: UA_NodeId;
   intVariableName: UA_QualifiedName;
   res: UA_StatusCode;
+  varlang:AnsiString;
+  varname:AnsiString;
 begin
+  varlang:='en-US';
+  varname:=eServerVariableName.Text;
   (* Define the attribute of the myInteger variable node *)
   attr := UA_VariableAttributes_default;
   intVariable := StrToInt(eServerVariableValue.Text);
   UA_Variant_setScalar(@attr.value, @intVariable, @UA_TYPES[UA_TYPES_INT32]);
-  attr.description := _UA_LOCALIZEDTEXT('en-US', PAnsiChar(eServerVariableName.Text));
-  attr.displayName := _UA_LOCALIZEDTEXT('en-US', PAnsiChar(eServerVariableName.Text));
+  attr.description := _UA_LOCALIZEDTEXT(varlang, varname);
+  attr.displayName := _UA_LOCALIZEDTEXT(varlang, varname);
   attr.dataType := UA_TYPES[UA_TYPES_INT32].typeId;
   attr.accessLevel := UA_ACCESSLEVELMASK_READ or UA_ACCESSLEVELMASK_WRITE;
 
   (* Add the variable node to the information model *)
-  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, PAnsiChar(eServerVariableName.Text));
-  intVariableName := _UA_QUALIFIEDNAME(StrToInt(cbServerNS.Text), PAnsiChar(eServerVariableName.Text));
+  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, varname);
+  intVariableName := _UA_QUALIFIEDNAME(StrToInt(cbServerNS.Text), varname);
   parentNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   parentReferenceNodeId := UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
   res := UA_Server_addVariableNode(server, intVariableNodeId, parentNodeId,
@@ -540,11 +544,12 @@ var
   value: UA_Variant;
   res: UA_StatusCode;
 begin
-  intVariableNodeId := UA_NODEID_STRING(StrToInt(cbServerNS.Text){name space index}, PAnsiChar(eServerVariableName.Text));
+  intVariableNodeId := UA_NODEID_STRING_ALLOC(StrToInt(cbServerNS.Text){name space index}, eServerVariableName.Text);
   UA_Variant_init(value);
   UA_Variant_setInteger(value, StrToInt(eServerVariableValue.Text));
   res := UA_Server_writeValue(server, intVariableNodeId, value);
   Memo1.Lines.Append(Format('Server write to variable "%s" (Result=%x)', [eServerVariableName.Text, res]));
+  UA_NodeId_clear(intVariableNodeId);
 end;
 
 end.
