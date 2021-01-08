@@ -1,3 +1,4 @@
+
 Version 1.1
 ===========
 Windows DLLs downloaded from:
@@ -8,3 +9,12 @@ Changelog
 =========
 Jun 2020	1.1	Initial release
 Dec 2020	1.1.3	Maintenance release (extended TestOpcUa demo application; updated DLLs)
+
+Authors
+=======
+Lacak <lacak At Sourceforge>
+
+Contributors
+============
+Luca Olivetti <>
+

@@ -6,6 +6,11 @@
  * They can be reused under any license and changes do not have to be published.
  *
  * Version 1.1 released on 13 Jun 2020
+ *
+ * Author: Lacak <lacak At Sourceforge>
+ *
+ * Contributors: 
+ *   Luca Olivetti <>
  *)
 unit open62541;
 
