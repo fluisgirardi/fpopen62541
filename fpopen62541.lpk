@@ -7,14 +7,18 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)\"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="1">
+    <Files Count="2">
       <Item1>
         <Filename Value="open62541.pas"/>
         <UnitName Value="open62541"/>
       </Item1>
+      <Item2>
+        <Filename Value="statuscodes.inc"/>
+        <Type Value="Include"/>
+      </Item2>
     </Files>
     <RequiredPkgs Count="1">
       <Item1>
