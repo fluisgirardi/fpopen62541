@@ -10,7 +10,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="2">
+    <Files Count="3">
       <Item1>
         <Filename Value="open62541.pas"/>
         <UnitName Value="open62541"/>
@@ -19,6 +19,10 @@
         <Filename Value="statuscodes.inc"/>
         <Type Value="Include"/>
       </Item2>
+      <Item3>
+        <Filename Value="types_generated.inc"/>
+        <Type Value="Include"/>
+      </Item3>
     </Files>
     <RequiredPkgs Count="1">
       <Item1>
