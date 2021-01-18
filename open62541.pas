@@ -190,19 +190,6 @@ type
       UA_LOGCATEGORY_SECURITYPOLICY
   );
 
-  (**
-   * ApplicationType
-   * ^^^^^^^^^^^^^^^
-   * The types of applications. *)
-  UA_ApplicationType = (
-      UA_APPLICATIONTYPE_SERVER = 0,
-      UA_APPLICATIONTYPE_CLIENT = 1,
-      UA_APPLICATIONTYPE_CLIENTANDSERVER = 2,
-      UA_APPLICATIONTYPE_DISCOVERYSERVER = 3,
-      __UA_APPLICATIONTYPE_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_ApplicationType) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
   UA_Logger = record
       (* Log a message. The message string and following varargs are formatted
        * according to the rules of the printf command. Use the convenience macros
@@ -265,6 +252,7 @@ type
       namespaceIndex: UA_UInt16;
       name: UA_String;
   end;
+  PUA_QualifiedName = ^UA_QualifiedName;
 
   (**
    * LocalizedText
@@ -274,6 +262,7 @@ type
       locale: UA_String;
       text: UA_String;
   end;
+  PUA_LocalizedText = ^UA_LocalizedText;
 
   (**
    * NumericRange
@@ -544,399 +533,13 @@ type
   { ------------------------- }
   { --- types_generated.h --- }
   { ------------------------- }
-
-  (**
-   * VariableAttributes
-   * ^^^^^^^^^^^^^^^^^^
-   * The attributes for a variable node. *)
-  UA_VariableAttributes = record
-      specifiedAttributes: UA_UInt32;
-      displayName: UA_LocalizedText;
-      description: UA_LocalizedText;
-      writeMask: UA_UInt32;
-      userWriteMask: UA_UInt32;
-      value: UA_Variant;
-      dataType: UA_NodeId;
-      valueRank: UA_Int32;
-      arrayDimensionsSize: size_t;
-      arrayDimensions: PUA_UInt32;
-      accessLevel: UA_Byte;
-      userAccessLevel: UA_Byte;
-      minimumSamplingInterval: UA_Double;
-      historizing: UA_Boolean;
-  end;
-  PUA_VariableAttributes = ^UA_VariableAttributes;
-
-  (**
-   * MessageSecurityMode
-   * ^^^^^^^^^^^^^^^^^^^
-   * The type of security to use on a message. *)
-  UA_MessageSecurityMode = (
-      UA_MESSAGESECURITYMODE_INVALID = 0,
-      UA_MESSAGESECURITYMODE_NONE = 1,
-      UA_MESSAGESECURITYMODE_SIGN = 2,
-      UA_MESSAGESECURITYMODE_SIGNANDENCRYPT = 3,
-      __UA_MESSAGESECURITYMODE_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_MessageSecurityMode) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  (**
-   * ApplicationDescription
-   * ^^^^^^^^^^^^^^^^^^^^^^
-   * Describes an application and how to find it. *)
-  UA_ApplicationDescription = record
-      applicationUri: UA_String;
-      productUri: UA_String;
-      applicationName: UA_LocalizedText;
-      applicationType: UA_ApplicationType;
-      gatewayServerUri: UA_String;
-      discoveryProfileUri: UA_String;
-      discoveryUrlsSize: size_t;
-      discoveryUrls: PUA_String;
-  end;
-
-  (**
-   * BrowseResultMask
-   * ^^^^^^^^^^^^^^^^
-   * A bit mask which specifies what should be returned in a browse response. *)
-  UA_BrowseResultMask = (
-      UA_BROWSERESULTMASK_NONE = 0,
-      UA_BROWSERESULTMASK_REFERENCETYPEID = 1,
-      UA_BROWSERESULTMASK_ISFORWARD = 2,
-      UA_BROWSERESULTMASK_REFERENCETYPEINFO = 3,
-      UA_BROWSERESULTMASK_NODECLASS = 4,
-      UA_BROWSERESULTMASK_BROWSENAME = 8,
-      UA_BROWSERESULTMASK_DISPLAYNAME = 16,
-      UA_BROWSERESULTMASK_TYPEDEFINITION = 32,
-      UA_BROWSERESULTMASK_TARGETINFO = 60,
-      UA_BROWSERESULTMASK_ALL = 63,
-      __UA_BROWSERESULTMASK_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_BrowseResultMask) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  (**
-   * RequestHeader
-   * ^^^^^^^^^^^^^
-   * The header passed with every server request. *)
-  UA_RequestHeader = record
-      authenticationToken: UA_NodeId;
-      timestamp: UA_DateTime;
-      requestHandle: UA_UInt32;
-      returnDiagnostics: UA_UInt32;
-      auditEntryId: UA_String;
-      timeoutHint: UA_UInt32;
-      additionalHeader: UA_ExtensionObject;
-  end;
-
-  (**
-   * ResponseHeader
-   * ^^^^^^^^^^^^^^
-   * The header passed with every server response. *)
-  UA_ResponseHeader = record
-      timestamp: UA_DateTime;
-      requestHandle: UA_UInt32;
-      serviceResult: UA_StatusCode;
-      serviceDiagnostics: UA_DiagnosticInfo;
-      stringTableSize: size_t;
-      stringTable: PUA_String;
-      additionalHeader: UA_ExtensionObject;
-  end;
-
-  (**
-   * ReadResponse
-   * ^^^^^^^^^^^^
-   *)
-  UA_ReadResponse = record
-      responseHeader: UA_ResponseHeader;
-      resultsSize: size_t;
-      results: PUA_DataValue;
-      diagnosticInfosSize: size_t;
-      diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-
-  UA_TimestampsToReturn = (
-      UA_TIMESTAMPSTORETURN_SOURCE = 0,
-      UA_TIMESTAMPSTORETURN_SERVER = 1,
-      UA_TIMESTAMPSTORETURN_BOTH = 2,
-      UA_TIMESTAMPSTORETURN_NEITHER = 3,
-      UA_TIMESTAMPSTORETURN_INVALID = 4,
-      __UA_TIMESTAMPSTORETURN_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_TimestampsToReturn) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  UA_NodeClass = (
-      UA_NODECLASS_UNSPECIFIED = 0,
-      UA_NODECLASS_OBJECT = 1,
-      UA_NODECLASS_VARIABLE = 2,
-      UA_NODECLASS_METHOD = 4,
-      UA_NODECLASS_OBJECTTYPE = 8,
-      UA_NODECLASS_VARIABLETYPE = 16,
-      UA_NODECLASS_REFERENCETYPE = 32,
-      UA_NODECLASS_DATATYPE = 64,
-      UA_NODECLASS_VIEW = 128,
-      __UA_NODECLASS_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_NodeClass) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  UA_ReadValueId = record
-      nodeId: UA_NodeId;
-      attributeId: UA_UInt32;
-      indexRange: UA_String;
-      dataEncoding: UA_QualifiedName;
-  end;
-
-  (**
-   * ViewDescription
-   * ^^^^^^^^^^^^^^^
-   * The view to browse. *)
-  UA_ViewDescription = record
-      viewId: UA_NodeId;
-      timestamp: UA_DateTime;
-      viewVersion: UA_UInt32;
-  end;
-
-  (*
-   * UserTokenPolicy
-   * ^^^^^^^^^^^^^^^
-   * Describes a user token that can be used with a server. *)
-  UA_UserTokenType = (
-     UA_USERTOKENTYPE_ANONYMOUS = 0,
-     UA_USERTOKENTYPE_USERNAME = 1,
-     UA_USERTOKENTYPE_CERTIFICATE = 2,
-     UA_USERTOKENTYPE_ISSUEDTOKEN = 3,
-     __UA_USERTOKENTYPE_FORCE32BIT = $7fffffff
-     );
-  {$IF SizeOf(UA_UserTokenType) <> SizeOf(UA_Int32)}{$MESSAGE ERROR enum_must_be_32bit}{$IFEND}
-
-  UA_UserTokenPolicy = record
-      policyId : UA_String;
-      tokenType : UA_UserTokenType;
-      issuedTokenType : UA_String;
-      issuerEndpointUrl : UA_String;
-      securityPolicyUri : UA_String;
-  end;
-
- (*
-  * EndpointDescription
-  * ^^^^^^^^^^^^^^^^^^^
-  * The description of a endpoint that can be used to access a server.*)
-  UA_EndpointDescription = record
-     endpointUrl : UA_String;
-     server : UA_ApplicationDescription;
-     serverCertificate : UA_ByteString;
-     securityMode : UA_MessageSecurityMode;
-     securityPolicyUri : UA_String;
-     userIdentityTokensSize : size_t;
-     userIdentityTokens : ^UA_UserTokenPolicy;
-     transportProfileUri : UA_String;
-     securityLevel : UA_Byte;
-   end;
-
-  (**
-   * UserNameIdentityToken
-   * ^^^^^^^^^^^^^^^^^^^^^
-   * A token representing a user identified by a user name and password. *)
-  UA_UserNameIdentityToken = record
-      policyId: UA_String ;
-      userName: UA_String;
-      password: UA_ByteString;
-      encryptionAlgorithm: UA_String;
-  end;
-  PUA_UserNameIdentityToken = ^UA_UserNameIdentityToken;
-
-  (**
-   * NodeAttributes
-   * ^^^^^^^^^^^^^^
-   * The base attributes for all nodes. *)
-  UA_NodeAttributes = record
-      specifiedAttributes: UA_UInt32;
-      displayName: UA_LocalizedText;
-      description: UA_LocalizedText;
-      writeMask: UA_UInt32;
-      userWriteMask: UA_UInt32;
-  end;
-  PUA_NodeAttributes = ^UA_NodeAttributes;
-
-  (**
-   * ReferenceDescription
-   * ^^^^^^^^^^^^^^^^^^^^
-   * The description of a reference. *)
-  UA_ReferenceDescription = record
-      referenceTypeId: UA_NodeId;
-      isForward: UA_Boolean;
-      nodeId: UA_ExpandedNodeId;
-      browseName: UA_QualifiedName;
-      displayName: UA_LocalizedText;
-      nodeClass: UA_NodeClass;
-      typeDefinition: UA_ExpandedNodeId;
-  end;
-  PUA_ReferenceDescription = ^UA_ReferenceDescription;
-
-  UA_CreateSubscriptionRequest = record
-      requestHeader: UA_RequestHeader;
-      requestedPublishingInterval: UA_Double;
-      requestedLifetimeCount: UA_UInt32;
-      requestedMaxKeepAliveCount: UA_UInt32;
-      maxNotificationsPerPublish: UA_UInt32;
-      publishingEnabled: UA_Boolean;
-      priority: UA_Byte;
-  end;
-
-  UA_CreateSubscriptionResponse = record
-      responseHeader: UA_ResponseHeader;
-      subscriptionId: UA_UInt32;
-      revisedPublishingInterval: UA_Double;
-      revisedLifetimeCount: UA_UInt32;
-      revisedMaxKeepAliveCount: UA_UInt32;
-  end;
-
-  UA_DeleteSubscriptionsRequest = record
-      requestHeader: UA_RequestHeader;
-      subscriptionIdsSize: size_t;
-      subscriptionIds: PUA_UInt32;
-  end;
-
-  UA_DeleteSubscriptionsResponse = record
-      responseHeader: UA_ResponseHeader;
-      resultsSize: size_t;
-      results: ^UA_StatusCode;
-      diagnosticInfosSize: size_t;
-      diagnosticInfos: ^UA_DiagnosticInfo;
-  end;
-
-  UA_StatusChangeNotification = record
-      status: UA_StatusCode;
-      diagnosticInfo: UA_DiagnosticInfo;
-  end;
-  PUA_StatusChangeNotification = ^UA_StatusChangeNotification;
-
-  UA_MonitoringMode = (
-      UA_MONITORINGMODE_DISABLED = 0,
-      UA_MONITORINGMODE_SAMPLING = 1,
-      UA_MONITORINGMODE_REPORTING = 2,
-      __UA_MONITORINGMODE_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_MonitoringMode) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  UA_MonitoringParameters = record
-      clientHandle: UA_UInt32;
-      samplingInterval: UA_Double;
-      filter: UA_ExtensionObject;
-      queueSize: UA_UInt32;
-      discardOldest: UA_Boolean;
-  end;
-
-  UA_MonitoredItemCreateRequest = record
-      itemToMonitor: UA_ReadValueId;
-      monitoringMode: UA_MonitoringMode;
-      requestedParameters: UA_MonitoringParameters;
-  end;
-
-  UA_MonitoredItemCreateResult = record
-      statusCode: UA_StatusCode;
-      monitoredItemId: UA_UInt32;
-      revisedSamplingInterval: UA_Double;
-      revisedQueueSize: UA_UInt32;
-      filterResult: UA_ExtensionObject;
-  end;
-
-  UA_CreateMonitoredItemsRequest = record
-      requestHeader: UA_RequestHeader;
-      subscriptionId: UA_UInt32;
-      timestampsToReturn: UA_TimestampsToReturn;
-      itemsToCreateSize: size_t;
-      itemsToCreate: ^UA_MonitoredItemCreateRequest;
-  end;
-
-  UA_CreateMonitoredItemsResponse = record
-      responseHeader: UA_ResponseHeader;
-      resultsSize: size_t;
-      results: ^UA_MonitoredItemCreateResult;
-      diagnosticInfosSize: size_t;
-      diagnosticInfos: ^UA_DiagnosticInfo;
-  end;
-
-  (**
-   * ReadRequest
-   * ^^^^^^^^^^^
-   *)
-  UA_ReadRequest = record
-    requestHeader: UA_RequestHeader;
-    maxAge: UA_Double;
-    timestampsToReturn: UA_TimestampsToReturn;
-    nodesToReadSize: size_t;
-    nodesToRead: ^UA_ReadValueId;
-  end;
-
-  (**
-   * BrowseDirection
-   * ^^^^^^^^^^^^^^^
-   * The directions of the references to return. *)
-  UA_BrowseDirection = (
-      UA_BROWSEDIRECTION_FORWARD = 0,
-      UA_BROWSEDIRECTION_INVERSE = 1,
-      UA_BROWSEDIRECTION_BOTH = 2,
-      UA_BROWSEDIRECTION_INVALID = 3,
-      __UA_BROWSEDIRECTION_FORCE32BIT = $7fffffff
-  );
-  {$IF SizeOf(UA_BrowseDirection) <> SizeOf(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-  (**
-   * BrowseDescription
-   * ^^^^^^^^^^^^^^^^^
-   * A request to browse the the references from a node. *)
-  UA_BrowseDescription = record
-      nodeId: UA_NodeId;
-      browseDirection: UA_BrowseDirection;
-      referenceTypeId: UA_NodeId;
-      includeSubtypes: UA_Boolean;
-      nodeClassMask: UA_NodeClass;
-      resultMask: UA_BrowseResultMask;
-  end;
-  PUA_BrowseDescription = ^UA_BrowseDescription;
-
-  (**
-   * BrowseRequest
-   * ^^^^^^^^^^^^^
-   * Browse the references for one or more nodes from the server address space. *)
-  UA_BrowseRequest = record
-      requestHeader: UA_RequestHeader;
-      view: UA_ViewDescription;
-      requestedMaxReferencesPerNode: UA_UInt32;
-      nodesToBrowseSize: size_t;
-      nodesToBrowse: PUA_BrowseDescription;
-  end;
-  PUA_BrowseRequest = ^UA_BrowseRequest;
-
-  (**
-   * BrowseResult
-   * ^^^^^^^^^^^^
-   * The result of a browse operation. *)
-  UA_BrowseResult = record
-      statusCode: UA_StatusCode;
-      continuationPoint: UA_ByteString;
-      referencesSize: size_t;
-      references: PUA_ReferenceDescription;
-  end;
-  PUA_BrowseResult = ^UA_BrowseResult;
-
-  (**
-   * BrowseResponse
-   * ^^^^^^^^^^^^^^
-   * Browse the references for one or more nodes from the server address space. *)
-  UA_BrowseResponse = record
-      responseHeader: UA_ResponseHeader;
-      resultsSize: size_t;
-      results: PUA_BrowseResult;
-      diagnosticInfosSize: size_t;
-      diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_BrowseResponse = ^UA_BrowseResponse;
-
+  {$I types_generated.inc}
 
   { ---------------- }
   { --- common.h --- }
   { ---------------- }
+
+  type
 
   (**
    * Standard-Defined Constants
@@ -1263,16 +866,7 @@ const
   { --- nodeids.h --- }
   { ----------------- }
 
-  UA_NS0ID_ORGANIZES = 35; (* ReferenceType *)
-  UA_NS0ID_BASEDATAVARIABLETYPE = 63; (* VariableType *)
-  UA_NS0ID_OBJECTSFOLDER = 85; (* Object *)
-  UA_NS0ID_SERVER = 2253; (* Object *)
-  UA_NS0ID_SERVER_SERVERARRAY = 2254; (* Variable *)
-  UA_NS0ID_SERVER_NAMESPACEARRAY = 2255; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME = 2258; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_BUILDINFO_PRODUCTNAME = 2261; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_BUILDINFO_MANUFACTURERNAME = 2263; (* Variable *)
-  UA_NS0ID_SERVER_NAMESPACES = 11715; (* Object *)
+  {$I nodeids.inc}
 
   { ------------------ }
   { --- ua_types.c --- }
@@ -1287,61 +881,6 @@ const
   { --------------- }
 
   UA_EMPTY_ARRAY_SENTINEL = Pointer($01);
-
-  { ------------------------- }
-  { --- types_generated.h --- }
-  { ------------------------- }
-
-  UA_TYPES_COUNT = 197;
-  UA_TYPES_BOOLEAN = 0;
-  UA_TYPES_SBYTE = 1;
-  UA_TYPES_BYTE = 2;
-  UA_TYPES_INT16 = 3;
-  UA_TYPES_UINT16 = 4;
-  UA_TYPES_INT32 = 5;
-  UA_TYPES_UINT32 = 6;
-  UA_TYPES_INT64 = 7;
-  UA_TYPES_UINT64 = 8;
-  UA_TYPES_FLOAT = 9;
-  UA_TYPES_DOUBLE = 10;
-  UA_TYPES_STRING = 11;
-  UA_TYPES_DATETIME = 12;
-  UA_TYPES_GUID = 13;
-  UA_TYPES_BYTESTRING = 14;
-  UA_TYPES_XMLELEMENT = 15;
-  UA_TYPES_NODEID = 16;
-  UA_TYPES_STATUSCODE = 18;
-  UA_TYPES_QUALIFIEDNAME = 19;
-  UA_TYPES_LOCALIZEDTEXT = 20;
-  UA_TYPES_EXTENSIONOBJECT = 21;
-  UA_TYPES_DATAVALUE = 22;
-  UA_TYPES_VARIANT = 23;
-  UA_TYPES_VARIABLEATTRIBUTES = 28;
-  UA_TYPES_MONITOREDITEMCREATERESULT = 31;
-  UA_TYPES_RESPONSEHEADER = 42;
-  UA_TYPES_NODEATTRIBUTES = 45;
-  UA_TYPES_MONITORINGMODE = 50;
-  UA_TYPES_REQUESTHEADER = 53;
-  UA_TYPES_CREATESUBSCRIPTIONRESPONSE = 57;
-  UA_TYPES_READRESPONSE = 62;
-  UA_TYPES_TIMESTAMPSTORETURN = 64;
-  UA_TYPES_NODECLASS = 65;
-  UA_TYPES_BROWSEDESCRIPTION = 74;
-  UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 88;
-  UA_TYPES_MONITORINGPARAMETERS = 97;
-  UA_TYPES_READVALUEID = 100;
-  UA_TYPES_VIEWDESCRIPTION = 112;
-  UA_TYPES_STATUSCHANGENOTIFICATION = 119;
-  UA_TYPES_MONITOREDITEMCREATEREQUEST = 123;
-  UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 135;
-  UA_TYPES_USERNAMEIDENTITYTOKEN = 139;
-  UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 147;
-  UA_TYPES_REFERENCEDESCRIPTION = 148;
-  UA_TYPES_BROWSERESULT = 159;
-  UA_TYPES_CREATEMONITOREDITEMSREQUEST = 162;
-  UA_TYPES_READREQUEST = 166;
-  UA_TYPES_BROWSEREQUEST = 170;
-  UA_TYPES_BROWSERESPONSE = 182;
 
 {$IFDEF LOAD_DYNAMICALLY}
 var
