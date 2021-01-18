@@ -866,16 +866,7 @@ const
   { --- nodeids.h --- }
   { ----------------- }
 
-  UA_NS0ID_ORGANIZES = 35; (* ReferenceType *)
-  UA_NS0ID_BASEDATAVARIABLETYPE = 63; (* VariableType *)
-  UA_NS0ID_OBJECTSFOLDER = 85; (* Object *)
-  UA_NS0ID_SERVER = 2253; (* Object *)
-  UA_NS0ID_SERVER_SERVERARRAY = 2254; (* Variable *)
-  UA_NS0ID_SERVER_NAMESPACEARRAY = 2255; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME = 2258; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_BUILDINFO_PRODUCTNAME = 2261; (* Variable *)
-  UA_NS0ID_SERVER_SERVERSTATUS_BUILDINFO_MANUFACTURERNAME = 2263; (* Variable *)
-  UA_NS0ID_SERVER_NAMESPACES = 11715; (* Object *)
+  {$I nodeids.inc}
 
   { ------------------ }
   { --- ua_types.c --- }

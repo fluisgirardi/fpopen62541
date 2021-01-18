@@ -26,6 +26,7 @@ cp -f "${srcdir}/backend_open62541_typedefinitions_fpc.py" "${opdir}/nodeset_com
 
 pushd "${opdir}"
 "${srcdir}/generate_statuscode_fpc.py"  schema/StatusCode.csv "${dstdir}/statuscodes"
+"${srcdir}/generate_nodeid_header_fpc.py"  schema/NodeIds.csv "${dstdir}/nodeids" "NS0"
 
 ./generate_datatypes_fpc.py --namespace=0 --selected-types=schema/datatypes_minimal.txt \
                                                    --selected-types=schema/datatypes_method.txt \
