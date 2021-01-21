@@ -1,14 +1,12 @@
 (* Generated from Opc.Ua.Types.bsd with script ./generate_datatypes_fpc.py
- * on host seis by user luca at 2021-01-15 04:37:58 *)
-
-
+* on host seis by user luca at 2021-01-21 03:44:50 *)
 
 (**
  * Every type is assigned an index in an array containing the type descriptions.
  * These descriptions are used during type handling (copying, deletion,
  * binary encoding, ...). *)
 const
-  UA_TYPES_COUNT = 187;
+  UA_TYPES_COUNT = 190;
 
 (**
  * Boolean
@@ -1131,6 +1129,21 @@ const
   UA_TYPES_SUBSCRIPTIONACKNOWLEDGEMENT = 82;
 
 (**
+ * TransferResult
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferResult = record
+    statusCode: UA_StatusCode;
+    availableSequenceNumbersSize: size_t;
+    availableSequenceNumbers: PUA_UInt32;
+  end;
+  PUA_TransferResult = ^UA_TransferResult;
+
+const
+  UA_TYPES_TRANSFERRESULT = 83;
+
+(**
  * CreateMonitoredItemsResponse
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
@@ -1145,7 +1158,7 @@ type
   PUA_CreateMonitoredItemsResponse = ^UA_CreateMonitoredItemsResponse;
 
 const
-  UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 83;
+  UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 84;
 
 (**
  * DeleteReferencesItem
@@ -1162,7 +1175,7 @@ type
   PUA_DeleteReferencesItem = ^UA_DeleteReferencesItem;
 
 const
-  UA_TYPES_DELETEREFERENCESITEM = 84;
+  UA_TYPES_DELETEREFERENCESITEM = 85;
 
 (**
  * WriteValue
@@ -1178,7 +1191,7 @@ type
   PUA_WriteValue = ^UA_WriteValue;
 
 const
-  UA_TYPES_WRITEVALUE = 85;
+  UA_TYPES_WRITEVALUE = 86;
 
 (**
  * DataTypeAttributes
@@ -1196,7 +1209,24 @@ type
   PUA_DataTypeAttributes = ^UA_DataTypeAttributes;
 
 const
-  UA_TYPES_DATATYPEATTRIBUTES = 86;
+  UA_TYPES_DATATYPEATTRIBUTES = 87;
+
+(**
+ * TransferSubscriptionsResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferSubscriptionsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_TransferResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_TransferSubscriptionsResponse = ^UA_TransferSubscriptionsResponse;
+
+const
+  UA_TYPES_TRANSFERSUBSCRIPTIONSRESPONSE = 88;
 
 (**
  * AddReferencesResponse
@@ -1213,7 +1243,7 @@ type
   PUA_AddReferencesResponse = ^UA_AddReferencesResponse;
 
 const
-  UA_TYPES_ADDREFERENCESRESPONSE = 87;
+  UA_TYPES_ADDREFERENCESRESPONSE = 89;
 
 (**
  * DeadbandType
@@ -1230,7 +1260,7 @@ type
   {$IF sizeof(UA_DeadbandType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_DEADBANDTYPE = 88;
+  UA_TYPES_DEADBANDTYPE = 90;
 
 (**
  * DataChangeTrigger
@@ -1247,7 +1277,7 @@ type
   {$IF sizeof(UA_DataChangeTrigger) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_DATACHANGETRIGGER = 89;
+  UA_TYPES_DATACHANGETRIGGER = 91;
 
 (**
  * BuildInfo
@@ -1265,7 +1295,7 @@ type
   PUA_BuildInfo = ^UA_BuildInfo;
 
 const
-  UA_TYPES_BUILDINFO = 90;
+  UA_TYPES_BUILDINFO = 92;
 
 (**
  * FilterOperand
@@ -1275,7 +1305,7 @@ type
   UA_FilterOperand = pointer;
 
 const
-  UA_TYPES_FILTEROPERAND = 91;
+  UA_TYPES_FILTEROPERAND = 93;
 
 (**
  * MonitoringParameters
@@ -1292,7 +1322,7 @@ type
   PUA_MonitoringParameters = ^UA_MonitoringParameters;
 
 const
-  UA_TYPES_MONITORINGPARAMETERS = 92;
+  UA_TYPES_MONITORINGPARAMETERS = 94;
 
 (**
  * DoubleComplexNumberType
@@ -1306,7 +1336,7 @@ type
   PUA_DoubleComplexNumberType = ^UA_DoubleComplexNumberType;
 
 const
-  UA_TYPES_DOUBLECOMPLEXNUMBERTYPE = 93;
+  UA_TYPES_DOUBLECOMPLEXNUMBERTYPE = 95;
 
 (**
  * DeleteNodesItem
@@ -1320,7 +1350,7 @@ type
   PUA_DeleteNodesItem = ^UA_DeleteNodesItem;
 
 const
-  UA_TYPES_DELETENODESITEM = 94;
+  UA_TYPES_DELETENODESITEM = 96;
 
 (**
  * ReadValueId
@@ -1336,7 +1366,7 @@ type
   PUA_ReadValueId = ^UA_ReadValueId;
 
 const
-  UA_TYPES_READVALUEID = 95;
+  UA_TYPES_READVALUEID = 97;
 
 (**
  * CallRequest
@@ -1351,7 +1381,7 @@ type
   PUA_CallRequest = ^UA_CallRequest;
 
 const
-  UA_TYPES_CALLREQUEST = 96;
+  UA_TYPES_CALLREQUEST = 98;
 
 (**
  * RelativePath
@@ -1365,7 +1395,7 @@ type
   PUA_RelativePath = ^UA_RelativePath;
 
 const
-  UA_TYPES_RELATIVEPATH = 97;
+  UA_TYPES_RELATIVEPATH = 99;
 
 (**
  * DeleteNodesRequest
@@ -1380,7 +1410,7 @@ type
   PUA_DeleteNodesRequest = ^UA_DeleteNodesRequest;
 
 const
-  UA_TYPES_DELETENODESREQUEST = 98;
+  UA_TYPES_DELETENODESREQUEST = 100;
 
 (**
  * MonitoredItemModifyRequest
@@ -1394,7 +1424,7 @@ type
   PUA_MonitoredItemModifyRequest = ^UA_MonitoredItemModifyRequest;
 
 const
-  UA_TYPES_MONITOREDITEMMODIFYREQUEST = 99;
+  UA_TYPES_MONITOREDITEMMODIFYREQUEST = 101;
 
 (**
  * UserTokenType
@@ -1412,7 +1442,7 @@ type
   {$IF sizeof(UA_UserTokenType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_USERTOKENTYPE = 100;
+  UA_TYPES_USERTOKENTYPE = 102;
 
 (**
  * AggregateConfiguration
@@ -1429,7 +1459,7 @@ type
   PUA_AggregateConfiguration = ^UA_AggregateConfiguration;
 
 const
-  UA_TYPES_AGGREGATECONFIGURATION = 101;
+  UA_TYPES_AGGREGATECONFIGURATION = 103;
 
 (**
  * LocaleId
@@ -1439,7 +1469,7 @@ type
   UA_LocaleId = UA_String;
 
 const
-  UA_TYPES_LOCALEID = 102;
+  UA_TYPES_LOCALEID = 104;
 
 (**
  * UnregisterNodesResponse
@@ -1452,7 +1482,7 @@ type
   PUA_UnregisterNodesResponse = ^UA_UnregisterNodesResponse;
 
 const
-  UA_TYPES_UNREGISTERNODESRESPONSE = 103;
+  UA_TYPES_UNREGISTERNODESRESPONSE = 105;
 
 (**
  * ContentFilterResult
@@ -1468,7 +1498,7 @@ type
   PUA_ContentFilterResult = ^UA_ContentFilterResult;
 
 const
-  UA_TYPES_CONTENTFILTERRESULT = 104;
+  UA_TYPES_CONTENTFILTERRESULT = 106;
 
 (**
  * UserTokenPolicy
@@ -1485,7 +1515,7 @@ type
   PUA_UserTokenPolicy = ^UA_UserTokenPolicy;
 
 const
-  UA_TYPES_USERTOKENPOLICY = 105;
+  UA_TYPES_USERTOKENPOLICY = 107;
 
 (**
  * DeleteMonitoredItemsRequest
@@ -1501,7 +1531,7 @@ type
   PUA_DeleteMonitoredItemsRequest = ^UA_DeleteMonitoredItemsRequest;
 
 const
-  UA_TYPES_DELETEMONITOREDITEMSREQUEST = 106;
+  UA_TYPES_DELETEMONITOREDITEMSREQUEST = 108;
 
 (**
  * SetMonitoringModeRequest
@@ -1518,7 +1548,7 @@ type
   PUA_SetMonitoringModeRequest = ^UA_SetMonitoringModeRequest;
 
 const
-  UA_TYPES_SETMONITORINGMODEREQUEST = 107;
+  UA_TYPES_SETMONITORINGMODEREQUEST = 109;
 
 (**
  * Duration
@@ -1528,7 +1558,7 @@ type
   UA_Duration = UA_Double;
 
 const
-  UA_TYPES_DURATION = 108;
+  UA_TYPES_DURATION = 110;
 
 (**
  * ReferenceTypeAttributes
@@ -1548,7 +1578,7 @@ type
   PUA_ReferenceTypeAttributes = ^UA_ReferenceTypeAttributes;
 
 const
-  UA_TYPES_REFERENCETYPEATTRIBUTES = 109;
+  UA_TYPES_REFERENCETYPEATTRIBUTES = 111;
 
 (**
  * GetEndpointsRequest
@@ -1566,7 +1596,7 @@ type
   PUA_GetEndpointsRequest = ^UA_GetEndpointsRequest;
 
 const
-  UA_TYPES_GETENDPOINTSREQUEST = 110;
+  UA_TYPES_GETENDPOINTSREQUEST = 112;
 
 (**
  * CloseSecureChannelResponse
@@ -1579,7 +1609,7 @@ type
   PUA_CloseSecureChannelResponse = ^UA_CloseSecureChannelResponse;
 
 const
-  UA_TYPES_CLOSESECURECHANNELRESPONSE = 111;
+  UA_TYPES_CLOSESECURECHANNELRESPONSE = 113;
 
 (**
  * ViewDescription
@@ -1594,7 +1624,7 @@ type
   PUA_ViewDescription = ^UA_ViewDescription;
 
 const
-  UA_TYPES_VIEWDESCRIPTION = 112;
+  UA_TYPES_VIEWDESCRIPTION = 114;
 
 (**
  * SetPublishingModeResponse
@@ -1611,7 +1641,7 @@ type
   PUA_SetPublishingModeResponse = ^UA_SetPublishingModeResponse;
 
 const
-  UA_TYPES_SETPUBLISHINGMODERESPONSE = 113;
+  UA_TYPES_SETPUBLISHINGMODERESPONSE = 115;
 
 (**
  * StatusChangeNotification
@@ -1625,7 +1655,7 @@ type
   PUA_StatusChangeNotification = ^UA_StatusChangeNotification;
 
 const
-  UA_TYPES_STATUSCHANGENOTIFICATION = 114;
+  UA_TYPES_STATUSCHANGENOTIFICATION = 116;
 
 (**
  * StructureField
@@ -1645,7 +1675,7 @@ type
   PUA_StructureField = ^UA_StructureField;
 
 const
-  UA_TYPES_STRUCTUREFIELD = 115;
+  UA_TYPES_STRUCTUREFIELD = 117;
 
 (**
  * NodeAttributesMask
@@ -1694,7 +1724,7 @@ type
   {$IF sizeof(UA_NodeAttributesMask) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_NODEATTRIBUTESMASK = 116;
+  UA_TYPES_NODEATTRIBUTESMASK = 118;
 
 (**
  * EventFilterResult
@@ -1711,7 +1741,7 @@ type
   PUA_EventFilterResult = ^UA_EventFilterResult;
 
 const
-  UA_TYPES_EVENTFILTERRESULT = 117;
+  UA_TYPES_EVENTFILTERRESULT = 119;
 
 (**
  * MonitoredItemCreateRequest
@@ -1726,7 +1756,7 @@ type
   PUA_MonitoredItemCreateRequest = ^UA_MonitoredItemCreateRequest;
 
 const
-  UA_TYPES_MONITOREDITEMCREATEREQUEST = 118;
+  UA_TYPES_MONITOREDITEMCREATEREQUEST = 120;
 
 (**
  * ComplexNumberType
@@ -1740,7 +1770,7 @@ type
   PUA_ComplexNumberType = ^UA_ComplexNumberType;
 
 const
-  UA_TYPES_COMPLEXNUMBERTYPE = 119;
+  UA_TYPES_COMPLEXNUMBERTYPE = 121;
 
 (**
  * Range
@@ -1754,7 +1784,7 @@ type
   PUA_Range = ^UA_Range;
 
 const
-  UA_TYPES_RANGE = 120;
+  UA_TYPES_RANGE = 122;
 
 (**
  * DataChangeNotification
@@ -1770,7 +1800,7 @@ type
   PUA_DataChangeNotification = ^UA_DataChangeNotification;
 
 const
-  UA_TYPES_DATACHANGENOTIFICATION = 121;
+  UA_TYPES_DATACHANGENOTIFICATION = 123;
 
 (**
  * Argument
@@ -1788,7 +1818,23 @@ type
   PUA_Argument = ^UA_Argument;
 
 const
-  UA_TYPES_ARGUMENT = 122;
+  UA_TYPES_ARGUMENT = 124;
+
+(**
+ * TransferSubscriptionsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferSubscriptionsRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionIdsSize: size_t;
+    subscriptionIds: PUA_UInt32;
+    sendInitialValues: UA_Boolean;
+  end;
+  PUA_TransferSubscriptionsRequest = ^UA_TransferSubscriptionsRequest;
+
+const
+  UA_TYPES_TRANSFERSUBSCRIPTIONSREQUEST = 125;
 
 (**
  * ChannelSecurityToken
@@ -1804,7 +1850,7 @@ type
   PUA_ChannelSecurityToken = ^UA_ChannelSecurityToken;
 
 const
-  UA_TYPES_CHANNELSECURITYTOKEN = 123;
+  UA_TYPES_CHANNELSECURITYTOKEN = 126;
 
 (**
  * ServerState
@@ -1826,7 +1872,7 @@ type
   {$IF sizeof(UA_ServerState) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_SERVERSTATE = 124;
+  UA_TYPES_SERVERSTATE = 127;
 
 (**
  * EventNotificationList
@@ -1840,7 +1886,7 @@ type
   PUA_EventNotificationList = ^UA_EventNotificationList;
 
 const
-  UA_TYPES_EVENTNOTIFICATIONLIST = 125;
+  UA_TYPES_EVENTNOTIFICATIONLIST = 128;
 
 (**
  * AnonymousIdentityToken
@@ -1853,7 +1899,7 @@ type
   PUA_AnonymousIdentityToken = ^UA_AnonymousIdentityToken;
 
 const
-  UA_TYPES_ANONYMOUSIDENTITYTOKEN = 126;
+  UA_TYPES_ANONYMOUSIDENTITYTOKEN = 129;
 
 (**
  * FilterOperator
@@ -1885,7 +1931,7 @@ type
   {$IF sizeof(UA_FilterOperator) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_FILTEROPERATOR = 127;
+  UA_TYPES_FILTEROPERATOR = 130;
 
 (**
  * AggregateFilter
@@ -1901,7 +1947,7 @@ type
   PUA_AggregateFilter = ^UA_AggregateFilter;
 
 const
-  UA_TYPES_AGGREGATEFILTER = 128;
+  UA_TYPES_AGGREGATEFILTER = 131;
 
 (**
  * RepublishResponse
@@ -1915,7 +1961,7 @@ type
   PUA_RepublishResponse = ^UA_RepublishResponse;
 
 const
-  UA_TYPES_REPUBLISHRESPONSE = 129;
+  UA_TYPES_REPUBLISHRESPONSE = 132;
 
 (**
  * DeleteSubscriptionsResponse
@@ -1932,7 +1978,7 @@ type
   PUA_DeleteSubscriptionsResponse = ^UA_DeleteSubscriptionsResponse;
 
 const
-  UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 130;
+  UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 133;
 
 (**
  * RegisterNodesRequest
@@ -1947,7 +1993,7 @@ type
   PUA_RegisterNodesRequest = ^UA_RegisterNodesRequest;
 
 const
-  UA_TYPES_REGISTERNODESREQUEST = 131;
+  UA_TYPES_REGISTERNODESREQUEST = 134;
 
 (**
  * StructureDefinition
@@ -1964,7 +2010,7 @@ type
   PUA_StructureDefinition = ^UA_StructureDefinition;
 
 const
-  UA_TYPES_STRUCTUREDEFINITION = 132;
+  UA_TYPES_STRUCTUREDEFINITION = 135;
 
 (**
  * MethodAttributes
@@ -1983,7 +2029,7 @@ type
   PUA_MethodAttributes = ^UA_MethodAttributes;
 
 const
-  UA_TYPES_METHODATTRIBUTES = 133;
+  UA_TYPES_METHODATTRIBUTES = 136;
 
 (**
  * UserNameIdentityToken
@@ -1999,7 +2045,7 @@ type
   PUA_UserNameIdentityToken = ^UA_UserNameIdentityToken;
 
 const
-  UA_TYPES_USERNAMEIDENTITYTOKEN = 134;
+  UA_TYPES_USERNAMEIDENTITYTOKEN = 137;
 
 (**
  * UnregisterNodesRequest
@@ -2014,7 +2060,7 @@ type
   PUA_UnregisterNodesRequest = ^UA_UnregisterNodesRequest;
 
 const
-  UA_TYPES_UNREGISTERNODESREQUEST = 135;
+  UA_TYPES_UNREGISTERNODESREQUEST = 138;
 
 (**
  * OpenSecureChannelResponse
@@ -2030,7 +2076,7 @@ type
   PUA_OpenSecureChannelResponse = ^UA_OpenSecureChannelResponse;
 
 const
-  UA_TYPES_OPENSECURECHANNELRESPONSE = 136;
+  UA_TYPES_OPENSECURECHANNELRESPONSE = 139;
 
 (**
  * SetTriggeringResponse
@@ -2051,7 +2097,7 @@ type
   PUA_SetTriggeringResponse = ^UA_SetTriggeringResponse;
 
 const
-  UA_TYPES_SETTRIGGERINGRESPONSE = 137;
+  UA_TYPES_SETTRIGGERINGRESPONSE = 140;
 
 (**
  * SimpleAttributeOperand
@@ -2068,7 +2114,7 @@ type
   PUA_SimpleAttributeOperand = ^UA_SimpleAttributeOperand;
 
 const
-  UA_TYPES_SIMPLEATTRIBUTEOPERAND = 138;
+  UA_TYPES_SIMPLEATTRIBUTEOPERAND = 141;
 
 (**
  * RepublishRequest
@@ -2083,7 +2129,7 @@ type
   PUA_RepublishRequest = ^UA_RepublishRequest;
 
 const
-  UA_TYPES_REPUBLISHREQUEST = 139;
+  UA_TYPES_REPUBLISHREQUEST = 142;
 
 (**
  * RegisterNodesResponse
@@ -2098,7 +2144,7 @@ type
   PUA_RegisterNodesResponse = ^UA_RegisterNodesResponse;
 
 const
-  UA_TYPES_REGISTERNODESRESPONSE = 140;
+  UA_TYPES_REGISTERNODESRESPONSE = 143;
 
 (**
  * ModifyMonitoredItemsResponse
@@ -2115,7 +2161,7 @@ type
   PUA_ModifyMonitoredItemsResponse = ^UA_ModifyMonitoredItemsResponse;
 
 const
-  UA_TYPES_MODIFYMONITOREDITEMSRESPONSE = 141;
+  UA_TYPES_MODIFYMONITOREDITEMSRESPONSE = 144;
 
 (**
  * DeleteSubscriptionsRequest
@@ -2130,7 +2176,7 @@ type
   PUA_DeleteSubscriptionsRequest = ^UA_DeleteSubscriptionsRequest;
 
 const
-  UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 142;
+  UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 145;
 
 (**
  * RedundancySupport
@@ -2150,7 +2196,7 @@ type
   {$IF sizeof(UA_RedundancySupport) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_REDUNDANCYSUPPORT = 143;
+  UA_TYPES_REDUNDANCYSUPPORT = 146;
 
 (**
  * BrowsePath
@@ -2164,7 +2210,7 @@ type
   PUA_BrowsePath = ^UA_BrowsePath;
 
 const
-  UA_TYPES_BROWSEPATH = 144;
+  UA_TYPES_BROWSEPATH = 147;
 
 (**
  * ObjectAttributes
@@ -2182,7 +2228,7 @@ type
   PUA_ObjectAttributes = ^UA_ObjectAttributes;
 
 const
-  UA_TYPES_OBJECTATTRIBUTES = 145;
+  UA_TYPES_OBJECTATTRIBUTES = 148;
 
 (**
  * PublishRequest
@@ -2197,7 +2243,7 @@ type
   PUA_PublishRequest = ^UA_PublishRequest;
 
 const
-  UA_TYPES_PUBLISHREQUEST = 146;
+  UA_TYPES_PUBLISHREQUEST = 149;
 
 (**
  * FindServersRequest
@@ -2215,7 +2261,7 @@ type
   PUA_FindServersRequest = ^UA_FindServersRequest;
 
 const
-  UA_TYPES_FINDSERVERSREQUEST = 147;
+  UA_TYPES_FINDSERVERSREQUEST = 150;
 
 (**
  * ReferenceDescription
@@ -2234,7 +2280,7 @@ type
   PUA_ReferenceDescription = ^UA_ReferenceDescription;
 
 const
-  UA_TYPES_REFERENCEDESCRIPTION = 148;
+  UA_TYPES_REFERENCEDESCRIPTION = 151;
 
 (**
  * CreateSubscriptionRequest
@@ -2253,7 +2299,7 @@ type
   PUA_CreateSubscriptionRequest = ^UA_CreateSubscriptionRequest;
 
 const
-  UA_TYPES_CREATESUBSCRIPTIONREQUEST = 149;
+  UA_TYPES_CREATESUBSCRIPTIONREQUEST = 152;
 
 (**
  * CallResponse
@@ -2270,7 +2316,7 @@ type
   PUA_CallResponse = ^UA_CallResponse;
 
 const
-  UA_TYPES_CALLRESPONSE = 150;
+  UA_TYPES_CALLRESPONSE = 153;
 
 (**
  * DeleteNodesResponse
@@ -2287,7 +2333,7 @@ type
   PUA_DeleteNodesResponse = ^UA_DeleteNodesResponse;
 
 const
-  UA_TYPES_DELETENODESRESPONSE = 151;
+  UA_TYPES_DELETENODESRESPONSE = 154;
 
 (**
  * ModifyMonitoredItemsRequest
@@ -2304,7 +2350,7 @@ type
   PUA_ModifyMonitoredItemsRequest = ^UA_ModifyMonitoredItemsRequest;
 
 const
-  UA_TYPES_MODIFYMONITOREDITEMSREQUEST = 152;
+  UA_TYPES_MODIFYMONITOREDITEMSREQUEST = 155;
 
 (**
  * ServiceFault
@@ -2317,7 +2363,7 @@ type
   PUA_ServiceFault = ^UA_ServiceFault;
 
 const
-  UA_TYPES_SERVICEFAULT = 153;
+  UA_TYPES_SERVICEFAULT = 156;
 
 (**
  * PublishResponse
@@ -2339,7 +2385,7 @@ type
   PUA_PublishResponse = ^UA_PublishResponse;
 
 const
-  UA_TYPES_PUBLISHRESPONSE = 154;
+  UA_TYPES_PUBLISHRESPONSE = 157;
 
 (**
  * CreateMonitoredItemsRequest
@@ -2356,7 +2402,7 @@ type
   PUA_CreateMonitoredItemsRequest = ^UA_CreateMonitoredItemsRequest;
 
 const
-  UA_TYPES_CREATEMONITOREDITEMSREQUEST = 155;
+  UA_TYPES_CREATEMONITOREDITEMSREQUEST = 158;
 
 (**
  * OpenSecureChannelRequest
@@ -2374,7 +2420,7 @@ type
   PUA_OpenSecureChannelRequest = ^UA_OpenSecureChannelRequest;
 
 const
-  UA_TYPES_OPENSECURECHANNELREQUEST = 156;
+  UA_TYPES_OPENSECURECHANNELREQUEST = 159;
 
 (**
  * CloseSessionRequest
@@ -2388,7 +2434,7 @@ type
   PUA_CloseSessionRequest = ^UA_CloseSessionRequest;
 
 const
-  UA_TYPES_CLOSESESSIONREQUEST = 157;
+  UA_TYPES_CLOSESESSIONREQUEST = 160;
 
 (**
  * SetTriggeringRequest
@@ -2407,7 +2453,7 @@ type
   PUA_SetTriggeringRequest = ^UA_SetTriggeringRequest;
 
 const
-  UA_TYPES_SETTRIGGERINGREQUEST = 158;
+  UA_TYPES_SETTRIGGERINGREQUEST = 161;
 
 (**
  * BrowseResult
@@ -2423,7 +2469,7 @@ type
   PUA_BrowseResult = ^UA_BrowseResult;
 
 const
-  UA_TYPES_BROWSERESULT = 159;
+  UA_TYPES_BROWSERESULT = 162;
 
 (**
  * AddReferencesRequest
@@ -2438,7 +2484,7 @@ type
   PUA_AddReferencesRequest = ^UA_AddReferencesRequest;
 
 const
-  UA_TYPES_ADDREFERENCESREQUEST = 160;
+  UA_TYPES_ADDREFERENCESREQUEST = 163;
 
 (**
  * AddNodesItem
@@ -2457,7 +2503,7 @@ type
   PUA_AddNodesItem = ^UA_AddNodesItem;
 
 const
-  UA_TYPES_ADDNODESITEM = 161;
+  UA_TYPES_ADDNODESITEM = 164;
 
 (**
  * ServerStatusDataType
@@ -2475,7 +2521,7 @@ type
   PUA_ServerStatusDataType = ^UA_ServerStatusDataType;
 
 const
-  UA_TYPES_SERVERSTATUSDATATYPE = 162;
+  UA_TYPES_SERVERSTATUSDATATYPE = 165;
 
 (**
  * BrowseNextResponse
@@ -2492,7 +2538,7 @@ type
   PUA_BrowseNextResponse = ^UA_BrowseNextResponse;
 
 const
-  UA_TYPES_BROWSENEXTRESPONSE = 163;
+  UA_TYPES_BROWSENEXTRESPONSE = 166;
 
 (**
  * AxisInformation
@@ -2510,7 +2556,7 @@ type
   PUA_AxisInformation = ^UA_AxisInformation;
 
 const
-  UA_TYPES_AXISINFORMATION = 164;
+  UA_TYPES_AXISINFORMATION = 167;
 
 (**
  * ApplicationDescription
@@ -2530,7 +2576,7 @@ type
   PUA_ApplicationDescription = ^UA_ApplicationDescription;
 
 const
-  UA_TYPES_APPLICATIONDESCRIPTION = 165;
+  UA_TYPES_APPLICATIONDESCRIPTION = 168;
 
 (**
  * ReadRequest
@@ -2547,7 +2593,7 @@ type
   PUA_ReadRequest = ^UA_ReadRequest;
 
 const
-  UA_TYPES_READREQUEST = 166;
+  UA_TYPES_READREQUEST = 169;
 
 (**
  * ActivateSessionRequest
@@ -2567,7 +2613,7 @@ type
   PUA_ActivateSessionRequest = ^UA_ActivateSessionRequest;
 
 const
-  UA_TYPES_ACTIVATESESSIONREQUEST = 167;
+  UA_TYPES_ACTIVATESESSIONREQUEST = 170;
 
 (**
  * BrowsePathResult
@@ -2582,7 +2628,7 @@ type
   PUA_BrowsePathResult = ^UA_BrowsePathResult;
 
 const
-  UA_TYPES_BROWSEPATHRESULT = 168;
+  UA_TYPES_BROWSEPATHRESULT = 171;
 
 (**
  * AddNodesRequest
@@ -2597,7 +2643,7 @@ type
   PUA_AddNodesRequest = ^UA_AddNodesRequest;
 
 const
-  UA_TYPES_ADDNODESREQUEST = 169;
+  UA_TYPES_ADDNODESREQUEST = 172;
 
 (**
  * BrowseRequest
@@ -2614,7 +2660,7 @@ type
   PUA_BrowseRequest = ^UA_BrowseRequest;
 
 const
-  UA_TYPES_BROWSEREQUEST = 170;
+  UA_TYPES_BROWSEREQUEST = 173;
 
 (**
  * WriteRequest
@@ -2629,7 +2675,7 @@ type
   PUA_WriteRequest = ^UA_WriteRequest;
 
 const
-  UA_TYPES_WRITEREQUEST = 171;
+  UA_TYPES_WRITEREQUEST = 174;
 
 (**
  * AddNodesResponse
@@ -2646,7 +2692,7 @@ type
   PUA_AddNodesResponse = ^UA_AddNodesResponse;
 
 const
-  UA_TYPES_ADDNODESRESPONSE = 172;
+  UA_TYPES_ADDNODESRESPONSE = 175;
 
 (**
  * AttributeOperand
@@ -2663,7 +2709,7 @@ type
   PUA_AttributeOperand = ^UA_AttributeOperand;
 
 const
-  UA_TYPES_ATTRIBUTEOPERAND = 173;
+  UA_TYPES_ATTRIBUTEOPERAND = 176;
 
 (**
  * DataChangeFilter
@@ -2678,7 +2724,7 @@ type
   PUA_DataChangeFilter = ^UA_DataChangeFilter;
 
 const
-  UA_TYPES_DATACHANGEFILTER = 174;
+  UA_TYPES_DATACHANGEFILTER = 177;
 
 (**
  * EndpointDescription
@@ -2699,7 +2745,7 @@ type
   PUA_EndpointDescription = ^UA_EndpointDescription;
 
 const
-  UA_TYPES_ENDPOINTDESCRIPTION = 175;
+  UA_TYPES_ENDPOINTDESCRIPTION = 178;
 
 (**
  * DeleteReferencesRequest
@@ -2714,7 +2760,7 @@ type
   PUA_DeleteReferencesRequest = ^UA_DeleteReferencesRequest;
 
 const
-  UA_TYPES_DELETEREFERENCESREQUEST = 176;
+  UA_TYPES_DELETEREFERENCESREQUEST = 179;
 
 (**
  * TranslateBrowsePathsToNodeIdsRequest
@@ -2729,7 +2775,7 @@ type
   PUA_TranslateBrowsePathsToNodeIdsRequest = ^UA_TranslateBrowsePathsToNodeIdsRequest;
 
 const
-  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSREQUEST = 177;
+  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSREQUEST = 180;
 
 (**
  * FindServersResponse
@@ -2744,7 +2790,7 @@ type
   PUA_FindServersResponse = ^UA_FindServersResponse;
 
 const
-  UA_TYPES_FINDSERVERSRESPONSE = 178;
+  UA_TYPES_FINDSERVERSRESPONSE = 181;
 
 (**
  * CreateSessionRequest
@@ -2765,7 +2811,7 @@ type
   PUA_CreateSessionRequest = ^UA_CreateSessionRequest;
 
 const
-  UA_TYPES_CREATESESSIONREQUEST = 179;
+  UA_TYPES_CREATESESSIONREQUEST = 182;
 
 (**
  * ContentFilterElement
@@ -2780,7 +2826,7 @@ type
   PUA_ContentFilterElement = ^UA_ContentFilterElement;
 
 const
-  UA_TYPES_CONTENTFILTERELEMENT = 180;
+  UA_TYPES_CONTENTFILTERELEMENT = 183;
 
 (**
  * TranslateBrowsePathsToNodeIdsResponse
@@ -2797,7 +2843,7 @@ type
   PUA_TranslateBrowsePathsToNodeIdsResponse = ^UA_TranslateBrowsePathsToNodeIdsResponse;
 
 const
-  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE = 181;
+  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE = 184;
 
 (**
  * BrowseResponse
@@ -2814,7 +2860,7 @@ type
   PUA_BrowseResponse = ^UA_BrowseResponse;
 
 const
-  UA_TYPES_BROWSERESPONSE = 182;
+  UA_TYPES_BROWSERESPONSE = 185;
 
 (**
  * CreateSessionResponse
@@ -2838,7 +2884,7 @@ type
   PUA_CreateSessionResponse = ^UA_CreateSessionResponse;
 
 const
-  UA_TYPES_CREATESESSIONRESPONSE = 183;
+  UA_TYPES_CREATESESSIONRESPONSE = 186;
 
 (**
  * ContentFilter
@@ -2852,7 +2898,7 @@ type
   PUA_ContentFilter = ^UA_ContentFilter;
 
 const
-  UA_TYPES_CONTENTFILTER = 184;
+  UA_TYPES_CONTENTFILTER = 187;
 
 (**
  * GetEndpointsResponse
@@ -2867,7 +2913,7 @@ type
   PUA_GetEndpointsResponse = ^UA_GetEndpointsResponse;
 
 const
-  UA_TYPES_GETENDPOINTSRESPONSE = 185;
+  UA_TYPES_GETENDPOINTSRESPONSE = 188;
 
 (**
  * EventFilter
@@ -2882,4 +2928,4 @@ type
   PUA_EventFilter = ^UA_EventFilter;
 
 const
-  UA_TYPES_EVENTFILTER = 186;
+  UA_TYPES_EVENTFILTER = 189;

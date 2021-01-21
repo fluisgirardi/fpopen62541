@@ -5,12 +5,16 @@
  * The plugins, as well as the server and client examples are in the public domain (CC0 license).
  * They can be reused under any license and changes do not have to be published.
  *
- * Version 1.1 released on 13 Jun 2020
+ * Version 1.2-rc2 released on 23 Dec 2020
+ *
+ * BEWARE: between version 1.1 and version 1.2 many structures
+ * and ids have changed so the two versions are not binary compatible
+ * (i.e you cannot use these headers with version 1.1)
  *
  * Author: Lacak <lacak At Sourceforge>
  *
  * Contributors: 
- *   Luca Olivetti <>
+ *   Luca Olivetti <luca@ventoso.org>
  *)
 unit open62541;
 
@@ -442,9 +446,6 @@ type
    * type operations as static inline functions. *)
 
    UA_DataTypeMember = record
-     {$ifdef UA_ENABLE_TYPEDESCRIPTION}
-       memberName: PAnsiChar;
-     {$endif}
        memberTypeIndex: UA_UInt16;   (* Index of the member in the array of data
                                         types *)
        padding: UA_Byte;             (* How much padding is there before this
@@ -460,6 +461,9 @@ type
                                         namespace zero only.*)
        {isArray: UA_Boolean:1;}        (* The member is an array *)
        {isOptional: UA_Boolean:1;}     (* The member is an optional field *)
+     {$ifdef UA_ENABLE_TYPEDESCRIPTION}
+       memberName: PAnsiChar;
+     {$endif}
    end;
 
    (* The DataType "kind" is an internal type classification. It is used to
@@ -499,10 +503,8 @@ type
    );
 
    UA_DataType = record
-     {$ifdef UA_ENABLE_TYPEDESCRIPTION}
-       typeName: PAnsiChar;
-     {$endif}
        typeId: UA_NodeId;               (* The nodeid of the type *)
+       binaryEncodingId: UA_NodeId;     (* NodeId of datatype when encoded as binary *)
        memSize: UA_UInt16;              (* Size of the struct in memory *)
        typeIndex: UA_UInt16;            (* Index of the type in the datatypetable *)
        flags: UA_Int32;
@@ -512,9 +514,11 @@ type
        {UA_UInt32 overlayable     : 1;} (* The type has the identical memory layout
                                          * in memory and on the binary stream. *)
        {UA_UInt32 membersSize     : 8;} (* How many members does the type have? *)
-       binaryEncodingId: UA_UInt32;     (* NodeId of datatype when encoded as binary *)
        //UA_UInt16  xmlEncodingId;      (* NodeId of datatype when encoded as XML *)
        members: ^UA_DataTypeMember;
+     {$ifdef UA_ENABLE_TYPEDESCRIPTION}
+       typeName: PAnsiChar;
+     {$endif}
    end;
 
   (* Datatype arrays with custom type definitions can be added in a linked list to

@@ -241,15 +241,15 @@ type
 
 const
   MyStructMembers: array[0..2] of UA_DataTypeMember = (
-    (memberName: 'x'; memberTypeIndex: UA_TYPES_UINT32;       padding:0; flag:1{namespaceZero=1}),
-    (memberName: 'y'; memberTypeIndex: UA_TYPES_UINT32;       padding:4; flag:1{namespaceZero=1}),
-    (memberName: 'z'; memberTypeIndex: {ns=3;i=}3014{STRING}; padding:8; flag:0{namespaceZero=0})
+    (memberTypeIndex: UA_TYPES_UINT32;       padding:0; flag:1{namespaceZero=1}; memberName: 'x'),
+    (memberTypeIndex: UA_TYPES_UINT32;       padding:4; flag:1{namespaceZero=1}; memberName: 'y'),
+    (memberTypeIndex: {ns=3;i=}3014{STRING}; padding:8; flag:0{namespaceZero=0}; memberName: 'z')
   );
 
   MyStructTypeName: array[0..15] of AnsiChar = 'MyStructTypeName';
   MyStructType: UA_DataType = (
-    typeName: 'MyStructType';
     typeId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_STRING; identifier:(_string:(length:Length(MyStructTypeName);data:{$IFDEF FPC}@MyStructTypeName{$ELSE}nil{$ENDIF}))); (* .typeId *) // MUST BE ONLY "UA_NODEIDTYPE_NUMERIC"
+    binaryEncodingId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_NUMERIC; identifier:(numeric:0));
     memSize: SizeOf(MyStruct);
     typeIndex: 0;                            (* .typeIndex, in the array of custom types *)
     flags: ord(UA_DATATYPEKIND_STRUCTURE) +  (* .typeKind:6 *)
@@ -257,10 +257,9 @@ const
            0 shl 7 +                         (* .overlayable:1 (depends on endianness and
                                                  the absence of padding) *)
            3 shl 8;                          (* .membersSize:8 *)
-    binaryEncodingId: 0;                     (* .binaryEncodingId, the numeric identifier used on the wire
-                                                 (the  namespaceindex is from .typeId) *)
     {!!! works only if binaryEncodingId==identifier.numeric !!!}
     members: @MyStructMembers;
+    typeName: 'MyStructType';
   );
 
   MyCustomDataTypes: UA_DataTypeArray = (
