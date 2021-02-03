@@ -28,7 +28,7 @@ pushd "${opdir}"
 "${srcdir}/generate_statuscode_fpc.py"  schema/StatusCode.csv "${dstdir}/statuscodes"
 "${srcdir}/generate_nodeid_header_fpc.py"  schema/NodeIds.csv "${dstdir}/nodeids" "NS0"
 
-./generate_datatypes_fpc.py --namespace=0 --selected-types=schema/datatypes_minimal.txt \
+./generate_datatypes_fpc.py --selected-types=schema/datatypes_minimal.txt \
                                                    --selected-types=schema/datatypes_method.txt \
                                                    --selected-types=schema/datatypes_subscriptions.txt \
                                                    --selected-types=schema/datatypes_dataaccess.txt \
