@@ -1,0 +1,10 @@
+name: Open62541 v1.2.2 libraries for windows and linux 32/64 bits
+
+#fake workflow to allow me to work on the real one in a separate branch
+on:
+  workflow_dispatch:
+  
+jobs:
+  DummyJob:
+    steps:
+      - name: DummyStep  
