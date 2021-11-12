@@ -585,6 +585,23 @@ type
   );
 
   (**
+   * Rule Handling
+   * -------------
+   *
+   * The RuleHanding settings define how error cases that result from rules in the
+   * OPC UA specification shall be handled. The rule handling can be softened,
+   * e.g. to workaround misbehaving implementations or to mitigate the impact of
+   * additional rules that are introduced in later versions of the OPC UA
+   * specification. *)
+   UA_RuleHandling = (
+    UA_RULEHANDLING_DEFAULT = 0,
+    UA_RULEHANDLING_ABORT,  (* Abort the operation and return an error code *)
+    UA_RULEHANDLING_WARN,   (* Print a message in the logs and continue *)
+    UA_RULEHANDLING_ACCEPT  (* Continue and disregard the broken rule *)
+    );
+
+
+  (**
    * Connection State
    * ---------------- *)
   UA_SecureChannelState = (
@@ -608,6 +625,50 @@ type
       UA_SESSIONSTATE_CLOSING
   );
   PUA_SessionState = ^UA_SessionState;
+
+  (**
+   * Statistic counters
+   * ------------------
+   *
+   * The stack manage statistic counter for the following layers:
+   *
+   * - Network
+   * - Secure channel
+   * - Session
+   *
+   * The session layer counters are matching the counters of the
+   * ServerDiagnosticsSummaryDataType that are defined in the OPC UA Part 5
+   * specification. Counter of the other layers are not specified by OPC UA but
+   * are harmonized with the session layer counters if possible. *)
+
+  UA_NetworkStatistics = record
+      currentConnectionCount:size_t;
+      cumulatedConnectionCount:size_t;
+      rejectedConnectionCount:size_t;
+      connectionTimeoutCount:size_t;
+      connectionAbortCount:size_t;
+  end;
+  PUA_NetworkStatistics = ^UA_NetworkStatistics;
+
+  UA_SecureChannelStatistics = record
+      currentChannelCount:size_t;
+      cumulatedChannelCount:size_t;
+      rejectedChannelCount:size_t;
+      channelTimeoutCount:size_t; (* only used by servers *)
+      channelAbortCount:size_t;
+      channelPurgeCount:size_t;   (* only used by servers *)
+  end;
+  PUA_SecureChannelStatistics = ^UA_SecureChannelStatistics;
+
+  UA_SessionStatistics = record
+      currentSessionCount:size_t;
+      cumulatedSessionCount:size_t;
+      securityRejectedSessionCount:size_t; (* only used by servers *)
+      rejectedSessionCount:size_t;
+      sessionTimeoutCount:size_t;          (* only used by servers *)
+      sessionAbortCount:size_t;            (* only used by servers *)
+  end;
+  PUA_SessionStatistics = ^UA_SessionStatistics;
 
   { ----------------- }
   { --- network.h --- }
@@ -642,7 +703,6 @@ type
  UA_ConnectionState = (UA_CONNECTION_CLOSED, UA_CONNECTION_OPENING, UA_CONNECTION_ESTABLISHED);
 
  UA_SecureChannel = record {undefined structure} end;
- UA_ServerNetworkLayer = record {undefined structure} end;
 
  UA_SOCKET = Integer;
 
@@ -667,6 +727,53 @@ type
 
  UA_ConnectClientConnection = function (config:UA_ConnectionConfig; endpointUrl:UA_String; timeout:UA_UInt32; logger:PUA_Logger):UA_Connection; cdecl;
 
+ {$IFDEF ENABLE_SERVER}
+ PUA_ServerNetworkLayer = ^UA_ServerNetworkLayer;
+ PUA_Server = ^UA_Server;
+ UA_ServerNetworkLayer = record
+     handle:pointer; (* Internal data *)
+
+     (* Points to external memory, i.e. handled by server or client *)
+     statistics:PUA_NetworkStatistics;
+
+     discoveryUrl:UA_String;
+
+     localConnectionConfig:UA_ConnectionConfig;
+
+     (* Start listening on the networklayer.
+      *
+      * @param nl The network layer
+      * @return Returns UA_STATUSCODE_GOOD or an error code. *)
+     start:function(nl:PUA_ServerNetworkLayer; const logger:PUA_Logger;
+                            const customHostname:PUA_String):UA_StatusCode;cdecl;
+
+     (* Listen for new and closed connections and arriving packets. Calls
+      * UA_Server_processBinaryMessage for the arriving packets. Closed
+      * connections are picked up here and forwarded to
+      * UA_Server_removeConnection where they are cleaned up and freed.
+      *
+      * @param nl The network layer
+      * @param server The server for processing the incoming packets and for
+      *               closing connections.
+      * @param timeout The timeout during which an event must arrive in
+      *                milliseconds
+      * @return A statuscode for the status of the network layer. *)
+     listen:function(nl:PUA_ServerNetworkLayer; server:PUA_Server;
+                             timeout:UA_UInt16):UA_StatusCode;cdecl;
+
+     (* Close the network socket and all open connections. Afterwards, the
+      * network layer can be safely deleted.
+      *
+      * @param nl The network layer
+      * @param server The server that processes the incoming packets and for
+      *               closing connections before deleting them.
+      * @return A statuscode for the status of the closing operation. *)
+     stop:procedure(nl:PUA_ServerNetworkLayer; server:PUA_Server);cdecl;
+
+     (* Deletes the network layer context. Call only after stopping. *)
+     clear:procedure(nl:PUA_ServerNetworkLayer);cdecl;
+  end;
+  {$ENDIF}
 
   { ------------------------ }
   { --- securitypolicy.h --- }
@@ -829,7 +936,6 @@ type
   { --- server.h --- }
   { ---------------- }
   UA_Server = record end;
-  PUA_Server = ^UA_Server;
   UA_MethodCallback = function (server: PUA_Server;
                                const sessionId: PUA_NodeId; sessionContext:pointer;
                                const methodId: PUA_NodeId; methodContext:pointer;
@@ -842,6 +948,43 @@ type
   { ----------------------- }
   UA_ServerConfig = record
       logger:UA_Logger;
+      (* Server Description:
+       * The description must be internally consistent.
+       * - The ApplicationUri set in the ApplicationDescription must match the
+       *   URI set in the server certificate *)
+      buildInfo:UA_BuildInfo;
+      applicationDescription:UA_ApplicationDescription;
+      serverCertificate:UA_ByteString;
+
+      shutdownDelay:UA_Double; (* Delay in ms from the shutdown signal (ctrl-c)
+                                  until the actual shutdown. Clients need to be
+                                  able to get a notification ahead of time. *)
+
+      (* Rule Handling *)
+      verifyRequestTimestamp:UA_RuleHandling; (* Verify that the server sends a
+                                               * timestamp in the request header *)
+      allowEmptyVariables:UA_RuleHandling; (* Variables (that don't have a
+                                            * DataType of BaseDataType) must not
+                                            * have an empty variant value. The
+                                            * default behaviour is to auto-create
+                                            * a matching zeroed-out value for
+                                            * empty VariableNodes when they are
+                                            * added. *)
+
+      (* Custom DataTypes. Attention! Custom datatypes are not cleaned up together
+       * with the configuration. So it is possible to allocate them on ROM. *)
+      customDataTypes:PUA_DataTypeArray;
+
+      (**
+       * .. note:: See the section on :ref:`generic-types`. Examples for working
+       *    with custom data types are provided in
+       *    ``/examples/custom_datatype/``. *)
+
+      (* Networking *)
+      networkLayersSize:size_t;
+      networkLayers:PUA_ServerNetworkLayer;
+      customHostname:UA_String;
+
   {
     FIXME define the remaining fields
   }
