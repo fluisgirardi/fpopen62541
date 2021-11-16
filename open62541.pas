@@ -585,6 +585,23 @@ type
   );
 
   (**
+   * Rule Handling
+   * -------------
+   *
+   * The RuleHanding settings define how error cases that result from rules in the
+   * OPC UA specification shall be handled. The rule handling can be softened,
+   * e.g. to workaround misbehaving implementations or to mitigate the impact of
+   * additional rules that are introduced in later versions of the OPC UA
+   * specification. *)
+   UA_RuleHandling = (
+    UA_RULEHANDLING_DEFAULT = 0,
+    UA_RULEHANDLING_ABORT,  (* Abort the operation and return an error code *)
+    UA_RULEHANDLING_WARN,   (* Print a message in the logs and continue *)
+    UA_RULEHANDLING_ACCEPT  (* Continue and disregard the broken rule *)
+    );
+
+
+  (**
    * Connection State
    * ---------------- *)
   UA_SecureChannelState = (
@@ -608,6 +625,50 @@ type
       UA_SESSIONSTATE_CLOSING
   );
   PUA_SessionState = ^UA_SessionState;
+
+  (**
+   * Statistic counters
+   * ------------------
+   *
+   * The stack manage statistic counter for the following layers:
+   *
+   * - Network
+   * - Secure channel
+   * - Session
+   *
+   * The session layer counters are matching the counters of the
+   * ServerDiagnosticsSummaryDataType that are defined in the OPC UA Part 5
+   * specification. Counter of the other layers are not specified by OPC UA but
+   * are harmonized with the session layer counters if possible. *)
+
+  UA_NetworkStatistics = record
+      currentConnectionCount:size_t;
+      cumulatedConnectionCount:size_t;
+      rejectedConnectionCount:size_t;
+      connectionTimeoutCount:size_t;
+      connectionAbortCount:size_t;
+  end;
+  PUA_NetworkStatistics = ^UA_NetworkStatistics;
+
+  UA_SecureChannelStatistics = record
+      currentChannelCount:size_t;
+      cumulatedChannelCount:size_t;
+      rejectedChannelCount:size_t;
+      channelTimeoutCount:size_t; (* only used by servers *)
+      channelAbortCount:size_t;
+      channelPurgeCount:size_t;   (* only used by servers *)
+  end;
+  PUA_SecureChannelStatistics = ^UA_SecureChannelStatistics;
+
+  UA_SessionStatistics = record
+      currentSessionCount:size_t;
+      cumulatedSessionCount:size_t;
+      securityRejectedSessionCount:size_t; (* only used by servers *)
+      rejectedSessionCount:size_t;
+      sessionTimeoutCount:size_t;          (* only used by servers *)
+      sessionAbortCount:size_t;            (* only used by servers *)
+  end;
+  PUA_SessionStatistics = ^UA_SessionStatistics;
 
   { ----------------- }
   { --- network.h --- }
@@ -633,14 +694,15 @@ type
       protocolVersion: UA_UInt32;
       recvBufferSize: UA_UInt32;
       sendBufferSize: UA_UInt32;
-      maxMessageSize: UA_UInt32; (* Indicated by the remote side (0 = unbounded) *)
-      maxChunkCount: UA_UInt32;  (* Indicated by the remote side (0 = unbounded) *)
+      localMaxMessageSize: UA_UInt32;   (*  (0 = unbounded) *)
+      remoteMaxMessageSize: UA_UInt32;  (*  (0 = unbounded) *)
+      localMaxChunkCount: UA_UInt32;    (*  (0 = unbounded) *)
+      remoteMaxChunkCount: UA_UInt32;   (*  (0 = unbounded) *)
   end;
 
  UA_ConnectionState = (UA_CONNECTION_CLOSED, UA_CONNECTION_OPENING, UA_CONNECTION_ESTABLISHED);
 
  UA_SecureChannel = record {undefined structure} end;
- UA_ServerNetworkLayer = record {undefined structure} end;
 
  UA_SOCKET = Integer;
 
@@ -665,6 +727,53 @@ type
 
  UA_ConnectClientConnection = function (config:UA_ConnectionConfig; endpointUrl:UA_String; timeout:UA_UInt32; logger:PUA_Logger):UA_Connection; cdecl;
 
+ {$IFDEF ENABLE_SERVER}
+ PUA_ServerNetworkLayer = ^UA_ServerNetworkLayer;
+ PUA_Server = ^UA_Server;
+ UA_ServerNetworkLayer = record
+     handle:pointer; (* Internal data *)
+
+     (* Points to external memory, i.e. handled by server or client *)
+     statistics:PUA_NetworkStatistics;
+
+     discoveryUrl:UA_String;
+
+     localConnectionConfig:UA_ConnectionConfig;
+
+     (* Start listening on the networklayer.
+      *
+      * @param nl The network layer
+      * @return Returns UA_STATUSCODE_GOOD or an error code. *)
+     start:function(nl:PUA_ServerNetworkLayer; const logger:PUA_Logger;
+                            const customHostname:PUA_String):UA_StatusCode;cdecl;
+
+     (* Listen for new and closed connections and arriving packets. Calls
+      * UA_Server_processBinaryMessage for the arriving packets. Closed
+      * connections are picked up here and forwarded to
+      * UA_Server_removeConnection where they are cleaned up and freed.
+      *
+      * @param nl The network layer
+      * @param server The server for processing the incoming packets and for
+      *               closing connections.
+      * @param timeout The timeout during which an event must arrive in
+      *                milliseconds
+      * @return A statuscode for the status of the network layer. *)
+     listen:function(nl:PUA_ServerNetworkLayer; server:PUA_Server;
+                             timeout:UA_UInt16):UA_StatusCode;cdecl;
+
+     (* Close the network socket and all open connections. Afterwards, the
+      * network layer can be safely deleted.
+      *
+      * @param nl The network layer
+      * @param server The server that processes the incoming packets and for
+      *               closing connections before deleting them.
+      * @return A statuscode for the status of the closing operation. *)
+     stop:procedure(nl:PUA_ServerNetworkLayer; server:PUA_Server);cdecl;
+
+     (* Deletes the network layer context. Call only after stopping. *)
+     clear:procedure(nl:PUA_ServerNetworkLayer);cdecl;
+  end;
+  {$ENDIF}
 
   { ------------------------ }
   { --- securitypolicy.h --- }
@@ -827,14 +936,55 @@ type
   { --- server.h --- }
   { ---------------- }
   UA_Server = record end;
-  PUA_Server = ^UA_Server;
+  UA_MethodCallback = function (server: PUA_Server;
+                               const sessionId: PUA_NodeId; sessionContext:pointer;
+                               const methodId: PUA_NodeId; methodContext:pointer;
+                               const objectId: PUA_NodeId; objectContext:pointer;
+                               inputSize: SIZE_T; const input:PUA_Variant;
+                               outputSize: SIZE_T; output:PUA_Variant): UA_StatusCode; cdecl;
 
   { ----------------------- }
   { --- server_config.h --- }
   { ----------------------- }
   UA_ServerConfig = record
-      nThreads:UA_UInt16; //only if multithreading is enabled
       logger:UA_Logger;
+      (* Server Description:
+       * The description must be internally consistent.
+       * - The ApplicationUri set in the ApplicationDescription must match the
+       *   URI set in the server certificate *)
+      buildInfo:UA_BuildInfo;
+      applicationDescription:UA_ApplicationDescription;
+      serverCertificate:UA_ByteString;
+
+      shutdownDelay:UA_Double; (* Delay in ms from the shutdown signal (ctrl-c)
+                                  until the actual shutdown. Clients need to be
+                                  able to get a notification ahead of time. *)
+
+      (* Rule Handling *)
+      verifyRequestTimestamp:UA_RuleHandling; (* Verify that the server sends a
+                                               * timestamp in the request header *)
+      allowEmptyVariables:UA_RuleHandling; (* Variables (that don't have a
+                                            * DataType of BaseDataType) must not
+                                            * have an empty variant value. The
+                                            * default behaviour is to auto-create
+                                            * a matching zeroed-out value for
+                                            * empty VariableNodes when they are
+                                            * added. *)
+
+      (* Custom DataTypes. Attention! Custom datatypes are not cleaned up together
+       * with the configuration. So it is possible to allocate them on ROM. *)
+      customDataTypes:PUA_DataTypeArray;
+
+      (**
+       * .. note:: See the section on :ref:`generic-types`. Examples for working
+       *    with custom data types are provided in
+       *    ``/examples/custom_datatype/``. *)
+
+      (* Networking *)
+      networkLayersSize:size_t;
+      networkLayers:PUA_ServerNetworkLayer;
+      customHostname:UA_String;
+
   {
     FIXME define the remaining fields
   }
@@ -890,6 +1040,10 @@ const
 var
   UA_TYPES: PUA_DataType;
   UA_VariableAttributes_default: UA_VariableAttributes;
+  UA_ObjectAttributes_default: UA_ObjectAttributes;
+  UA_ObjectTypeAttributes_default: UA_ObjectTypeAttributes;
+  UA_ReferenceTypeAttributes_default: UA_ReferenceTypeAttributes;
+  UA_DataTypeAttributes_default: UA_DataTypeAttributes;
 
   UA_Client_new: function (): PUA_Client; cdecl;
   UA_Client_newWithConfig: function(const config: PUA_ClientConfig): PUA_Client; cdecl;
@@ -957,6 +1111,26 @@ var
                       const attributeType: PUA_DataType;
                       nodeContext: Pointer; outNewNodeId: PUA_NodeId): UA_StatusCode; cdecl;
   __UA_Server_write: function (server: PUA_Server; const nodeId: PUA_NodeId; const attributeId: UA_AttributeId; const attr_type: PUA_DataType; attr: Pointer): UA_StatusCode; cdecl;
+  UA_Server_addReference: function (server: PUA_Server; const sourceId:UA_NodeId;
+                                    const refTypeId: UA_NodeId;
+                                    const targetId: UA_ExpandedNodeId; isForward: UA_Boolean): UA_StatusCode; cdecl;
+  UA_Server_deleteReference: function (server: PUA_Server; const sourceNodeId:UA_NodeId;
+                                       const referenceTypeId: UA_NodeId; isForward: UA_Boolean;
+                                       const targetNodeId: UA_ExpandedNodeId; deleteBitirectional: UA_Boolean): UA_StatusCode; cdecl;
+  UA_Server_addNamespace: function (server: PUA_Server; namespace: PChar): UA_Uint16; cdecl;
+  UA_Server_addMethodNodeEx: function(server: PUA_Server; const requestedNewNodeId:UA_NodeId;
+                            const parentNodeId:UA_NodeId;
+                            const referenceTypeId:UA_NodeId;
+                            const browseName:UA_QualifiedName ;
+                            const attr:UA_MethodAttributes; method:UA_MethodCallback;
+                            inputArgumentsSize:SIZE_T; const inputArguments: PUA_Argument;
+                            const inputArgumentsRequestedNewNodeId:UA_NodeId;
+                            inputArgumentsOutNewNodeId:PUA_NodeId;
+                            outputArgumentsSize:SIZE_T; const outputArguments:PUA_Argument;
+                            const outputArgumentsRequestedNewNodeId:UA_NodeId;
+                            outputArgumentsOutNewNodeId:PUA_NodeId;
+                            nodeContext: pointer; outNewNodeId:PUA_NodeId): UA_StatusCode; cdecl;
+  UA_MethodAttributes_default:UA_MethodAttributes;
   {$ENDIF}
 
   procedure LoadOpen62541();
@@ -965,6 +1139,11 @@ var
 var
   UA_TYPES: array[0..UA_TYPES_COUNT-1] of UA_DataType; external libopen62541;
   UA_VariableAttributes_default: UA_VariableAttributes; external libopen62541;
+  UA_ObjectAttributes_default: UA_ObjectAttributes; external libopen62541;
+  UA_MethodAttributes_default: UA_MethodAttributes; external libopen62541;
+  UA_ObjectTypeAttributes_default: UA_ObjectTypeAttributes; external libopen62541;
+  UA_ReferenceTypeAttributes_default: UA_ReferenceTypeAttributes; external libopen62541;
+  UA_DataTypeAttributes_default: UA_DataTypeAttributes; external libopen62541;
 
 { ---------------- }
 { --- client.h --- }
@@ -1212,7 +1391,26 @@ function __UA_Server_addNode(server: PUA_Server; const nodeClass: UA_NodeClass;
                     const attr: PUA_NodeAttributes;
                     const attributeType: PUA_DataType;
                     nodeContext: Pointer; outNewNodeId: PUA_NodeId): UA_StatusCode; cdecl;  external libopen62541;
+function UA_Server_addReference(server: PUA_Server; const sourceId:UA_NodeId;
+                                const refTypeId: UA_NodeId;
+                                const targetId: UA_ExpandedNodeId; isForward: UA_Boolean): UA_StatusCode; cdecl; external libopen62541;
+function UA_Server_deleteReference(server: PUA_Server; const sourceNodeId:UA_NodeId;
+                                   const referenceTypeId: UA_NodeId; isForward: UA_Boolean;
+                                   const targetNodeId: UA_ExpandedNodeId; deleteBitirectional: UA_Boolean): UA_StatusCode; cdecl; external libopen62541;
 function __UA_Server_write(server: PUA_Server; const nodeId: PUA_NodeId; const attributeId: UA_AttributeId; const attr_type: PUA_DataType; attr: Pointer): UA_StatusCode; cdecl; external libopen62541;
+function UA_Server_addNamespace: function (server: PUA_Server; namespace: PChar):UA_Uint16; cdecl; external libopen62541;
+function UA_Server_addMethodNodeEx: function(server: PUA_Server; const requestedNewNodeId:PUA_NodeId;
+                          const parentNodeId:PUA_NodeId;
+                          const referenceTypeId:PUA_NodeId;
+                          const browseName:PUA_QualifiedName ;
+                          const attr:PUA_MethodAttributes; method:UA_MethodCallback;
+                          inputArgumentsSize:SIZE_T; const inputArguments: PUA_Argument;
+                          const inputArgumentsRequestedNewNodeId:PUA_NodeId;
+                          inputArgumentsOutNewNodeId:PUA_NodeId;
+                          outputArgumentsSize:SIZE_T; const outputArguments:PUA_Argument;
+                          const outputArgumentsRequestedNewNodeId:PUA_NodeId;
+                          outputArgumentsOutNewNodeId:PUA_NodeId;
+                          nodeContext: pointer; outNewNodeId:PUA_NodeId): UA_StatusCode; cdecl;  external libopen62541;
 {$ENDIF}
 {$ENDIF}
 
@@ -1271,6 +1469,7 @@ function UA_NODEID_STRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA
 function UA_NODEID_GUID(nsIndex: UA_UInt16; guid: UA_Guid): UA_NodeId;
 function UA_NODEID_BYTESTRING(nsIndex: UA_UInt16; var chars: AnsiString): UA_NodeId;
 function UA_NODEID_BYTESTRING_ALLOC(nsIndex: UA_UInt16; const chars: AnsiString): UA_NodeId;
+function UA_EXPANDEDNODEID_NUMERIC(nsIndex: UA_UInt16; identifier: UA_Uint32): UA_ExpandedNodeId;
 
 (* Test if the data type is a numeric builtin data type. This includes Boolean,
  * integers and floating point numbers. Not included are DateTime and StatusCode. *)
@@ -1362,7 +1561,56 @@ function UA_Server_addVariableNode(server: PUA_Server; const requestedNewNodeId:
                           const typeDefinition: UA_NodeId;
                           const attr: UA_VariableAttributes;
                           nodeContext: Pointer; outNewNodeId: PUA_NodeId): UA_StatusCode;
+function UA_Server_addObjectTypeNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                            const parentNodeId:UA_NodeId;
+                            const referenceTypeId:UA_NodeId;
+                            const browseName: UA_QualifiedName;
+                            const attr:UA_ObjectTypeAttributes;
+                            nodeContext:pointer; outNewNodeId: PUA_NodeId):UA_StatusCode;
+function UA_Server_addObjectNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                        const parentNodeId:UA_NodeId;
+                        const referenceTypeId:UA_NodeId;
+                        const browseName: UA_QualifiedName;
+                        const typeDefinition: UA_NodeId;
+                        const attr:UA_ObjectAttributes;
+                        nodeContext:pointer; outNewNodeId: PUA_NodeId):UA_StatusCode;
+function UA_Server_addVariableTypeNode(server:PUA_Server;
+                              const requestedNewNodeId:UA_NodeId;
+                              const parentNodeId:UA_NodeId;
+                              const referenceTypeId:UA_NodeId;
+                              const browseName:UA_QualifiedName;
+                              const typeDefinition:UA_NodeId;
+                              const attr:UA_VariableTypeAttributes;
+                              nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+function UA_Server_addViewNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                      const parentNodeId:UA_NodeId;
+                      const referenceTypeId:UA_NodeId;
+                      const browseName:UA_QualifiedName;
+                      const attr:UA_ViewAttributes;
+                      nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+function UA_Server_addReferenceTypeNode(server:PUA_Server;
+                               const requestedNewNodeId:UA_NodeId;
+                               const parentNodeId:UA_NodeId;
+                               const referenceTypeId:UA_NodeId;
+                               const browseName:UA_QualifiedName;
+                               const attr:UA_ReferenceTypeAttributes;
+                               nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+function UA_Server_addDataTypeNode(server:PUA_Server;
+                          const requestedNewNodeId:UA_NodeId;
+                          const parentNodeId:UA_NodeId;
+                          const referenceTypeId:UA_NodeId;
+                          const browseName:UA_QualifiedName;
+                          const attr:UA_DataTypeAttributes;
+                          nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
 function UA_Server_writeValue(server: PUA_Server; const nodeId: UA_NodeId; const value: UA_Variant): UA_StatusCode;
+function UA_Server_addMethodNode(server: PUA_Server; const requestedNewNodeId:UA_NodeId;
+                            const parentNodeId:UA_NodeId;
+                            const referenceTypeId:UA_NodeId;
+                            const browseName:UA_QualifiedName ;
+                            const attr:UA_MethodAttributes; method:UA_MethodCallback;
+                            inputArgumentsSize:SIZE_T; const inputArguments: PUA_Argument;
+                            outputArgumentsSize:SIZE_T; const outputArguments:PUA_Argument;
+                            nodeContext: pointer; outNewNodeId:PUA_NodeId): UA_StatusCode;
 {$ENDIF}
 
 implementation
@@ -1403,6 +1651,11 @@ begin
 
     pointer(UA_TYPES) := GetProcedureAddress(open62541LibHandle,'UA_TYPES'); // external variable name
     UA_VariableAttributes_default := PUA_VariableAttributes(GetProcedureAddress(open62541LibHandle,'UA_VariableAttributes_default'))^;
+    UA_MethodAttributes_default := PUA_MethodAttributes(GetProcedureAddress(open62541LibHandle,'UA_MethodAttributes_default'))^;
+    UA_ObjectAttributes_default := PUA_ObjectAttributes(GetProcedureAddress(open62541LibHandle,'UA_ObjectAttributes_default'))^;
+    UA_ObjectTypeAttributes_default := PUA_ObjectTypeAttributes(GetProcedureAddress(open62541LibHandle,'UA_ObjectTypeAttributes_default'))^;
+    UA_ReferenceTypeAttributes_default := PUA_ReferenceTypeAttributes(GetProcedureAddress(open62541LibHandle,'UA_ReferenceTypeAttributes_default'))^;
+    UA_DataTypeAttributes_default := PUA_DataTypeAttributes(GetProcedureAddress(open62541LibHandle,'UA_DataTypeAttributes_default'))^;
 
     @UA_Client_new := GetProcedureAddress(open62541LibHandle,'UA_Client_new');
     @UA_Client_newWithConfig := GetProcedureAddress(open62541LibHandle,'UA_Client_newWithConfig');
@@ -1458,7 +1711,11 @@ begin
     @UA_Server_run_shutdown := GetProcedureAddress(open62541LibHandle,'UA_Server_run_shutdown');
 
     @__UA_Server_addNode := GetProcedureAddress(open62541LibHandle,'__UA_Server_addNode');
+    @UA_Server_addReference:= GetProcedureAddress(open62541LibHandle,'UA_Server_addReference');
+    @UA_Server_deleteReference:= GetProcedureAddress(open62541LibHandle,'UA_Server_deleteReference');
     @__UA_Server_write := GetProcedureAddress(open62541LibHandle,'__UA_Server_write');
+    @UA_Server_addNamespace := GetProcedureAddress(open62541LibHandle,'UA_Server_addNamespace');
+    @UA_Server_addMethodNodeEx := GetProcedureAddress(open62541LibHandle,'UA_Server_addMethodNodeEx');
   end;
 end;
 
@@ -1837,6 +2094,13 @@ begin
   Result.identifier.byteString := _UA_BYTESTRING_ALLOC(chars);
 end;
 
+function UA_EXPANDEDNODEID_NUMERIC(nsIndex: UA_UInt16; identifier: UA_Uint32): UA_ExpandedNodeId;
+begin
+  result.nodeId:=UA_NODEID_NUMERIC(nsIndex, identifier);
+  result.serverIndex:=0;
+  result.namespaceUri:=UA_STRING_NULL;
+end;
+
 procedure UA_init(p: Pointer; const _type: PUA_DataType);
 begin
   FillChar(p^, _type^.memSize, #0);
@@ -2125,10 +2389,120 @@ begin
                                nodeContext, outNewNodeId);
 end;
 
+function UA_Server_addObjectTypeNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                            const parentNodeId:UA_NodeId;
+                            const referenceTypeId:UA_NodeId;
+                            const browseName: UA_QualifiedName;
+                            const attr:UA_ObjectTypeAttributes;
+                            nodeContext:pointer; outNewNodeId: PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_OBJECTTYPE, @requestedNewNodeId,
+                               @parentNodeId, @referenceTypeId, browseName,
+                               @UA_NODEID_NULL, @attr,
+                               @UA_TYPES[UA_TYPES_OBJECTTYPEATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
+
+function UA_Server_addObjectNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                        const parentNodeId:UA_NodeId;
+                        const referenceTypeId:UA_NodeId;
+                        const browseName: UA_QualifiedName;
+                        const typeDefinition: UA_NodeId;
+                        const attr:UA_ObjectAttributes;
+                        nodeContext:pointer; outNewNodeId: PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_OBJECT, @requestedNewNodeId,
+                               @parentNodeId, @referenceTypeId, browseName,
+                               @typeDefinition, @attr,
+                               @UA_TYPES[UA_TYPES_OBJECTATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
+function UA_Server_addVariableTypeNode(server:PUA_Server;
+                              const requestedNewNodeId:UA_NodeId;
+                              const parentNodeId:UA_NodeId;
+                              const referenceTypeId:UA_NodeId;
+                              const browseName:UA_QualifiedName;
+                              const typeDefinition:UA_NodeId;
+                              const attr:UA_VariableTypeAttributes;
+                              nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_VARIABLETYPE,
+                               @requestedNewNodeId, @parentNodeId, @referenceTypeId,
+                               browseName, @typeDefinition,
+                               @attr,
+                               @UA_TYPES[UA_TYPES_VARIABLETYPEATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
+function UA_Server_addViewNode(server:PUA_Server; const requestedNewNodeId:UA_NodeId;
+                      const parentNodeId:UA_NodeId;
+                      const referenceTypeId:UA_NodeId;
+                      const browseName:UA_QualifiedName;
+                      const attr:UA_ViewAttributes;
+                      nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_VIEW, @requestedNewNodeId,
+                               @parentNodeId, @referenceTypeId, browseName,
+                               @UA_NODEID_NULL, @attr,
+                               @UA_TYPES[UA_TYPES_VIEWATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
+function UA_Server_addReferenceTypeNode(server:PUA_Server;
+                               const requestedNewNodeId:UA_NodeId;
+                               const parentNodeId:UA_NodeId;
+                               const referenceTypeId:UA_NodeId;
+                               const browseName:UA_QualifiedName;
+                               const attr:UA_ReferenceTypeAttributes;
+                               nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_REFERENCETYPE,
+                               @requestedNewNodeId, @parentNodeId, @referenceTypeId,
+                               browseName, @UA_NODEID_NULL,
+                               @attr,
+                               @UA_TYPES[UA_TYPES_REFERENCETYPEATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
+function UA_Server_addDataTypeNode(server:PUA_Server;
+                          const requestedNewNodeId:UA_NodeId;
+                          const parentNodeId:UA_NodeId;
+                          const referenceTypeId:UA_NodeId;
+                          const browseName:UA_QualifiedName;
+                          const attr:UA_DataTypeAttributes;
+                          nodeContext:pointer; outNewNodeId:PUA_NodeId):UA_StatusCode;
+begin
+    result:= __UA_Server_addNode(server, UA_NODECLASS_DATATYPE, @requestedNewNodeId,
+                               @parentNodeId, @referenceTypeId, browseName,
+                               @UA_NODEID_NULL, @attr,
+                               @UA_TYPES[UA_TYPES_DATATYPEATTRIBUTES],
+                               nodeContext, outNewNodeId);
+end;
+
 function UA_Server_writeValue(server: PUA_Server; const nodeId: UA_NodeId; const value: UA_Variant): UA_StatusCode;
 begin
   Result := __UA_Server_write(server, @nodeId, UA_ATTRIBUTEID_VALUE, @UA_TYPES[UA_TYPES_VARIANT], @value);
 end;
+
+function UA_Server_addMethodNode(server: PUA_Server; const requestedNewNodeId:UA_NodeId;
+                            const parentNodeId:UA_NodeId;
+                            const referenceTypeId:UA_NodeId;
+                            const browseName:UA_QualifiedName ;
+                            const attr:UA_MethodAttributes; method:UA_MethodCallback;
+                            inputArgumentsSize:SIZE_T; const inputArguments: PUA_Argument;
+                            outputArgumentsSize:SIZE_T; const outputArguments:PUA_Argument;
+                            nodeContext: pointer; outNewNodeId:PUA_NodeId): UA_StatusCode;
+begin
+  result := UA_Server_addMethodNodeEx(server, requestedNewNodeId, parentNodeId,
+                                      referenceTypeId, browseName, attr, method,
+                                      inputArgumentsSize, inputArguments, UA_NODEID_NULL, nil,
+                                      outputArgumentsSize, outputArguments, UA_NODEID_NULL, nil,
+                                      nodeContext, outNewNodeId);
+end;
+
+
 {$ENDIF}
 end.
 

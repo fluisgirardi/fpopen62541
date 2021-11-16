@@ -1,5 +1,5 @@
 (* Generated from Opc.Ua.Types.bsd with script ./generate_datatypes_fpc.py
-* on host seis by user luca at 2021-01-21 03:44:50 *)
+* on host seis by user luca at 2021-11-04 04:52:46 *)
 
 (**
  * Every type is assigned an index in an array containing the type descriptions.
@@ -159,663 +159,6 @@ const
   UA_TYPES_DIAGNOSTICINFO = 24;
 
 (**
- * ViewAttributes
- * ^^^^^^^^^^^^^^
- * The attributes for a view node. *)
-type
-  UA_ViewAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    containsNoLoops: UA_Boolean;
-    eventNotifier: UA_Byte;
-  end;
-  PUA_ViewAttributes = ^UA_ViewAttributes;
-
-const
-  UA_TYPES_VIEWATTRIBUTES = 25;
-
-(**
- * XVType
- * ^^^^^^
- *)
-type
-  UA_XVType = record
-    x: UA_Double;
-    value: UA_Float;
-  end;
-  PUA_XVType = ^UA_XVType;
-
-const
-  UA_TYPES_XVTYPE = 26;
-
-(**
- * ElementOperand
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_ElementOperand = record
-    index: UA_UInt32;
-  end;
-  PUA_ElementOperand = ^UA_ElementOperand;
-
-const
-  UA_TYPES_ELEMENTOPERAND = 27;
-
-(**
- * VariableAttributes
- * ^^^^^^^^^^^^^^^^^^
- * The attributes for a variable node. *)
-type
-  UA_VariableAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    value: UA_Variant;
-    dataType: UA_NodeId;
-    valueRank: UA_Int32;
-    arrayDimensionsSize: size_t;
-    arrayDimensions: PUA_UInt32;
-    accessLevel: UA_Byte;
-    userAccessLevel: UA_Byte;
-    minimumSamplingInterval: UA_Double;
-    historizing: UA_Boolean;
-  end;
-  PUA_VariableAttributes = ^UA_VariableAttributes;
-
-const
-  UA_TYPES_VARIABLEATTRIBUTES = 28;
-
-(**
- * EnumValueType
- * ^^^^^^^^^^^^^
- * A mapping between a value of an enumerated type and a name and description. *)
-type
-  UA_EnumValueType = record
-    value: UA_Int64;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-  end;
-  PUA_EnumValueType = ^UA_EnumValueType;
-
-const
-  UA_TYPES_ENUMVALUETYPE = 29;
-
-(**
- * EventFieldList
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_EventFieldList = record
-    clientHandle: UA_UInt32;
-    eventFieldsSize: size_t;
-    eventFields: PUA_Variant;
-  end;
-  PUA_EventFieldList = ^UA_EventFieldList;
-
-const
-  UA_TYPES_EVENTFIELDLIST = 30;
-
-(**
- * MonitoredItemCreateResult
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoredItemCreateResult = record
-    statusCode: UA_StatusCode;
-    monitoredItemId: UA_UInt32;
-    revisedSamplingInterval: UA_Double;
-    revisedQueueSize: UA_UInt32;
-    filterResult: UA_ExtensionObject;
-  end;
-  PUA_MonitoredItemCreateResult = ^UA_MonitoredItemCreateResult;
-
-const
-  UA_TYPES_MONITOREDITEMCREATERESULT = 31;
-
-(**
- * EUInformation
- * ^^^^^^^^^^^^^
- *)
-type
-  UA_EUInformation = record
-    namespaceUri: UA_String;
-    unitId: UA_Int32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-  end;
-  PUA_EUInformation = ^UA_EUInformation;
-
-const
-  UA_TYPES_EUINFORMATION = 32;
-
-(**
- * ServerDiagnosticsSummaryDataType
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ServerDiagnosticsSummaryDataType = record
-    serverViewCount: UA_UInt32;
-    currentSessionCount: UA_UInt32;
-    cumulatedSessionCount: UA_UInt32;
-    securityRejectedSessionCount: UA_UInt32;
-    rejectedSessionCount: UA_UInt32;
-    sessionTimeoutCount: UA_UInt32;
-    sessionAbortCount: UA_UInt32;
-    currentSubscriptionCount: UA_UInt32;
-    cumulatedSubscriptionCount: UA_UInt32;
-    publishingIntervalCount: UA_UInt32;
-    securityRejectedRequestsCount: UA_UInt32;
-    rejectedRequestsCount: UA_UInt32;
-  end;
-  PUA_ServerDiagnosticsSummaryDataType = ^UA_ServerDiagnosticsSummaryDataType;
-
-const
-  UA_TYPES_SERVERDIAGNOSTICSSUMMARYDATATYPE = 33;
-
-(**
- * ContentFilterElementResult
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ContentFilterElementResult = record
-    statusCode: UA_StatusCode;
-    operandStatusCodesSize: size_t;
-    operandStatusCodes: PUA_StatusCode;
-    operandDiagnosticInfosSize: size_t;
-    operandDiagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_ContentFilterElementResult = ^UA_ContentFilterElementResult;
-
-const
-  UA_TYPES_CONTENTFILTERELEMENTRESULT = 34;
-
-(**
- * LiteralOperand
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_LiteralOperand = record
-    value: UA_Variant;
-  end;
-  PUA_LiteralOperand = ^UA_LiteralOperand;
-
-const
-  UA_TYPES_LITERALOPERAND = 35;
-
-(**
- * MessageSecurityMode
- * ^^^^^^^^^^^^^^^^^^^
- * The type of security to use on a message. *)
-type
-  UA_MessageSecurityMode = (
-    UA_MESSAGESECURITYMODE_INVALID = 0,
-    UA_MESSAGESECURITYMODE_NONE = 1,
-    UA_MESSAGESECURITYMODE_SIGN = 2,
-    UA_MESSAGESECURITYMODE_SIGNANDENCRYPT = 3,
-    __UA_MESSAGESECURITYMODE_FORCE32BIT = $7fffffff
-  );
-  PUA_MessageSecurityMode = ^UA_MessageSecurityMode;
-  {$IF sizeof(UA_MessageSecurityMode) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_MESSAGESECURITYMODE = 36;
-
-(**
- * UtcTime
- * ^^^^^^^
- * A date/time value specified in Universal Coordinated Time (UTC). *)
-type
-  UA_UtcTime = UA_DateTime;
-
-const
-  UA_TYPES_UTCTIME = 37;
-
-(**
- * UserIdentityToken
- * ^^^^^^^^^^^^^^^^^
- * A base type for a user identity token. *)
-type
-  UA_UserIdentityToken = record
-    policyId: UA_String;
-  end;
-  PUA_UserIdentityToken = ^UA_UserIdentityToken;
-
-const
-  UA_TYPES_USERIDENTITYTOKEN = 38;
-
-(**
- * X509IdentityToken
- * ^^^^^^^^^^^^^^^^^
- * A token representing a user identified by an X509 certificate. *)
-type
-  UA_X509IdentityToken = record
-    policyId: UA_String;
-    certificateData: UA_ByteString;
-  end;
-  PUA_X509IdentityToken = ^UA_X509IdentityToken;
-
-const
-  UA_TYPES_X509IDENTITYTOKEN = 39;
-
-(**
- * MonitoredItemNotification
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoredItemNotification = record
-    clientHandle: UA_UInt32;
-    value: UA_DataValue;
-  end;
-  PUA_MonitoredItemNotification = ^UA_MonitoredItemNotification;
-
-const
-  UA_TYPES_MONITOREDITEMNOTIFICATION = 40;
-
-(**
- * StructureType
- * ^^^^^^^^^^^^^
- *)
-type
-  UA_StructureType = (
-    UA_STRUCTURETYPE_STRUCTURE = 0,
-    UA_STRUCTURETYPE_STRUCTUREWITHOPTIONALFIELDS = 1,
-    UA_STRUCTURETYPE_UNION = 2,
-    __UA_STRUCTURETYPE_FORCE32BIT = $7fffffff
-  );
-  PUA_StructureType = ^UA_StructureType;
-  {$IF sizeof(UA_StructureType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_STRUCTURETYPE = 41;
-
-(**
- * ResponseHeader
- * ^^^^^^^^^^^^^^
- * The header passed with every server response. *)
-type
-  UA_ResponseHeader = record
-    timestamp: UA_DateTime;
-    requestHandle: UA_UInt32;
-    serviceResult: UA_StatusCode;
-    serviceDiagnostics: UA_DiagnosticInfo;
-    stringTableSize: size_t;
-    stringTable: PUA_String;
-    additionalHeader: UA_ExtensionObject;
-  end;
-  PUA_ResponseHeader = ^UA_ResponseHeader;
-
-const
-  UA_TYPES_RESPONSEHEADER = 42;
-
-(**
- * SignatureData
- * ^^^^^^^^^^^^^
- * A digital signature. *)
-type
-  UA_SignatureData = record
-    algorithm: UA_String;
-    signature: UA_ByteString;
-  end;
-  PUA_SignatureData = ^UA_SignatureData;
-
-const
-  UA_TYPES_SIGNATUREDATA = 43;
-
-(**
- * ModifySubscriptionResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ModifySubscriptionResponse = record
-    responseHeader: UA_ResponseHeader;
-    revisedPublishingInterval: UA_Double;
-    revisedLifetimeCount: UA_UInt32;
-    revisedMaxKeepAliveCount: UA_UInt32;
-  end;
-  PUA_ModifySubscriptionResponse = ^UA_ModifySubscriptionResponse;
-
-const
-  UA_TYPES_MODIFYSUBSCRIPTIONRESPONSE = 44;
-
-(**
- * NodeAttributes
- * ^^^^^^^^^^^^^^
- * The base attributes for all nodes. *)
-type
-  UA_NodeAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-  end;
-  PUA_NodeAttributes = ^UA_NodeAttributes;
-
-const
-  UA_TYPES_NODEATTRIBUTES = 45;
-
-(**
- * ActivateSessionResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^
- * Activates a session with the server. *)
-type
-  UA_ActivateSessionResponse = record
-    responseHeader: UA_ResponseHeader;
-    serverNonce: UA_ByteString;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_ActivateSessionResponse = ^UA_ActivateSessionResponse;
-
-const
-  UA_TYPES_ACTIVATESESSIONRESPONSE = 46;
-
-(**
- * EnumField
- * ^^^^^^^^^
- *)
-type
-  UA_EnumField = record
-    value: UA_Int64;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    name: UA_String;
-  end;
-  PUA_EnumField = ^UA_EnumField;
-
-const
-  UA_TYPES_ENUMFIELD = 47;
-
-(**
- * VariableTypeAttributes
- * ^^^^^^^^^^^^^^^^^^^^^^
- * The attributes for a variable type node. *)
-type
-  UA_VariableTypeAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    value: UA_Variant;
-    dataType: UA_NodeId;
-    valueRank: UA_Int32;
-    arrayDimensionsSize: size_t;
-    arrayDimensions: PUA_UInt32;
-    isAbstract: UA_Boolean;
-  end;
-  PUA_VariableTypeAttributes = ^UA_VariableTypeAttributes;
-
-const
-  UA_TYPES_VARIABLETYPEATTRIBUTES = 48;
-
-(**
- * CallMethodResult
- * ^^^^^^^^^^^^^^^^
- *)
-type
-  UA_CallMethodResult = record
-    statusCode: UA_StatusCode;
-    inputArgumentResultsSize: size_t;
-    inputArgumentResults: PUA_StatusCode;
-    inputArgumentDiagnosticInfosSize: size_t;
-    inputArgumentDiagnosticInfos: PUA_DiagnosticInfo;
-    outputArgumentsSize: size_t;
-    outputArguments: PUA_Variant;
-  end;
-  PUA_CallMethodResult = ^UA_CallMethodResult;
-
-const
-  UA_TYPES_CALLMETHODRESULT = 49;
-
-(**
- * MonitoringMode
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoringMode = (
-    UA_MONITORINGMODE_DISABLED = 0,
-    UA_MONITORINGMODE_SAMPLING = 1,
-    UA_MONITORINGMODE_REPORTING = 2,
-    __UA_MONITORINGMODE_FORCE32BIT = $7fffffff
-  );
-  PUA_MonitoringMode = ^UA_MonitoringMode;
-  {$IF sizeof(UA_MonitoringMode) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_MONITORINGMODE = 50;
-
-(**
- * SetMonitoringModeResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_SetMonitoringModeResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_SetMonitoringModeResponse = ^UA_SetMonitoringModeResponse;
-
-const
-  UA_TYPES_SETMONITORINGMODERESPONSE = 51;
-
-(**
- * BrowseResultMask
- * ^^^^^^^^^^^^^^^^
- * A bit mask which specifies what should be returned in a browse response. *)
-type
-  UA_BrowseResultMask = (
-    UA_BROWSERESULTMASK_NONE = 0,
-    UA_BROWSERESULTMASK_REFERENCETYPEID = 1,
-    UA_BROWSERESULTMASK_ISFORWARD = 2,
-    UA_BROWSERESULTMASK_NODECLASS = 4,
-    UA_BROWSERESULTMASK_BROWSENAME = 8,
-    UA_BROWSERESULTMASK_DISPLAYNAME = 16,
-    UA_BROWSERESULTMASK_TYPEDEFINITION = 32,
-    UA_BROWSERESULTMASK_ALL = 63,
-    UA_BROWSERESULTMASK_REFERENCETYPEINFO = 3,
-    UA_BROWSERESULTMASK_TARGETINFO = 60,
-    __UA_BROWSERESULTMASK_FORCE32BIT = $7fffffff
-  );
-  PUA_BrowseResultMask = ^UA_BrowseResultMask;
-  {$IF sizeof(UA_BrowseResultMask) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_BROWSERESULTMASK = 52;
-
-(**
- * RequestHeader
- * ^^^^^^^^^^^^^
- * The header passed with every server request. *)
-type
-  UA_RequestHeader = record
-    authenticationToken: UA_NodeId;
-    timestamp: UA_DateTime;
-    requestHandle: UA_UInt32;
-    returnDiagnostics: UA_UInt32;
-    auditEntryId: UA_String;
-    timeoutHint: UA_UInt32;
-    additionalHeader: UA_ExtensionObject;
-  end;
-  PUA_RequestHeader = ^UA_RequestHeader;
-
-const
-  UA_TYPES_REQUESTHEADER = 53;
-
-(**
- * MonitoredItemModifyResult
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoredItemModifyResult = record
-    statusCode: UA_StatusCode;
-    revisedSamplingInterval: UA_Double;
-    revisedQueueSize: UA_UInt32;
-    filterResult: UA_ExtensionObject;
-  end;
-  PUA_MonitoredItemModifyResult = ^UA_MonitoredItemModifyResult;
-
-const
-  UA_TYPES_MONITOREDITEMMODIFYRESULT = 54;
-
-(**
- * CloseSecureChannelRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- * Closes a secure channel. *)
-type
-  UA_CloseSecureChannelRequest = record
-    requestHeader: UA_RequestHeader;
-  end;
-  PUA_CloseSecureChannelRequest = ^UA_CloseSecureChannelRequest;
-
-const
-  UA_TYPES_CLOSESECURECHANNELREQUEST = 55;
-
-(**
- * NotificationMessage
- * ^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_NotificationMessage = record
-    sequenceNumber: UA_UInt32;
-    publishTime: UA_DateTime;
-    notificationDataSize: size_t;
-    notificationData: PUA_ExtensionObject;
-  end;
-  PUA_NotificationMessage = ^UA_NotificationMessage;
-
-const
-  UA_TYPES_NOTIFICATIONMESSAGE = 56;
-
-(**
- * CreateSubscriptionResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_CreateSubscriptionResponse = record
-    responseHeader: UA_ResponseHeader;
-    subscriptionId: UA_UInt32;
-    revisedPublishingInterval: UA_Double;
-    revisedLifetimeCount: UA_UInt32;
-    revisedMaxKeepAliveCount: UA_UInt32;
-  end;
-  PUA_CreateSubscriptionResponse = ^UA_CreateSubscriptionResponse;
-
-const
-  UA_TYPES_CREATESUBSCRIPTIONRESPONSE = 57;
-
-(**
- * EnumDefinition
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_EnumDefinition = record
-    fieldsSize: size_t;
-    fields: PUA_EnumField;
-  end;
-  PUA_EnumDefinition = ^UA_EnumDefinition;
-
-const
-  UA_TYPES_ENUMDEFINITION = 58;
-
-(**
- * AxisScaleEnumeration
- * ^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_AxisScaleEnumeration = (
-    UA_AXISSCALEENUMERATION_LINEAR = 0,
-    UA_AXISSCALEENUMERATION_LOG = 1,
-    UA_AXISSCALEENUMERATION_LN = 2,
-    __UA_AXISSCALEENUMERATION_FORCE32BIT = $7fffffff
-  );
-  PUA_AxisScaleEnumeration = ^UA_AxisScaleEnumeration;
-  {$IF sizeof(UA_AxisScaleEnumeration) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_AXISSCALEENUMERATION = 59;
-
-(**
- * BrowseDirection
- * ^^^^^^^^^^^^^^^
- * The directions of the references to return. *)
-type
-  UA_BrowseDirection = (
-    UA_BROWSEDIRECTION_FORWARD = 0,
-    UA_BROWSEDIRECTION_INVERSE = 1,
-    UA_BROWSEDIRECTION_BOTH = 2,
-    UA_BROWSEDIRECTION_INVALID = 3,
-    __UA_BROWSEDIRECTION_FORCE32BIT = $7fffffff
-  );
-  PUA_BrowseDirection = ^UA_BrowseDirection;
-  {$IF sizeof(UA_BrowseDirection) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_BROWSEDIRECTION = 60;
-
-(**
- * CallMethodRequest
- * ^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_CallMethodRequest = record
-    objectId: UA_NodeId;
-    methodId: UA_NodeId;
-    inputArgumentsSize: size_t;
-    inputArguments: PUA_Variant;
-  end;
-  PUA_CallMethodRequest = ^UA_CallMethodRequest;
-
-const
-  UA_TYPES_CALLMETHODREQUEST = 61;
-
-(**
- * ReadResponse
- * ^^^^^^^^^^^^
- *)
-type
-  UA_ReadResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_DataValue;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_ReadResponse = ^UA_ReadResponse;
-
-const
-  UA_TYPES_READRESPONSE = 62;
-
-(**
- * TimestampsToReturn
- * ^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_TimestampsToReturn = (
-    UA_TIMESTAMPSTORETURN_SOURCE = 0,
-    UA_TIMESTAMPSTORETURN_SERVER = 1,
-    UA_TIMESTAMPSTORETURN_BOTH = 2,
-    UA_TIMESTAMPSTORETURN_NEITHER = 3,
-    UA_TIMESTAMPSTORETURN_INVALID = 4,
-    __UA_TIMESTAMPSTORETURN_FORCE32BIT = $7fffffff
-  );
-  PUA_TimestampsToReturn = ^UA_TimestampsToReturn;
-  {$IF sizeof(UA_TimestampsToReturn) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_TIMESTAMPSTORETURN = 63;
-
-(**
  * NodeClass
  * ^^^^^^^^^
  * A mask specifying the class of the node. *)
@@ -836,826 +179,24 @@ type
   {$IF sizeof(UA_NodeClass) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_NODECLASS = 64;
+  UA_TYPES_NODECLASS = 25;
 
 (**
- * ObjectTypeAttributes
- * ^^^^^^^^^^^^^^^^^^^^
- * The attributes for an object type node. *)
-type
-  UA_ObjectTypeAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    isAbstract: UA_Boolean;
-  end;
-  PUA_ObjectTypeAttributes = ^UA_ObjectTypeAttributes;
-
-const
-  UA_TYPES_OBJECTTYPEATTRIBUTES = 65;
-
-(**
- * SecurityTokenRequestType
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- * Indicates whether a token if being created or renewed. *)
-type
-  UA_SecurityTokenRequestType = (
-    UA_SECURITYTOKENREQUESTTYPE_ISSUE = 0,
-    UA_SECURITYTOKENREQUESTTYPE_RENEW = 1,
-    __UA_SECURITYTOKENREQUESTTYPE_FORCE32BIT = $7fffffff
-  );
-  PUA_SecurityTokenRequestType = ^UA_SecurityTokenRequestType;
-  {$IF sizeof(UA_SecurityTokenRequestType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_SECURITYTOKENREQUESTTYPE = 66;
-
-(**
- * CloseSessionResponse
- * ^^^^^^^^^^^^^^^^^^^^
- * Closes a session with the server. *)
-type
-  UA_CloseSessionResponse = record
-    responseHeader: UA_ResponseHeader;
-  end;
-  PUA_CloseSessionResponse = ^UA_CloseSessionResponse;
-
-const
-  UA_TYPES_CLOSESESSIONRESPONSE = 67;
-
-(**
- * SetPublishingModeRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_SetPublishingModeRequest = record
-    requestHeader: UA_RequestHeader;
-    publishingEnabled: UA_Boolean;
-    subscriptionIdsSize: size_t;
-    subscriptionIds: PUA_UInt32;
-  end;
-  PUA_SetPublishingModeRequest = ^UA_SetPublishingModeRequest;
-
-const
-  UA_TYPES_SETPUBLISHINGMODEREQUEST = 68;
-
-(**
- * IssuedIdentityToken
- * ^^^^^^^^^^^^^^^^^^^
- * A token representing a user identified by a WS-Security XML token. *)
-type
-  UA_IssuedIdentityToken = record
-    policyId: UA_String;
-    tokenData: UA_ByteString;
-    encryptionAlgorithm: UA_String;
-  end;
-  PUA_IssuedIdentityToken = ^UA_IssuedIdentityToken;
-
-const
-  UA_TYPES_ISSUEDIDENTITYTOKEN = 69;
-
-(**
- * DeleteMonitoredItemsResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DeleteMonitoredItemsResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_DeleteMonitoredItemsResponse = ^UA_DeleteMonitoredItemsResponse;
-
-const
-  UA_TYPES_DELETEMONITOREDITEMSRESPONSE = 70;
-
-(**
- * ApplicationType
- * ^^^^^^^^^^^^^^^
- * The types of applications. *)
-type
-  UA_ApplicationType = (
-    UA_APPLICATIONTYPE_SERVER = 0,
-    UA_APPLICATIONTYPE_CLIENT = 1,
-    UA_APPLICATIONTYPE_CLIENTANDSERVER = 2,
-    UA_APPLICATIONTYPE_DISCOVERYSERVER = 3,
-    __UA_APPLICATIONTYPE_FORCE32BIT = $7fffffff
-  );
-  PUA_ApplicationType = ^UA_ApplicationType;
-  {$IF sizeof(UA_ApplicationType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_APPLICATIONTYPE = 71;
-
-(**
- * BrowseNextRequest
- * ^^^^^^^^^^^^^^^^^
- * Continues one or more browse operations. *)
-type
-  UA_BrowseNextRequest = record
-    requestHeader: UA_RequestHeader;
-    releaseContinuationPoints: UA_Boolean;
-    continuationPointsSize: size_t;
-    continuationPoints: PUA_ByteString;
-  end;
-  PUA_BrowseNextRequest = ^UA_BrowseNextRequest;
-
-const
-  UA_TYPES_BROWSENEXTREQUEST = 72;
-
-(**
- * ModifySubscriptionRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ModifySubscriptionRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionId: UA_UInt32;
-    requestedPublishingInterval: UA_Double;
-    requestedLifetimeCount: UA_UInt32;
-    requestedMaxKeepAliveCount: UA_UInt32;
-    maxNotificationsPerPublish: UA_UInt32;
-    priority: UA_Byte;
-  end;
-  PUA_ModifySubscriptionRequest = ^UA_ModifySubscriptionRequest;
-
-const
-  UA_TYPES_MODIFYSUBSCRIPTIONREQUEST = 73;
-
-(**
- * BrowseDescription
- * ^^^^^^^^^^^^^^^^^
- * A request to browse the the references from a node. *)
-type
-  UA_BrowseDescription = record
-    nodeId: UA_NodeId;
-    browseDirection: UA_BrowseDirection;
-    referenceTypeId: UA_NodeId;
-    includeSubtypes: UA_Boolean;
-    nodeClassMask: UA_UInt32;
-    resultMask: UA_UInt32;
-  end;
-  PUA_BrowseDescription = ^UA_BrowseDescription;
-
-const
-  UA_TYPES_BROWSEDESCRIPTION = 74;
-
-(**
- * SignedSoftwareCertificate
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- * A software certificate with a digital signature. *)
-type
-  UA_SignedSoftwareCertificate = record
-    certificateData: UA_ByteString;
-    signature: UA_ByteString;
-  end;
-  PUA_SignedSoftwareCertificate = ^UA_SignedSoftwareCertificate;
-
-const
-  UA_TYPES_SIGNEDSOFTWARECERTIFICATE = 75;
-
-(**
- * BrowsePathTarget
- * ^^^^^^^^^^^^^^^^
- * The target of the translated path. *)
-type
-  UA_BrowsePathTarget = record
-    targetId: UA_ExpandedNodeId;
-    remainingPathIndex: UA_UInt32;
-  end;
-  PUA_BrowsePathTarget = ^UA_BrowsePathTarget;
-
-const
-  UA_TYPES_BROWSEPATHTARGET = 76;
-
-(**
- * WriteResponse
+ * StructureType
  * ^^^^^^^^^^^^^
  *)
 type
-  UA_WriteResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_WriteResponse = ^UA_WriteResponse;
-
-const
-  UA_TYPES_WRITERESPONSE = 77;
-
-(**
- * AddNodesResult
- * ^^^^^^^^^^^^^^
- * A result of an add node operation. *)
-type
-  UA_AddNodesResult = record
-    statusCode: UA_StatusCode;
-    addedNodeId: UA_NodeId;
-  end;
-  PUA_AddNodesResult = ^UA_AddNodesResult;
-
-const
-  UA_TYPES_ADDNODESRESULT = 78;
-
-(**
- * AddReferencesItem
- * ^^^^^^^^^^^^^^^^^
- * A request to add a reference to the server address space. *)
-type
-  UA_AddReferencesItem = record
-    sourceNodeId: UA_NodeId;
-    referenceTypeId: UA_NodeId;
-    isForward: UA_Boolean;
-    targetServerUri: UA_String;
-    targetNodeId: UA_ExpandedNodeId;
-    targetNodeClass: UA_NodeClass;
-  end;
-  PUA_AddReferencesItem = ^UA_AddReferencesItem;
-
-const
-  UA_TYPES_ADDREFERENCESITEM = 79;
-
-(**
- * DeleteReferencesResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- * Delete one or more references from the server address space. *)
-type
-  UA_DeleteReferencesResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_DeleteReferencesResponse = ^UA_DeleteReferencesResponse;
-
-const
-  UA_TYPES_DELETEREFERENCESRESPONSE = 80;
-
-(**
- * RelativePathElement
- * ^^^^^^^^^^^^^^^^^^^
- * An element in a relative path. *)
-type
-  UA_RelativePathElement = record
-    referenceTypeId: UA_NodeId;
-    isInverse: UA_Boolean;
-    includeSubtypes: UA_Boolean;
-    targetName: UA_QualifiedName;
-  end;
-  PUA_RelativePathElement = ^UA_RelativePathElement;
-
-const
-  UA_TYPES_RELATIVEPATHELEMENT = 81;
-
-(**
- * SubscriptionAcknowledgement
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_SubscriptionAcknowledgement = record
-    subscriptionId: UA_UInt32;
-    sequenceNumber: UA_UInt32;
-  end;
-  PUA_SubscriptionAcknowledgement = ^UA_SubscriptionAcknowledgement;
-
-const
-  UA_TYPES_SUBSCRIPTIONACKNOWLEDGEMENT = 82;
-
-(**
- * TransferResult
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_TransferResult = record
-    statusCode: UA_StatusCode;
-    availableSequenceNumbersSize: size_t;
-    availableSequenceNumbers: PUA_UInt32;
-  end;
-  PUA_TransferResult = ^UA_TransferResult;
-
-const
-  UA_TYPES_TRANSFERRESULT = 83;
-
-(**
- * CreateMonitoredItemsResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_CreateMonitoredItemsResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_MonitoredItemCreateResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_CreateMonitoredItemsResponse = ^UA_CreateMonitoredItemsResponse;
-
-const
-  UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 84;
-
-(**
- * DeleteReferencesItem
- * ^^^^^^^^^^^^^^^^^^^^
- * A request to delete a node from the server address space. *)
-type
-  UA_DeleteReferencesItem = record
-    sourceNodeId: UA_NodeId;
-    referenceTypeId: UA_NodeId;
-    isForward: UA_Boolean;
-    targetNodeId: UA_ExpandedNodeId;
-    deleteBidirectional: UA_Boolean;
-  end;
-  PUA_DeleteReferencesItem = ^UA_DeleteReferencesItem;
-
-const
-  UA_TYPES_DELETEREFERENCESITEM = 85;
-
-(**
- * WriteValue
- * ^^^^^^^^^^
- *)
-type
-  UA_WriteValue = record
-    nodeId: UA_NodeId;
-    attributeId: UA_UInt32;
-    indexRange: UA_String;
-    value: UA_DataValue;
-  end;
-  PUA_WriteValue = ^UA_WriteValue;
-
-const
-  UA_TYPES_WRITEVALUE = 86;
-
-(**
- * DataTypeAttributes
- * ^^^^^^^^^^^^^^^^^^
- * The attributes for a data type node. *)
-type
-  UA_DataTypeAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    isAbstract: UA_Boolean;
-  end;
-  PUA_DataTypeAttributes = ^UA_DataTypeAttributes;
-
-const
-  UA_TYPES_DATATYPEATTRIBUTES = 87;
-
-(**
- * TransferSubscriptionsResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_TransferSubscriptionsResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_TransferResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_TransferSubscriptionsResponse = ^UA_TransferSubscriptionsResponse;
-
-const
-  UA_TYPES_TRANSFERSUBSCRIPTIONSRESPONSE = 88;
-
-(**
- * AddReferencesResponse
- * ^^^^^^^^^^^^^^^^^^^^^
- * Adds one or more references to the server address space. *)
-type
-  UA_AddReferencesResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_AddReferencesResponse = ^UA_AddReferencesResponse;
-
-const
-  UA_TYPES_ADDREFERENCESRESPONSE = 89;
-
-(**
- * DeadbandType
- * ^^^^^^^^^^^^
- *)
-type
-  UA_DeadbandType = (
-    UA_DEADBANDTYPE_NONE = 0,
-    UA_DEADBANDTYPE_ABSOLUTE = 1,
-    UA_DEADBANDTYPE_PERCENT = 2,
-    __UA_DEADBANDTYPE_FORCE32BIT = $7fffffff
+  UA_StructureType = (
+    UA_STRUCTURETYPE_STRUCTURE = 0,
+    UA_STRUCTURETYPE_STRUCTUREWITHOPTIONALFIELDS = 1,
+    UA_STRUCTURETYPE_UNION = 2,
+    __UA_STRUCTURETYPE_FORCE32BIT = $7fffffff
   );
-  PUA_DeadbandType = ^UA_DeadbandType;
-  {$IF sizeof(UA_DeadbandType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+  PUA_StructureType = ^UA_StructureType;
+  {$IF sizeof(UA_StructureType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_DEADBANDTYPE = 90;
-
-(**
- * DataChangeTrigger
- * ^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DataChangeTrigger = (
-    UA_DATACHANGETRIGGER_STATUS = 0,
-    UA_DATACHANGETRIGGER_STATUSVALUE = 1,
-    UA_DATACHANGETRIGGER_STATUSVALUETIMESTAMP = 2,
-    __UA_DATACHANGETRIGGER_FORCE32BIT = $7fffffff
-  );
-  PUA_DataChangeTrigger = ^UA_DataChangeTrigger;
-  {$IF sizeof(UA_DataChangeTrigger) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_DATACHANGETRIGGER = 91;
-
-(**
- * BuildInfo
- * ^^^^^^^^^
- *)
-type
-  UA_BuildInfo = record
-    productUri: UA_String;
-    manufacturerName: UA_String;
-    productName: UA_String;
-    softwareVersion: UA_String;
-    buildNumber: UA_String;
-    buildDate: UA_DateTime;
-  end;
-  PUA_BuildInfo = ^UA_BuildInfo;
-
-const
-  UA_TYPES_BUILDINFO = 92;
-
-(**
- * FilterOperand
- * ^^^^^^^^^^^^^
- *)
-type
-  UA_FilterOperand = pointer;
-
-const
-  UA_TYPES_FILTEROPERAND = 93;
-
-(**
- * MonitoringParameters
- * ^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoringParameters = record
-    clientHandle: UA_UInt32;
-    samplingInterval: UA_Double;
-    filter: UA_ExtensionObject;
-    queueSize: UA_UInt32;
-    discardOldest: UA_Boolean;
-  end;
-  PUA_MonitoringParameters = ^UA_MonitoringParameters;
-
-const
-  UA_TYPES_MONITORINGPARAMETERS = 94;
-
-(**
- * DoubleComplexNumberType
- * ^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DoubleComplexNumberType = record
-    real: UA_Double;
-    imaginary: UA_Double;
-  end;
-  PUA_DoubleComplexNumberType = ^UA_DoubleComplexNumberType;
-
-const
-  UA_TYPES_DOUBLECOMPLEXNUMBERTYPE = 95;
-
-(**
- * DeleteNodesItem
- * ^^^^^^^^^^^^^^^
- * A request to delete a node to the server address space. *)
-type
-  UA_DeleteNodesItem = record
-    nodeId: UA_NodeId;
-    deleteTargetReferences: UA_Boolean;
-  end;
-  PUA_DeleteNodesItem = ^UA_DeleteNodesItem;
-
-const
-  UA_TYPES_DELETENODESITEM = 96;
-
-(**
- * ReadValueId
- * ^^^^^^^^^^^
- *)
-type
-  UA_ReadValueId = record
-    nodeId: UA_NodeId;
-    attributeId: UA_UInt32;
-    indexRange: UA_String;
-    dataEncoding: UA_QualifiedName;
-  end;
-  PUA_ReadValueId = ^UA_ReadValueId;
-
-const
-  UA_TYPES_READVALUEID = 97;
-
-(**
- * CallRequest
- * ^^^^^^^^^^^
- *)
-type
-  UA_CallRequest = record
-    requestHeader: UA_RequestHeader;
-    methodsToCallSize: size_t;
-    methodsToCall: PUA_CallMethodRequest;
-  end;
-  PUA_CallRequest = ^UA_CallRequest;
-
-const
-  UA_TYPES_CALLREQUEST = 98;
-
-(**
- * RelativePath
- * ^^^^^^^^^^^^
- * A relative path constructed from reference types and browse names. *)
-type
-  UA_RelativePath = record
-    elementsSize: size_t;
-    elements: PUA_RelativePathElement;
-  end;
-  PUA_RelativePath = ^UA_RelativePath;
-
-const
-  UA_TYPES_RELATIVEPATH = 99;
-
-(**
- * DeleteNodesRequest
- * ^^^^^^^^^^^^^^^^^^
- * Delete one or more nodes from the server address space. *)
-type
-  UA_DeleteNodesRequest = record
-    requestHeader: UA_RequestHeader;
-    nodesToDeleteSize: size_t;
-    nodesToDelete: PUA_DeleteNodesItem;
-  end;
-  PUA_DeleteNodesRequest = ^UA_DeleteNodesRequest;
-
-const
-  UA_TYPES_DELETENODESREQUEST = 100;
-
-(**
- * MonitoredItemModifyRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_MonitoredItemModifyRequest = record
-    monitoredItemId: UA_UInt32;
-    requestedParameters: UA_MonitoringParameters;
-  end;
-  PUA_MonitoredItemModifyRequest = ^UA_MonitoredItemModifyRequest;
-
-const
-  UA_TYPES_MONITOREDITEMMODIFYREQUEST = 101;
-
-(**
- * UserTokenType
- * ^^^^^^^^^^^^^
- * The possible user token types. *)
-type
-  UA_UserTokenType = (
-    UA_USERTOKENTYPE_ANONYMOUS = 0,
-    UA_USERTOKENTYPE_USERNAME = 1,
-    UA_USERTOKENTYPE_CERTIFICATE = 2,
-    UA_USERTOKENTYPE_ISSUEDTOKEN = 3,
-    __UA_USERTOKENTYPE_FORCE32BIT = $7fffffff
-  );
-  PUA_UserTokenType = ^UA_UserTokenType;
-  {$IF sizeof(UA_UserTokenType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_USERTOKENTYPE = 102;
-
-(**
- * AggregateConfiguration
- * ^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_AggregateConfiguration = record
-    useServerCapabilitiesDefaults: UA_Boolean;
-    treatUncertainAsBad: UA_Boolean;
-    percentDataBad: UA_Byte;
-    percentDataGood: UA_Byte;
-    useSlopedExtrapolation: UA_Boolean;
-  end;
-  PUA_AggregateConfiguration = ^UA_AggregateConfiguration;
-
-const
-  UA_TYPES_AGGREGATECONFIGURATION = 103;
-
-(**
- * LocaleId
- * ^^^^^^^^
- * An identifier for a user locale. *)
-type
-  UA_LocaleId = UA_String;
-
-const
-  UA_TYPES_LOCALEID = 104;
-
-(**
- * UnregisterNodesResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^
- * Unregisters one or more previously registered nodes. *)
-type
-  UA_UnregisterNodesResponse = record
-    responseHeader: UA_ResponseHeader;
-  end;
-  PUA_UnregisterNodesResponse = ^UA_UnregisterNodesResponse;
-
-const
-  UA_TYPES_UNREGISTERNODESRESPONSE = 105;
-
-(**
- * ContentFilterResult
- * ^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ContentFilterResult = record
-    elementResultsSize: size_t;
-    elementResults: PUA_ContentFilterElementResult;
-    elementDiagnosticInfosSize: size_t;
-    elementDiagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_ContentFilterResult = ^UA_ContentFilterResult;
-
-const
-  UA_TYPES_CONTENTFILTERRESULT = 106;
-
-(**
- * UserTokenPolicy
- * ^^^^^^^^^^^^^^^
- * Describes a user token that can be used with a server. *)
-type
-  UA_UserTokenPolicy = record
-    policyId: UA_String;
-    tokenType: UA_UserTokenType;
-    issuedTokenType: UA_String;
-    issuerEndpointUrl: UA_String;
-    securityPolicyUri: UA_String;
-  end;
-  PUA_UserTokenPolicy = ^UA_UserTokenPolicy;
-
-const
-  UA_TYPES_USERTOKENPOLICY = 107;
-
-(**
- * DeleteMonitoredItemsRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DeleteMonitoredItemsRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionId: UA_UInt32;
-    monitoredItemIdsSize: size_t;
-    monitoredItemIds: PUA_UInt32;
-  end;
-  PUA_DeleteMonitoredItemsRequest = ^UA_DeleteMonitoredItemsRequest;
-
-const
-  UA_TYPES_DELETEMONITOREDITEMSREQUEST = 108;
-
-(**
- * SetMonitoringModeRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_SetMonitoringModeRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionId: UA_UInt32;
-    monitoringMode: UA_MonitoringMode;
-    monitoredItemIdsSize: size_t;
-    monitoredItemIds: PUA_UInt32;
-  end;
-  PUA_SetMonitoringModeRequest = ^UA_SetMonitoringModeRequest;
-
-const
-  UA_TYPES_SETMONITORINGMODEREQUEST = 109;
-
-(**
- * Duration
- * ^^^^^^^^
- * A period of time measured in milliseconds. *)
-type
-  UA_Duration = UA_Double;
-
-const
-  UA_TYPES_DURATION = 110;
-
-(**
- * ReferenceTypeAttributes
- * ^^^^^^^^^^^^^^^^^^^^^^^
- * The attributes for a reference type node. *)
-type
-  UA_ReferenceTypeAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    isAbstract: UA_Boolean;
-    symmetric: UA_Boolean;
-    inverseName: UA_LocalizedText;
-  end;
-  PUA_ReferenceTypeAttributes = ^UA_ReferenceTypeAttributes;
-
-const
-  UA_TYPES_REFERENCETYPEATTRIBUTES = 111;
-
-(**
- * GetEndpointsRequest
- * ^^^^^^^^^^^^^^^^^^^
- * Gets the endpoints used by the server. *)
-type
-  UA_GetEndpointsRequest = record
-    requestHeader: UA_RequestHeader;
-    endpointUrl: UA_String;
-    localeIdsSize: size_t;
-    localeIds: PUA_String;
-    profileUrisSize: size_t;
-    profileUris: PUA_String;
-  end;
-  PUA_GetEndpointsRequest = ^UA_GetEndpointsRequest;
-
-const
-  UA_TYPES_GETENDPOINTSREQUEST = 112;
-
-(**
- * CloseSecureChannelResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- * Closes a secure channel. *)
-type
-  UA_CloseSecureChannelResponse = record
-    responseHeader: UA_ResponseHeader;
-  end;
-  PUA_CloseSecureChannelResponse = ^UA_CloseSecureChannelResponse;
-
-const
-  UA_TYPES_CLOSESECURECHANNELRESPONSE = 113;
-
-(**
- * ViewDescription
- * ^^^^^^^^^^^^^^^
- * The view to browse. *)
-type
-  UA_ViewDescription = record
-    viewId: UA_NodeId;
-    timestamp: UA_DateTime;
-    viewVersion: UA_UInt32;
-  end;
-  PUA_ViewDescription = ^UA_ViewDescription;
-
-const
-  UA_TYPES_VIEWDESCRIPTION = 114;
-
-(**
- * SetPublishingModeResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_SetPublishingModeResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_StatusCode;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_SetPublishingModeResponse = ^UA_SetPublishingModeResponse;
-
-const
-  UA_TYPES_SETPUBLISHINGMODERESPONSE = 115;
-
-(**
- * StatusChangeNotification
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_StatusChangeNotification = record
-    status: UA_StatusCode;
-    diagnosticInfo: UA_DiagnosticInfo;
-  end;
-  PUA_StatusChangeNotification = ^UA_StatusChangeNotification;
-
-const
-  UA_TYPES_STATUSCHANGENOTIFICATION = 116;
+  UA_TYPES_STRUCTURETYPE = 26;
 
 (**
  * StructureField
@@ -1675,7 +216,633 @@ type
   PUA_StructureField = ^UA_StructureField;
 
 const
-  UA_TYPES_STRUCTUREFIELD = 117;
+  UA_TYPES_STRUCTUREFIELD = 27;
+
+(**
+ * StructureDefinition
+ * ^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_StructureDefinition = record
+    defaultEncodingId: UA_NodeId;
+    baseDataType: UA_NodeId;
+    structureType: UA_StructureType;
+    fieldsSize: size_t;
+    fields: PUA_StructureField;
+  end;
+  PUA_StructureDefinition = ^UA_StructureDefinition;
+
+const
+  UA_TYPES_STRUCTUREDEFINITION = 28;
+
+(**
+ * Argument
+ * ^^^^^^^^
+ * An argument for a method. *)
+type
+  UA_Argument = record
+    name: UA_String;
+    dataType: UA_NodeId;
+    valueRank: UA_Int32;
+    arrayDimensionsSize: size_t;
+    arrayDimensions: PUA_UInt32;
+    description: UA_LocalizedText;
+  end;
+  PUA_Argument = ^UA_Argument;
+
+const
+  UA_TYPES_ARGUMENT = 29;
+
+(**
+ * EnumValueType
+ * ^^^^^^^^^^^^^
+ * A mapping between a value of an enumerated type and a name and description. *)
+type
+  UA_EnumValueType = record
+    value: UA_Int64;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+  end;
+  PUA_EnumValueType = ^UA_EnumValueType;
+
+const
+  UA_TYPES_ENUMVALUETYPE = 30;
+
+(**
+ * EnumField
+ * ^^^^^^^^^
+ *)
+type
+  UA_EnumField = record
+    value: UA_Int64;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    name: UA_String;
+  end;
+  PUA_EnumField = ^UA_EnumField;
+
+const
+  UA_TYPES_ENUMFIELD = 31;
+
+(**
+ * Duration
+ * ^^^^^^^^
+ * A period of time measured in milliseconds. *)
+type
+  UA_Duration = UA_Double;
+
+const
+  UA_TYPES_DURATION = 32;
+
+(**
+ * UtcTime
+ * ^^^^^^^
+ * A date/time value specified in Universal Coordinated Time (UTC). *)
+type
+  UA_UtcTime = UA_DateTime;
+
+const
+  UA_TYPES_UTCTIME = 33;
+
+(**
+ * LocaleId
+ * ^^^^^^^^
+ * An identifier for a user locale. *)
+type
+  UA_LocaleId = UA_String;
+
+const
+  UA_TYPES_LOCALEID = 34;
+
+(**
+ * ApplicationType
+ * ^^^^^^^^^^^^^^^
+ * The types of applications. *)
+type
+  UA_ApplicationType = (
+    UA_APPLICATIONTYPE_SERVER = 0,
+    UA_APPLICATIONTYPE_CLIENT = 1,
+    UA_APPLICATIONTYPE_CLIENTANDSERVER = 2,
+    UA_APPLICATIONTYPE_DISCOVERYSERVER = 3,
+    __UA_APPLICATIONTYPE_FORCE32BIT = $7fffffff
+  );
+  PUA_ApplicationType = ^UA_ApplicationType;
+  {$IF sizeof(UA_ApplicationType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_APPLICATIONTYPE = 35;
+
+(**
+ * ApplicationDescription
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ * Describes an application and how to find it. *)
+type
+  UA_ApplicationDescription = record
+    applicationUri: UA_String;
+    productUri: UA_String;
+    applicationName: UA_LocalizedText;
+    applicationType: UA_ApplicationType;
+    gatewayServerUri: UA_String;
+    discoveryProfileUri: UA_String;
+    discoveryUrlsSize: size_t;
+    discoveryUrls: PUA_String;
+  end;
+  PUA_ApplicationDescription = ^UA_ApplicationDescription;
+
+const
+  UA_TYPES_APPLICATIONDESCRIPTION = 36;
+
+(**
+ * RequestHeader
+ * ^^^^^^^^^^^^^
+ * The header passed with every server request. *)
+type
+  UA_RequestHeader = record
+    authenticationToken: UA_NodeId;
+    timestamp: UA_DateTime;
+    requestHandle: UA_UInt32;
+    returnDiagnostics: UA_UInt32;
+    auditEntryId: UA_String;
+    timeoutHint: UA_UInt32;
+    additionalHeader: UA_ExtensionObject;
+  end;
+  PUA_RequestHeader = ^UA_RequestHeader;
+
+const
+  UA_TYPES_REQUESTHEADER = 37;
+
+(**
+ * ResponseHeader
+ * ^^^^^^^^^^^^^^
+ * The header passed with every server response. *)
+type
+  UA_ResponseHeader = record
+    timestamp: UA_DateTime;
+    requestHandle: UA_UInt32;
+    serviceResult: UA_StatusCode;
+    serviceDiagnostics: UA_DiagnosticInfo;
+    stringTableSize: size_t;
+    stringTable: PUA_String;
+    additionalHeader: UA_ExtensionObject;
+  end;
+  PUA_ResponseHeader = ^UA_ResponseHeader;
+
+const
+  UA_TYPES_RESPONSEHEADER = 38;
+
+(**
+ * ServiceFault
+ * ^^^^^^^^^^^^
+ * The response returned by all services when there is a service level error. *)
+type
+  UA_ServiceFault = record
+    responseHeader: UA_ResponseHeader;
+  end;
+  PUA_ServiceFault = ^UA_ServiceFault;
+
+const
+  UA_TYPES_SERVICEFAULT = 39;
+
+(**
+ * FindServersRequest
+ * ^^^^^^^^^^^^^^^^^^
+ * Finds the servers known to the discovery server. *)
+type
+  UA_FindServersRequest = record
+    requestHeader: UA_RequestHeader;
+    endpointUrl: UA_String;
+    localeIdsSize: size_t;
+    localeIds: PUA_String;
+    serverUrisSize: size_t;
+    serverUris: PUA_String;
+  end;
+  PUA_FindServersRequest = ^UA_FindServersRequest;
+
+const
+  UA_TYPES_FINDSERVERSREQUEST = 40;
+
+(**
+ * FindServersResponse
+ * ^^^^^^^^^^^^^^^^^^^
+ * Finds the servers known to the discovery server. *)
+type
+  UA_FindServersResponse = record
+    responseHeader: UA_ResponseHeader;
+    serversSize: size_t;
+    servers: PUA_ApplicationDescription;
+  end;
+  PUA_FindServersResponse = ^UA_FindServersResponse;
+
+const
+  UA_TYPES_FINDSERVERSRESPONSE = 41;
+
+(**
+ * MessageSecurityMode
+ * ^^^^^^^^^^^^^^^^^^^
+ * The type of security to use on a message. *)
+type
+  UA_MessageSecurityMode = (
+    UA_MESSAGESECURITYMODE_INVALID = 0,
+    UA_MESSAGESECURITYMODE_NONE = 1,
+    UA_MESSAGESECURITYMODE_SIGN = 2,
+    UA_MESSAGESECURITYMODE_SIGNANDENCRYPT = 3,
+    __UA_MESSAGESECURITYMODE_FORCE32BIT = $7fffffff
+  );
+  PUA_MessageSecurityMode = ^UA_MessageSecurityMode;
+  {$IF sizeof(UA_MessageSecurityMode) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_MESSAGESECURITYMODE = 42;
+
+(**
+ * UserTokenType
+ * ^^^^^^^^^^^^^
+ * The possible user token types. *)
+type
+  UA_UserTokenType = (
+    UA_USERTOKENTYPE_ANONYMOUS = 0,
+    UA_USERTOKENTYPE_USERNAME = 1,
+    UA_USERTOKENTYPE_CERTIFICATE = 2,
+    UA_USERTOKENTYPE_ISSUEDTOKEN = 3,
+    __UA_USERTOKENTYPE_FORCE32BIT = $7fffffff
+  );
+  PUA_UserTokenType = ^UA_UserTokenType;
+  {$IF sizeof(UA_UserTokenType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_USERTOKENTYPE = 43;
+
+(**
+ * UserTokenPolicy
+ * ^^^^^^^^^^^^^^^
+ * Describes a user token that can be used with a server. *)
+type
+  UA_UserTokenPolicy = record
+    policyId: UA_String;
+    tokenType: UA_UserTokenType;
+    issuedTokenType: UA_String;
+    issuerEndpointUrl: UA_String;
+    securityPolicyUri: UA_String;
+  end;
+  PUA_UserTokenPolicy = ^UA_UserTokenPolicy;
+
+const
+  UA_TYPES_USERTOKENPOLICY = 44;
+
+(**
+ * EndpointDescription
+ * ^^^^^^^^^^^^^^^^^^^
+ * The description of a endpoint that can be used to access a server. *)
+type
+  UA_EndpointDescription = record
+    endpointUrl: UA_String;
+    server: UA_ApplicationDescription;
+    serverCertificate: UA_ByteString;
+    securityMode: UA_MessageSecurityMode;
+    securityPolicyUri: UA_String;
+    userIdentityTokensSize: size_t;
+    userIdentityTokens: PUA_UserTokenPolicy;
+    transportProfileUri: UA_String;
+    securityLevel: UA_Byte;
+  end;
+  PUA_EndpointDescription = ^UA_EndpointDescription;
+
+const
+  UA_TYPES_ENDPOINTDESCRIPTION = 45;
+
+(**
+ * GetEndpointsRequest
+ * ^^^^^^^^^^^^^^^^^^^
+ * Gets the endpoints used by the server. *)
+type
+  UA_GetEndpointsRequest = record
+    requestHeader: UA_RequestHeader;
+    endpointUrl: UA_String;
+    localeIdsSize: size_t;
+    localeIds: PUA_String;
+    profileUrisSize: size_t;
+    profileUris: PUA_String;
+  end;
+  PUA_GetEndpointsRequest = ^UA_GetEndpointsRequest;
+
+const
+  UA_TYPES_GETENDPOINTSREQUEST = 46;
+
+(**
+ * GetEndpointsResponse
+ * ^^^^^^^^^^^^^^^^^^^^
+ * Gets the endpoints used by the server. *)
+type
+  UA_GetEndpointsResponse = record
+    responseHeader: UA_ResponseHeader;
+    endpointsSize: size_t;
+    endpoints: PUA_EndpointDescription;
+  end;
+  PUA_GetEndpointsResponse = ^UA_GetEndpointsResponse;
+
+const
+  UA_TYPES_GETENDPOINTSRESPONSE = 47;
+
+(**
+ * SecurityTokenRequestType
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ * Indicates whether a token if being created or renewed. *)
+type
+  UA_SecurityTokenRequestType = (
+    UA_SECURITYTOKENREQUESTTYPE_ISSUE = 0,
+    UA_SECURITYTOKENREQUESTTYPE_RENEW = 1,
+    __UA_SECURITYTOKENREQUESTTYPE_FORCE32BIT = $7fffffff
+  );
+  PUA_SecurityTokenRequestType = ^UA_SecurityTokenRequestType;
+  {$IF sizeof(UA_SecurityTokenRequestType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_SECURITYTOKENREQUESTTYPE = 48;
+
+(**
+ * ChannelSecurityToken
+ * ^^^^^^^^^^^^^^^^^^^^
+ * The token that identifies a set of keys for an active secure channel. *)
+type
+  UA_ChannelSecurityToken = record
+    channelId: UA_UInt32;
+    tokenId: UA_UInt32;
+    createdAt: UA_DateTime;
+    revisedLifetime: UA_UInt32;
+  end;
+  PUA_ChannelSecurityToken = ^UA_ChannelSecurityToken;
+
+const
+  UA_TYPES_CHANNELSECURITYTOKEN = 49;
+
+(**
+ * OpenSecureChannelRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ * Creates a secure channel with a server. *)
+type
+  UA_OpenSecureChannelRequest = record
+    requestHeader: UA_RequestHeader;
+    clientProtocolVersion: UA_UInt32;
+    requestType: UA_SecurityTokenRequestType;
+    securityMode: UA_MessageSecurityMode;
+    clientNonce: UA_ByteString;
+    requestedLifetime: UA_UInt32;
+  end;
+  PUA_OpenSecureChannelRequest = ^UA_OpenSecureChannelRequest;
+
+const
+  UA_TYPES_OPENSECURECHANNELREQUEST = 50;
+
+(**
+ * OpenSecureChannelResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Creates a secure channel with a server. *)
+type
+  UA_OpenSecureChannelResponse = record
+    responseHeader: UA_ResponseHeader;
+    serverProtocolVersion: UA_UInt32;
+    securityToken: UA_ChannelSecurityToken;
+    serverNonce: UA_ByteString;
+  end;
+  PUA_OpenSecureChannelResponse = ^UA_OpenSecureChannelResponse;
+
+const
+  UA_TYPES_OPENSECURECHANNELRESPONSE = 51;
+
+(**
+ * CloseSecureChannelRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Closes a secure channel. *)
+type
+  UA_CloseSecureChannelRequest = record
+    requestHeader: UA_RequestHeader;
+  end;
+  PUA_CloseSecureChannelRequest = ^UA_CloseSecureChannelRequest;
+
+const
+  UA_TYPES_CLOSESECURECHANNELREQUEST = 52;
+
+(**
+ * CloseSecureChannelResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Closes a secure channel. *)
+type
+  UA_CloseSecureChannelResponse = record
+    responseHeader: UA_ResponseHeader;
+  end;
+  PUA_CloseSecureChannelResponse = ^UA_CloseSecureChannelResponse;
+
+const
+  UA_TYPES_CLOSESECURECHANNELRESPONSE = 53;
+
+(**
+ * SignedSoftwareCertificate
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ * A software certificate with a digital signature. *)
+type
+  UA_SignedSoftwareCertificate = record
+    certificateData: UA_ByteString;
+    signature: UA_ByteString;
+  end;
+  PUA_SignedSoftwareCertificate = ^UA_SignedSoftwareCertificate;
+
+const
+  UA_TYPES_SIGNEDSOFTWARECERTIFICATE = 54;
+
+(**
+ * SignatureData
+ * ^^^^^^^^^^^^^
+ * A digital signature. *)
+type
+  UA_SignatureData = record
+    algorithm: UA_String;
+    signature: UA_ByteString;
+  end;
+  PUA_SignatureData = ^UA_SignatureData;
+
+const
+  UA_TYPES_SIGNATUREDATA = 55;
+
+(**
+ * CreateSessionRequest
+ * ^^^^^^^^^^^^^^^^^^^^
+ * Creates a new session with the server. *)
+type
+  UA_CreateSessionRequest = record
+    requestHeader: UA_RequestHeader;
+    clientDescription: UA_ApplicationDescription;
+    serverUri: UA_String;
+    endpointUrl: UA_String;
+    sessionName: UA_String;
+    clientNonce: UA_ByteString;
+    clientCertificate: UA_ByteString;
+    requestedSessionTimeout: UA_Double;
+    maxResponseMessageSize: UA_UInt32;
+  end;
+  PUA_CreateSessionRequest = ^UA_CreateSessionRequest;
+
+const
+  UA_TYPES_CREATESESSIONREQUEST = 56;
+
+(**
+ * CreateSessionResponse
+ * ^^^^^^^^^^^^^^^^^^^^^
+ * Creates a new session with the server. *)
+type
+  UA_CreateSessionResponse = record
+    responseHeader: UA_ResponseHeader;
+    sessionId: UA_NodeId;
+    authenticationToken: UA_NodeId;
+    revisedSessionTimeout: UA_Double;
+    serverNonce: UA_ByteString;
+    serverCertificate: UA_ByteString;
+    serverEndpointsSize: size_t;
+    serverEndpoints: PUA_EndpointDescription;
+    serverSoftwareCertificatesSize: size_t;
+    serverSoftwareCertificates: PUA_SignedSoftwareCertificate;
+    serverSignature: UA_SignatureData;
+    maxRequestMessageSize: UA_UInt32;
+  end;
+  PUA_CreateSessionResponse = ^UA_CreateSessionResponse;
+
+const
+  UA_TYPES_CREATESESSIONRESPONSE = 57;
+
+(**
+ * UserIdentityToken
+ * ^^^^^^^^^^^^^^^^^
+ * A base type for a user identity token. *)
+type
+  UA_UserIdentityToken = record
+    policyId: UA_String;
+  end;
+  PUA_UserIdentityToken = ^UA_UserIdentityToken;
+
+const
+  UA_TYPES_USERIDENTITYTOKEN = 58;
+
+(**
+ * AnonymousIdentityToken
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ * A token representing an anonymous user. *)
+type
+  UA_AnonymousIdentityToken = record
+    policyId: UA_String;
+  end;
+  PUA_AnonymousIdentityToken = ^UA_AnonymousIdentityToken;
+
+const
+  UA_TYPES_ANONYMOUSIDENTITYTOKEN = 59;
+
+(**
+ * UserNameIdentityToken
+ * ^^^^^^^^^^^^^^^^^^^^^
+ * A token representing a user identified by a user name and password. *)
+type
+  UA_UserNameIdentityToken = record
+    policyId: UA_String;
+    userName: UA_String;
+    password: UA_ByteString;
+    encryptionAlgorithm: UA_String;
+  end;
+  PUA_UserNameIdentityToken = ^UA_UserNameIdentityToken;
+
+const
+  UA_TYPES_USERNAMEIDENTITYTOKEN = 60;
+
+(**
+ * X509IdentityToken
+ * ^^^^^^^^^^^^^^^^^
+ * A token representing a user identified by an X509 certificate. *)
+type
+  UA_X509IdentityToken = record
+    policyId: UA_String;
+    certificateData: UA_ByteString;
+  end;
+  PUA_X509IdentityToken = ^UA_X509IdentityToken;
+
+const
+  UA_TYPES_X509IDENTITYTOKEN = 61;
+
+(**
+ * IssuedIdentityToken
+ * ^^^^^^^^^^^^^^^^^^^
+ * A token representing a user identified by a WS-Security XML token. *)
+type
+  UA_IssuedIdentityToken = record
+    policyId: UA_String;
+    tokenData: UA_ByteString;
+    encryptionAlgorithm: UA_String;
+  end;
+  PUA_IssuedIdentityToken = ^UA_IssuedIdentityToken;
+
+const
+  UA_TYPES_ISSUEDIDENTITYTOKEN = 62;
+
+(**
+ * ActivateSessionRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ * Activates a session with the server. *)
+type
+  UA_ActivateSessionRequest = record
+    requestHeader: UA_RequestHeader;
+    clientSignature: UA_SignatureData;
+    clientSoftwareCertificatesSize: size_t;
+    clientSoftwareCertificates: PUA_SignedSoftwareCertificate;
+    localeIdsSize: size_t;
+    localeIds: PUA_String;
+    userIdentityToken: UA_ExtensionObject;
+    userTokenSignature: UA_SignatureData;
+  end;
+  PUA_ActivateSessionRequest = ^UA_ActivateSessionRequest;
+
+const
+  UA_TYPES_ACTIVATESESSIONREQUEST = 63;
+
+(**
+ * ActivateSessionResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^
+ * Activates a session with the server. *)
+type
+  UA_ActivateSessionResponse = record
+    responseHeader: UA_ResponseHeader;
+    serverNonce: UA_ByteString;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_ActivateSessionResponse = ^UA_ActivateSessionResponse;
+
+const
+  UA_TYPES_ACTIVATESESSIONRESPONSE = 64;
+
+(**
+ * CloseSessionRequest
+ * ^^^^^^^^^^^^^^^^^^^
+ * Closes a session with the server. *)
+type
+  UA_CloseSessionRequest = record
+    requestHeader: UA_RequestHeader;
+    deleteSubscriptions: UA_Boolean;
+  end;
+  PUA_CloseSessionRequest = ^UA_CloseSessionRequest;
+
+const
+  UA_TYPES_CLOSESESSIONREQUEST = 65;
+
+(**
+ * CloseSessionResponse
+ * ^^^^^^^^^^^^^^^^^^^^
+ * Closes a session with the server. *)
+type
+  UA_CloseSessionResponse = record
+    responseHeader: UA_ResponseHeader;
+  end;
+  PUA_CloseSessionResponse = ^UA_CloseSessionResponse;
+
+const
+  UA_TYPES_CLOSESESSIONRESPONSE = 66;
 
 (**
  * NodeAttributesMask
@@ -1724,182 +891,735 @@ type
   {$IF sizeof(UA_NodeAttributesMask) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_NODEATTRIBUTESMASK = 118;
+  UA_TYPES_NODEATTRIBUTESMASK = 67;
 
 (**
- * EventFilterResult
- * ^^^^^^^^^^^^^^^^^
- *)
+ * NodeAttributes
+ * ^^^^^^^^^^^^^^
+ * The base attributes for all nodes. *)
 type
-  UA_EventFilterResult = record
-    selectClauseResultsSize: size_t;
-    selectClauseResults: PUA_StatusCode;
-    selectClauseDiagnosticInfosSize: size_t;
-    selectClauseDiagnosticInfos: PUA_DiagnosticInfo;
-    whereClauseResult: UA_ContentFilterResult;
+  UA_NodeAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
   end;
-  PUA_EventFilterResult = ^UA_EventFilterResult;
+  PUA_NodeAttributes = ^UA_NodeAttributes;
 
 const
-  UA_TYPES_EVENTFILTERRESULT = 119;
+  UA_TYPES_NODEATTRIBUTES = 68;
 
 (**
- * MonitoredItemCreateRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
+ * ObjectAttributes
+ * ^^^^^^^^^^^^^^^^
+ * The attributes for an object node. *)
 type
-  UA_MonitoredItemCreateRequest = record
-    itemToMonitor: UA_ReadValueId;
-    monitoringMode: UA_MonitoringMode;
-    requestedParameters: UA_MonitoringParameters;
+  UA_ObjectAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    eventNotifier: UA_Byte;
   end;
-  PUA_MonitoredItemCreateRequest = ^UA_MonitoredItemCreateRequest;
+  PUA_ObjectAttributes = ^UA_ObjectAttributes;
 
 const
-  UA_TYPES_MONITOREDITEMCREATEREQUEST = 120;
+  UA_TYPES_OBJECTATTRIBUTES = 69;
 
 (**
- * ComplexNumberType
- * ^^^^^^^^^^^^^^^^^
- *)
+ * VariableAttributes
+ * ^^^^^^^^^^^^^^^^^^
+ * The attributes for a variable node. *)
 type
-  UA_ComplexNumberType = record
-    real: UA_Float;
-    imaginary: UA_Float;
-  end;
-  PUA_ComplexNumberType = ^UA_ComplexNumberType;
-
-const
-  UA_TYPES_COMPLEXNUMBERTYPE = 121;
-
-(**
- * Range
- * ^^^^^
- *)
-type
-  UA_Range = record
-    low: UA_Double;
-    high: UA_Double;
-  end;
-  PUA_Range = ^UA_Range;
-
-const
-  UA_TYPES_RANGE = 122;
-
-(**
- * DataChangeNotification
- * ^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DataChangeNotification = record
-    monitoredItemsSize: size_t;
-    monitoredItems: PUA_MonitoredItemNotification;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_DataChangeNotification = ^UA_DataChangeNotification;
-
-const
-  UA_TYPES_DATACHANGENOTIFICATION = 123;
-
-(**
- * Argument
- * ^^^^^^^^
- * An argument for a method. *)
-type
-  UA_Argument = record
-    name: UA_String;
+  UA_VariableAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    value: UA_Variant;
     dataType: UA_NodeId;
     valueRank: UA_Int32;
     arrayDimensionsSize: size_t;
     arrayDimensions: PUA_UInt32;
+    accessLevel: UA_Byte;
+    userAccessLevel: UA_Byte;
+    minimumSamplingInterval: UA_Double;
+    historizing: UA_Boolean;
+  end;
+  PUA_VariableAttributes = ^UA_VariableAttributes;
+
+const
+  UA_TYPES_VARIABLEATTRIBUTES = 70;
+
+(**
+ * MethodAttributes
+ * ^^^^^^^^^^^^^^^^
+ * The attributes for a method node. *)
+type
+  UA_MethodAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
     description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    executable: UA_Boolean;
+    userExecutable: UA_Boolean;
   end;
-  PUA_Argument = ^UA_Argument;
+  PUA_MethodAttributes = ^UA_MethodAttributes;
 
 const
-  UA_TYPES_ARGUMENT = 124;
+  UA_TYPES_METHODATTRIBUTES = 71;
 
 (**
- * TransferSubscriptionsRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_TransferSubscriptionsRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionIdsSize: size_t;
-    subscriptionIds: PUA_UInt32;
-    sendInitialValues: UA_Boolean;
-  end;
-  PUA_TransferSubscriptionsRequest = ^UA_TransferSubscriptionsRequest;
-
-const
-  UA_TYPES_TRANSFERSUBSCRIPTIONSREQUEST = 125;
-
-(**
- * ChannelSecurityToken
+ * ObjectTypeAttributes
  * ^^^^^^^^^^^^^^^^^^^^
- * The token that identifies a set of keys for an active secure channel. *)
+ * The attributes for an object type node. *)
 type
-  UA_ChannelSecurityToken = record
-    channelId: UA_UInt32;
-    tokenId: UA_UInt32;
-    createdAt: UA_DateTime;
-    revisedLifetime: UA_UInt32;
+  UA_ObjectTypeAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    isAbstract: UA_Boolean;
   end;
-  PUA_ChannelSecurityToken = ^UA_ChannelSecurityToken;
+  PUA_ObjectTypeAttributes = ^UA_ObjectTypeAttributes;
 
 const
-  UA_TYPES_CHANNELSECURITYTOKEN = 126;
+  UA_TYPES_OBJECTTYPEATTRIBUTES = 72;
 
 (**
- * ServerState
- * ^^^^^^^^^^^
- *)
-type
-  UA_ServerState = (
-    UA_SERVERSTATE_RUNNING = 0,
-    UA_SERVERSTATE_FAILED = 1,
-    UA_SERVERSTATE_NOCONFIGURATION = 2,
-    UA_SERVERSTATE_SUSPENDED = 3,
-    UA_SERVERSTATE_SHUTDOWN = 4,
-    UA_SERVERSTATE_TEST = 5,
-    UA_SERVERSTATE_COMMUNICATIONFAULT = 6,
-    UA_SERVERSTATE_UNKNOWN = 7,
-    __UA_SERVERSTATE_FORCE32BIT = $7fffffff
-  );
-  PUA_ServerState = ^UA_ServerState;
-  {$IF sizeof(UA_ServerState) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_SERVERSTATE = 127;
-
-(**
- * EventNotificationList
- * ^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_EventNotificationList = record
-    eventsSize: size_t;
-    events: PUA_EventFieldList;
-  end;
-  PUA_EventNotificationList = ^UA_EventNotificationList;
-
-const
-  UA_TYPES_EVENTNOTIFICATIONLIST = 128;
-
-(**
- * AnonymousIdentityToken
+ * VariableTypeAttributes
  * ^^^^^^^^^^^^^^^^^^^^^^
- * A token representing an anonymous user. *)
+ * The attributes for a variable type node. *)
 type
-  UA_AnonymousIdentityToken = record
-    policyId: UA_String;
+  UA_VariableTypeAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    value: UA_Variant;
+    dataType: UA_NodeId;
+    valueRank: UA_Int32;
+    arrayDimensionsSize: size_t;
+    arrayDimensions: PUA_UInt32;
+    isAbstract: UA_Boolean;
   end;
-  PUA_AnonymousIdentityToken = ^UA_AnonymousIdentityToken;
+  PUA_VariableTypeAttributes = ^UA_VariableTypeAttributes;
 
 const
-  UA_TYPES_ANONYMOUSIDENTITYTOKEN = 129;
+  UA_TYPES_VARIABLETYPEATTRIBUTES = 73;
+
+(**
+ * ReferenceTypeAttributes
+ * ^^^^^^^^^^^^^^^^^^^^^^^
+ * The attributes for a reference type node. *)
+type
+  UA_ReferenceTypeAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    isAbstract: UA_Boolean;
+    symmetric: UA_Boolean;
+    inverseName: UA_LocalizedText;
+  end;
+  PUA_ReferenceTypeAttributes = ^UA_ReferenceTypeAttributes;
+
+const
+  UA_TYPES_REFERENCETYPEATTRIBUTES = 74;
+
+(**
+ * DataTypeAttributes
+ * ^^^^^^^^^^^^^^^^^^
+ * The attributes for a data type node. *)
+type
+  UA_DataTypeAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    isAbstract: UA_Boolean;
+  end;
+  PUA_DataTypeAttributes = ^UA_DataTypeAttributes;
+
+const
+  UA_TYPES_DATATYPEATTRIBUTES = 75;
+
+(**
+ * ViewAttributes
+ * ^^^^^^^^^^^^^^
+ * The attributes for a view node. *)
+type
+  UA_ViewAttributes = record
+    specifiedAttributes: UA_UInt32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+    writeMask: UA_UInt32;
+    userWriteMask: UA_UInt32;
+    containsNoLoops: UA_Boolean;
+    eventNotifier: UA_Byte;
+  end;
+  PUA_ViewAttributes = ^UA_ViewAttributes;
+
+const
+  UA_TYPES_VIEWATTRIBUTES = 76;
+
+(**
+ * AddNodesItem
+ * ^^^^^^^^^^^^
+ * A request to add a node to the server address space. *)
+type
+  UA_AddNodesItem = record
+    parentNodeId: UA_ExpandedNodeId;
+    referenceTypeId: UA_NodeId;
+    requestedNewNodeId: UA_ExpandedNodeId;
+    browseName: UA_QualifiedName;
+    nodeClass: UA_NodeClass;
+    nodeAttributes: UA_ExtensionObject;
+    typeDefinition: UA_ExpandedNodeId;
+  end;
+  PUA_AddNodesItem = ^UA_AddNodesItem;
+
+const
+  UA_TYPES_ADDNODESITEM = 77;
+
+(**
+ * AddNodesResult
+ * ^^^^^^^^^^^^^^
+ * A result of an add node operation. *)
+type
+  UA_AddNodesResult = record
+    statusCode: UA_StatusCode;
+    addedNodeId: UA_NodeId;
+  end;
+  PUA_AddNodesResult = ^UA_AddNodesResult;
+
+const
+  UA_TYPES_ADDNODESRESULT = 78;
+
+(**
+ * AddNodesRequest
+ * ^^^^^^^^^^^^^^^
+ * Adds one or more nodes to the server address space. *)
+type
+  UA_AddNodesRequest = record
+    requestHeader: UA_RequestHeader;
+    nodesToAddSize: size_t;
+    nodesToAdd: PUA_AddNodesItem;
+  end;
+  PUA_AddNodesRequest = ^UA_AddNodesRequest;
+
+const
+  UA_TYPES_ADDNODESREQUEST = 79;
+
+(**
+ * AddNodesResponse
+ * ^^^^^^^^^^^^^^^^
+ * Adds one or more nodes to the server address space. *)
+type
+  UA_AddNodesResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_AddNodesResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_AddNodesResponse = ^UA_AddNodesResponse;
+
+const
+  UA_TYPES_ADDNODESRESPONSE = 80;
+
+(**
+ * AddReferencesItem
+ * ^^^^^^^^^^^^^^^^^
+ * A request to add a reference to the server address space. *)
+type
+  UA_AddReferencesItem = record
+    sourceNodeId: UA_NodeId;
+    referenceTypeId: UA_NodeId;
+    isForward: UA_Boolean;
+    targetServerUri: UA_String;
+    targetNodeId: UA_ExpandedNodeId;
+    targetNodeClass: UA_NodeClass;
+  end;
+  PUA_AddReferencesItem = ^UA_AddReferencesItem;
+
+const
+  UA_TYPES_ADDREFERENCESITEM = 81;
+
+(**
+ * AddReferencesRequest
+ * ^^^^^^^^^^^^^^^^^^^^
+ * Adds one or more references to the server address space. *)
+type
+  UA_AddReferencesRequest = record
+    requestHeader: UA_RequestHeader;
+    referencesToAddSize: size_t;
+    referencesToAdd: PUA_AddReferencesItem;
+  end;
+  PUA_AddReferencesRequest = ^UA_AddReferencesRequest;
+
+const
+  UA_TYPES_ADDREFERENCESREQUEST = 82;
+
+(**
+ * AddReferencesResponse
+ * ^^^^^^^^^^^^^^^^^^^^^
+ * Adds one or more references to the server address space. *)
+type
+  UA_AddReferencesResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_AddReferencesResponse = ^UA_AddReferencesResponse;
+
+const
+  UA_TYPES_ADDREFERENCESRESPONSE = 83;
+
+(**
+ * DeleteNodesItem
+ * ^^^^^^^^^^^^^^^
+ * A request to delete a node to the server address space. *)
+type
+  UA_DeleteNodesItem = record
+    nodeId: UA_NodeId;
+    deleteTargetReferences: UA_Boolean;
+  end;
+  PUA_DeleteNodesItem = ^UA_DeleteNodesItem;
+
+const
+  UA_TYPES_DELETENODESITEM = 84;
+
+(**
+ * DeleteNodesRequest
+ * ^^^^^^^^^^^^^^^^^^
+ * Delete one or more nodes from the server address space. *)
+type
+  UA_DeleteNodesRequest = record
+    requestHeader: UA_RequestHeader;
+    nodesToDeleteSize: size_t;
+    nodesToDelete: PUA_DeleteNodesItem;
+  end;
+  PUA_DeleteNodesRequest = ^UA_DeleteNodesRequest;
+
+const
+  UA_TYPES_DELETENODESREQUEST = 85;
+
+(**
+ * DeleteNodesResponse
+ * ^^^^^^^^^^^^^^^^^^^
+ * Delete one or more nodes from the server address space. *)
+type
+  UA_DeleteNodesResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_DeleteNodesResponse = ^UA_DeleteNodesResponse;
+
+const
+  UA_TYPES_DELETENODESRESPONSE = 86;
+
+(**
+ * DeleteReferencesItem
+ * ^^^^^^^^^^^^^^^^^^^^
+ * A request to delete a node from the server address space. *)
+type
+  UA_DeleteReferencesItem = record
+    sourceNodeId: UA_NodeId;
+    referenceTypeId: UA_NodeId;
+    isForward: UA_Boolean;
+    targetNodeId: UA_ExpandedNodeId;
+    deleteBidirectional: UA_Boolean;
+  end;
+  PUA_DeleteReferencesItem = ^UA_DeleteReferencesItem;
+
+const
+  UA_TYPES_DELETEREFERENCESITEM = 87;
+
+(**
+ * DeleteReferencesRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^
+ * Delete one or more references from the server address space. *)
+type
+  UA_DeleteReferencesRequest = record
+    requestHeader: UA_RequestHeader;
+    referencesToDeleteSize: size_t;
+    referencesToDelete: PUA_DeleteReferencesItem;
+  end;
+  PUA_DeleteReferencesRequest = ^UA_DeleteReferencesRequest;
+
+const
+  UA_TYPES_DELETEREFERENCESREQUEST = 88;
+
+(**
+ * DeleteReferencesResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ * Delete one or more references from the server address space. *)
+type
+  UA_DeleteReferencesResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_DeleteReferencesResponse = ^UA_DeleteReferencesResponse;
+
+const
+  UA_TYPES_DELETEREFERENCESRESPONSE = 89;
+
+(**
+ * BrowseDirection
+ * ^^^^^^^^^^^^^^^
+ * The directions of the references to return. *)
+type
+  UA_BrowseDirection = (
+    UA_BROWSEDIRECTION_FORWARD = 0,
+    UA_BROWSEDIRECTION_INVERSE = 1,
+    UA_BROWSEDIRECTION_BOTH = 2,
+    UA_BROWSEDIRECTION_INVALID = 3,
+    __UA_BROWSEDIRECTION_FORCE32BIT = $7fffffff
+  );
+  PUA_BrowseDirection = ^UA_BrowseDirection;
+  {$IF sizeof(UA_BrowseDirection) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_BROWSEDIRECTION = 90;
+
+(**
+ * ViewDescription
+ * ^^^^^^^^^^^^^^^
+ * The view to browse. *)
+type
+  UA_ViewDescription = record
+    viewId: UA_NodeId;
+    timestamp: UA_DateTime;
+    viewVersion: UA_UInt32;
+  end;
+  PUA_ViewDescription = ^UA_ViewDescription;
+
+const
+  UA_TYPES_VIEWDESCRIPTION = 91;
+
+(**
+ * BrowseDescription
+ * ^^^^^^^^^^^^^^^^^
+ * A request to browse the the references from a node. *)
+type
+  UA_BrowseDescription = record
+    nodeId: UA_NodeId;
+    browseDirection: UA_BrowseDirection;
+    referenceTypeId: UA_NodeId;
+    includeSubtypes: UA_Boolean;
+    nodeClassMask: UA_UInt32;
+    resultMask: UA_UInt32;
+  end;
+  PUA_BrowseDescription = ^UA_BrowseDescription;
+
+const
+  UA_TYPES_BROWSEDESCRIPTION = 92;
+
+(**
+ * BrowseResultMask
+ * ^^^^^^^^^^^^^^^^
+ * A bit mask which specifies what should be returned in a browse response. *)
+type
+  UA_BrowseResultMask = (
+    UA_BROWSERESULTMASK_NONE = 0,
+    UA_BROWSERESULTMASK_REFERENCETYPEID = 1,
+    UA_BROWSERESULTMASK_ISFORWARD = 2,
+    UA_BROWSERESULTMASK_NODECLASS = 4,
+    UA_BROWSERESULTMASK_BROWSENAME = 8,
+    UA_BROWSERESULTMASK_DISPLAYNAME = 16,
+    UA_BROWSERESULTMASK_TYPEDEFINITION = 32,
+    UA_BROWSERESULTMASK_ALL = 63,
+    UA_BROWSERESULTMASK_REFERENCETYPEINFO = 3,
+    UA_BROWSERESULTMASK_TARGETINFO = 60,
+    __UA_BROWSERESULTMASK_FORCE32BIT = $7fffffff
+  );
+  PUA_BrowseResultMask = ^UA_BrowseResultMask;
+  {$IF sizeof(UA_BrowseResultMask) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_BROWSERESULTMASK = 93;
+
+(**
+ * ReferenceDescription
+ * ^^^^^^^^^^^^^^^^^^^^
+ * The description of a reference. *)
+type
+  UA_ReferenceDescription = record
+    referenceTypeId: UA_NodeId;
+    isForward: UA_Boolean;
+    nodeId: UA_ExpandedNodeId;
+    browseName: UA_QualifiedName;
+    displayName: UA_LocalizedText;
+    nodeClass: UA_NodeClass;
+    typeDefinition: UA_ExpandedNodeId;
+  end;
+  PUA_ReferenceDescription = ^UA_ReferenceDescription;
+
+const
+  UA_TYPES_REFERENCEDESCRIPTION = 94;
+
+(**
+ * BrowseResult
+ * ^^^^^^^^^^^^
+ * The result of a browse operation. *)
+type
+  UA_BrowseResult = record
+    statusCode: UA_StatusCode;
+    continuationPoint: UA_ByteString;
+    referencesSize: size_t;
+    references: PUA_ReferenceDescription;
+  end;
+  PUA_BrowseResult = ^UA_BrowseResult;
+
+const
+  UA_TYPES_BROWSERESULT = 95;
+
+(**
+ * BrowseRequest
+ * ^^^^^^^^^^^^^
+ * Browse the references for one or more nodes from the server address space. *)
+type
+  UA_BrowseRequest = record
+    requestHeader: UA_RequestHeader;
+    view: UA_ViewDescription;
+    requestedMaxReferencesPerNode: UA_UInt32;
+    nodesToBrowseSize: size_t;
+    nodesToBrowse: PUA_BrowseDescription;
+  end;
+  PUA_BrowseRequest = ^UA_BrowseRequest;
+
+const
+  UA_TYPES_BROWSEREQUEST = 96;
+
+(**
+ * BrowseResponse
+ * ^^^^^^^^^^^^^^
+ * Browse the references for one or more nodes from the server address space. *)
+type
+  UA_BrowseResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_BrowseResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_BrowseResponse = ^UA_BrowseResponse;
+
+const
+  UA_TYPES_BROWSERESPONSE = 97;
+
+(**
+ * BrowseNextRequest
+ * ^^^^^^^^^^^^^^^^^
+ * Continues one or more browse operations. *)
+type
+  UA_BrowseNextRequest = record
+    requestHeader: UA_RequestHeader;
+    releaseContinuationPoints: UA_Boolean;
+    continuationPointsSize: size_t;
+    continuationPoints: PUA_ByteString;
+  end;
+  PUA_BrowseNextRequest = ^UA_BrowseNextRequest;
+
+const
+  UA_TYPES_BROWSENEXTREQUEST = 98;
+
+(**
+ * BrowseNextResponse
+ * ^^^^^^^^^^^^^^^^^^
+ * Continues one or more browse operations. *)
+type
+  UA_BrowseNextResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_BrowseResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_BrowseNextResponse = ^UA_BrowseNextResponse;
+
+const
+  UA_TYPES_BROWSENEXTRESPONSE = 99;
+
+(**
+ * RelativePathElement
+ * ^^^^^^^^^^^^^^^^^^^
+ * An element in a relative path. *)
+type
+  UA_RelativePathElement = record
+    referenceTypeId: UA_NodeId;
+    isInverse: UA_Boolean;
+    includeSubtypes: UA_Boolean;
+    targetName: UA_QualifiedName;
+  end;
+  PUA_RelativePathElement = ^UA_RelativePathElement;
+
+const
+  UA_TYPES_RELATIVEPATHELEMENT = 100;
+
+(**
+ * RelativePath
+ * ^^^^^^^^^^^^
+ * A relative path constructed from reference types and browse names. *)
+type
+  UA_RelativePath = record
+    elementsSize: size_t;
+    elements: PUA_RelativePathElement;
+  end;
+  PUA_RelativePath = ^UA_RelativePath;
+
+const
+  UA_TYPES_RELATIVEPATH = 101;
+
+(**
+ * BrowsePath
+ * ^^^^^^^^^^
+ * A request to translate a path into a node id. *)
+type
+  UA_BrowsePath = record
+    startingNode: UA_NodeId;
+    relativePath: UA_RelativePath;
+  end;
+  PUA_BrowsePath = ^UA_BrowsePath;
+
+const
+  UA_TYPES_BROWSEPATH = 102;
+
+(**
+ * BrowsePathTarget
+ * ^^^^^^^^^^^^^^^^
+ * The target of the translated path. *)
+type
+  UA_BrowsePathTarget = record
+    targetId: UA_ExpandedNodeId;
+    remainingPathIndex: UA_UInt32;
+  end;
+  PUA_BrowsePathTarget = ^UA_BrowsePathTarget;
+
+const
+  UA_TYPES_BROWSEPATHTARGET = 103;
+
+(**
+ * BrowsePathResult
+ * ^^^^^^^^^^^^^^^^
+ * The result of a translate opearation. *)
+type
+  UA_BrowsePathResult = record
+    statusCode: UA_StatusCode;
+    targetsSize: size_t;
+    targets: PUA_BrowsePathTarget;
+  end;
+  PUA_BrowsePathResult = ^UA_BrowsePathResult;
+
+const
+  UA_TYPES_BROWSEPATHRESULT = 104;
+
+(**
+ * TranslateBrowsePathsToNodeIdsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Translates one or more paths in the server address space. *)
+type
+  UA_TranslateBrowsePathsToNodeIdsRequest = record
+    requestHeader: UA_RequestHeader;
+    browsePathsSize: size_t;
+    browsePaths: PUA_BrowsePath;
+  end;
+  PUA_TranslateBrowsePathsToNodeIdsRequest = ^UA_TranslateBrowsePathsToNodeIdsRequest;
+
+const
+  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSREQUEST = 105;
+
+(**
+ * TranslateBrowsePathsToNodeIdsResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Translates one or more paths in the server address space. *)
+type
+  UA_TranslateBrowsePathsToNodeIdsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_BrowsePathResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_TranslateBrowsePathsToNodeIdsResponse = ^UA_TranslateBrowsePathsToNodeIdsResponse;
+
+const
+  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE = 106;
+
+(**
+ * RegisterNodesRequest
+ * ^^^^^^^^^^^^^^^^^^^^
+ * Registers one or more nodes for repeated use within a session. *)
+type
+  UA_RegisterNodesRequest = record
+    requestHeader: UA_RequestHeader;
+    nodesToRegisterSize: size_t;
+    nodesToRegister: PUA_NodeId;
+  end;
+  PUA_RegisterNodesRequest = ^UA_RegisterNodesRequest;
+
+const
+  UA_TYPES_REGISTERNODESREQUEST = 107;
+
+(**
+ * RegisterNodesResponse
+ * ^^^^^^^^^^^^^^^^^^^^^
+ * Registers one or more nodes for repeated use within a session. *)
+type
+  UA_RegisterNodesResponse = record
+    responseHeader: UA_ResponseHeader;
+    registeredNodeIdsSize: size_t;
+    registeredNodeIds: PUA_NodeId;
+  end;
+  PUA_RegisterNodesResponse = ^UA_RegisterNodesResponse;
+
+const
+  UA_TYPES_REGISTERNODESRESPONSE = 108;
+
+(**
+ * UnregisterNodesRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ * Unregisters one or more previously registered nodes. *)
+type
+  UA_UnregisterNodesRequest = record
+    requestHeader: UA_RequestHeader;
+    nodesToUnregisterSize: size_t;
+    nodesToUnregister: PUA_NodeId;
+  end;
+  PUA_UnregisterNodesRequest = ^UA_UnregisterNodesRequest;
+
+const
+  UA_TYPES_UNREGISTERNODESREQUEST = 109;
+
+(**
+ * UnregisterNodesResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^
+ * Unregisters one or more previously registered nodes. *)
+type
+  UA_UnregisterNodesResponse = record
+    responseHeader: UA_ResponseHeader;
+  end;
+  PUA_UnregisterNodesResponse = ^UA_UnregisterNodesResponse;
+
+const
+  UA_TYPES_UNREGISTERNODESRESPONSE = 110;
 
 (**
  * FilterOperator
@@ -1931,7 +1651,421 @@ type
   {$IF sizeof(UA_FilterOperator) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_FILTEROPERATOR = 130;
+  UA_TYPES_FILTEROPERATOR = 111;
+
+(**
+ * ContentFilterElement
+ * ^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ContentFilterElement = record
+    filterOperator: UA_FilterOperator;
+    filterOperandsSize: size_t;
+    filterOperands: PUA_ExtensionObject;
+  end;
+  PUA_ContentFilterElement = ^UA_ContentFilterElement;
+
+const
+  UA_TYPES_CONTENTFILTERELEMENT = 112;
+
+(**
+ * ContentFilter
+ * ^^^^^^^^^^^^^
+ *)
+type
+  UA_ContentFilter = record
+    elementsSize: size_t;
+    elements: PUA_ContentFilterElement;
+  end;
+  PUA_ContentFilter = ^UA_ContentFilter;
+
+const
+  UA_TYPES_CONTENTFILTER = 113;
+
+(**
+ * FilterOperand
+ * ^^^^^^^^^^^^^
+ *)
+type
+  UA_FilterOperand = pointer;
+
+const
+  UA_TYPES_FILTEROPERAND = 114;
+
+(**
+ * ElementOperand
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_ElementOperand = record
+    index: UA_UInt32;
+  end;
+  PUA_ElementOperand = ^UA_ElementOperand;
+
+const
+  UA_TYPES_ELEMENTOPERAND = 115;
+
+(**
+ * LiteralOperand
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_LiteralOperand = record
+    value: UA_Variant;
+  end;
+  PUA_LiteralOperand = ^UA_LiteralOperand;
+
+const
+  UA_TYPES_LITERALOPERAND = 116;
+
+(**
+ * AttributeOperand
+ * ^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_AttributeOperand = record
+    nodeId: UA_NodeId;
+    alias: UA_String;
+    browsePath: UA_RelativePath;
+    attributeId: UA_UInt32;
+    indexRange: UA_String;
+  end;
+  PUA_AttributeOperand = ^UA_AttributeOperand;
+
+const
+  UA_TYPES_ATTRIBUTEOPERAND = 117;
+
+(**
+ * SimpleAttributeOperand
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_SimpleAttributeOperand = record
+    typeDefinitionId: UA_NodeId;
+    browsePathSize: size_t;
+    browsePath: PUA_QualifiedName;
+    attributeId: UA_UInt32;
+    indexRange: UA_String;
+  end;
+  PUA_SimpleAttributeOperand = ^UA_SimpleAttributeOperand;
+
+const
+  UA_TYPES_SIMPLEATTRIBUTEOPERAND = 118;
+
+(**
+ * ContentFilterElementResult
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ContentFilterElementResult = record
+    statusCode: UA_StatusCode;
+    operandStatusCodesSize: size_t;
+    operandStatusCodes: PUA_StatusCode;
+    operandDiagnosticInfosSize: size_t;
+    operandDiagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_ContentFilterElementResult = ^UA_ContentFilterElementResult;
+
+const
+  UA_TYPES_CONTENTFILTERELEMENTRESULT = 119;
+
+(**
+ * ContentFilterResult
+ * ^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ContentFilterResult = record
+    elementResultsSize: size_t;
+    elementResults: PUA_ContentFilterElementResult;
+    elementDiagnosticInfosSize: size_t;
+    elementDiagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_ContentFilterResult = ^UA_ContentFilterResult;
+
+const
+  UA_TYPES_CONTENTFILTERRESULT = 120;
+
+(**
+ * TimestampsToReturn
+ * ^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_TimestampsToReturn = (
+    UA_TIMESTAMPSTORETURN_SOURCE = 0,
+    UA_TIMESTAMPSTORETURN_SERVER = 1,
+    UA_TIMESTAMPSTORETURN_BOTH = 2,
+    UA_TIMESTAMPSTORETURN_NEITHER = 3,
+    UA_TIMESTAMPSTORETURN_INVALID = 4,
+    __UA_TIMESTAMPSTORETURN_FORCE32BIT = $7fffffff
+  );
+  PUA_TimestampsToReturn = ^UA_TimestampsToReturn;
+  {$IF sizeof(UA_TimestampsToReturn) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_TIMESTAMPSTORETURN = 121;
+
+(**
+ * ReadValueId
+ * ^^^^^^^^^^^
+ *)
+type
+  UA_ReadValueId = record
+    nodeId: UA_NodeId;
+    attributeId: UA_UInt32;
+    indexRange: UA_String;
+    dataEncoding: UA_QualifiedName;
+  end;
+  PUA_ReadValueId = ^UA_ReadValueId;
+
+const
+  UA_TYPES_READVALUEID = 122;
+
+(**
+ * ReadRequest
+ * ^^^^^^^^^^^
+ *)
+type
+  UA_ReadRequest = record
+    requestHeader: UA_RequestHeader;
+    maxAge: UA_Double;
+    timestampsToReturn: UA_TimestampsToReturn;
+    nodesToReadSize: size_t;
+    nodesToRead: PUA_ReadValueId;
+  end;
+  PUA_ReadRequest = ^UA_ReadRequest;
+
+const
+  UA_TYPES_READREQUEST = 123;
+
+(**
+ * ReadResponse
+ * ^^^^^^^^^^^^
+ *)
+type
+  UA_ReadResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_DataValue;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_ReadResponse = ^UA_ReadResponse;
+
+const
+  UA_TYPES_READRESPONSE = 124;
+
+(**
+ * WriteValue
+ * ^^^^^^^^^^
+ *)
+type
+  UA_WriteValue = record
+    nodeId: UA_NodeId;
+    attributeId: UA_UInt32;
+    indexRange: UA_String;
+    value: UA_DataValue;
+  end;
+  PUA_WriteValue = ^UA_WriteValue;
+
+const
+  UA_TYPES_WRITEVALUE = 125;
+
+(**
+ * WriteRequest
+ * ^^^^^^^^^^^^
+ *)
+type
+  UA_WriteRequest = record
+    requestHeader: UA_RequestHeader;
+    nodesToWriteSize: size_t;
+    nodesToWrite: PUA_WriteValue;
+  end;
+  PUA_WriteRequest = ^UA_WriteRequest;
+
+const
+  UA_TYPES_WRITEREQUEST = 126;
+
+(**
+ * WriteResponse
+ * ^^^^^^^^^^^^^
+ *)
+type
+  UA_WriteResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_WriteResponse = ^UA_WriteResponse;
+
+const
+  UA_TYPES_WRITERESPONSE = 127;
+
+(**
+ * CallMethodRequest
+ * ^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_CallMethodRequest = record
+    objectId: UA_NodeId;
+    methodId: UA_NodeId;
+    inputArgumentsSize: size_t;
+    inputArguments: PUA_Variant;
+  end;
+  PUA_CallMethodRequest = ^UA_CallMethodRequest;
+
+const
+  UA_TYPES_CALLMETHODREQUEST = 128;
+
+(**
+ * CallMethodResult
+ * ^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_CallMethodResult = record
+    statusCode: UA_StatusCode;
+    inputArgumentResultsSize: size_t;
+    inputArgumentResults: PUA_StatusCode;
+    inputArgumentDiagnosticInfosSize: size_t;
+    inputArgumentDiagnosticInfos: PUA_DiagnosticInfo;
+    outputArgumentsSize: size_t;
+    outputArguments: PUA_Variant;
+  end;
+  PUA_CallMethodResult = ^UA_CallMethodResult;
+
+const
+  UA_TYPES_CALLMETHODRESULT = 129;
+
+(**
+ * CallRequest
+ * ^^^^^^^^^^^
+ *)
+type
+  UA_CallRequest = record
+    requestHeader: UA_RequestHeader;
+    methodsToCallSize: size_t;
+    methodsToCall: PUA_CallMethodRequest;
+  end;
+  PUA_CallRequest = ^UA_CallRequest;
+
+const
+  UA_TYPES_CALLREQUEST = 130;
+
+(**
+ * CallResponse
+ * ^^^^^^^^^^^^
+ *)
+type
+  UA_CallResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_CallMethodResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_CallResponse = ^UA_CallResponse;
+
+const
+  UA_TYPES_CALLRESPONSE = 131;
+
+(**
+ * MonitoringMode
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoringMode = (
+    UA_MONITORINGMODE_DISABLED = 0,
+    UA_MONITORINGMODE_SAMPLING = 1,
+    UA_MONITORINGMODE_REPORTING = 2,
+    __UA_MONITORINGMODE_FORCE32BIT = $7fffffff
+  );
+  PUA_MonitoringMode = ^UA_MonitoringMode;
+  {$IF sizeof(UA_MonitoringMode) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_MONITORINGMODE = 132;
+
+(**
+ * DataChangeTrigger
+ * ^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_DataChangeTrigger = (
+    UA_DATACHANGETRIGGER_STATUS = 0,
+    UA_DATACHANGETRIGGER_STATUSVALUE = 1,
+    UA_DATACHANGETRIGGER_STATUSVALUETIMESTAMP = 2,
+    __UA_DATACHANGETRIGGER_FORCE32BIT = $7fffffff
+  );
+  PUA_DataChangeTrigger = ^UA_DataChangeTrigger;
+  {$IF sizeof(UA_DataChangeTrigger) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_DATACHANGETRIGGER = 133;
+
+(**
+ * DeadbandType
+ * ^^^^^^^^^^^^
+ *)
+type
+  UA_DeadbandType = (
+    UA_DEADBANDTYPE_NONE = 0,
+    UA_DEADBANDTYPE_ABSOLUTE = 1,
+    UA_DEADBANDTYPE_PERCENT = 2,
+    __UA_DEADBANDTYPE_FORCE32BIT = $7fffffff
+  );
+  PUA_DeadbandType = ^UA_DeadbandType;
+  {$IF sizeof(UA_DeadbandType) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_DEADBANDTYPE = 134;
+
+(**
+ * DataChangeFilter
+ * ^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_DataChangeFilter = record
+    trigger: UA_DataChangeTrigger;
+    deadbandType: UA_UInt32;
+    deadbandValue: UA_Double;
+  end;
+  PUA_DataChangeFilter = ^UA_DataChangeFilter;
+
+const
+  UA_TYPES_DATACHANGEFILTER = 135;
+
+(**
+ * EventFilter
+ * ^^^^^^^^^^^
+ *)
+type
+  UA_EventFilter = record
+    selectClausesSize: size_t;
+    selectClauses: PUA_SimpleAttributeOperand;
+    whereClause: UA_ContentFilter;
+  end;
+  PUA_EventFilter = ^UA_EventFilter;
+
+const
+  UA_TYPES_EVENTFILTER = 136;
+
+(**
+ * AggregateConfiguration
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_AggregateConfiguration = record
+    useServerCapabilitiesDefaults: UA_Boolean;
+    treatUncertainAsBad: UA_Boolean;
+    percentDataBad: UA_Byte;
+    percentDataGood: UA_Byte;
+    useSlopedExtrapolation: UA_Boolean;
+  end;
+  PUA_AggregateConfiguration = ^UA_AggregateConfiguration;
+
+const
+  UA_TYPES_AGGREGATECONFIGURATION = 137;
 
 (**
  * AggregateFilter
@@ -1947,136 +2081,224 @@ type
   PUA_AggregateFilter = ^UA_AggregateFilter;
 
 const
-  UA_TYPES_AGGREGATEFILTER = 131;
+  UA_TYPES_AGGREGATEFILTER = 138;
 
 (**
- * RepublishResponse
+ * EventFilterResult
  * ^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_RepublishResponse = record
-    responseHeader: UA_ResponseHeader;
-    notificationMessage: UA_NotificationMessage;
+  UA_EventFilterResult = record
+    selectClauseResultsSize: size_t;
+    selectClauseResults: PUA_StatusCode;
+    selectClauseDiagnosticInfosSize: size_t;
+    selectClauseDiagnosticInfos: PUA_DiagnosticInfo;
+    whereClauseResult: UA_ContentFilterResult;
   end;
-  PUA_RepublishResponse = ^UA_RepublishResponse;
+  PUA_EventFilterResult = ^UA_EventFilterResult;
 
 const
-  UA_TYPES_REPUBLISHRESPONSE = 132;
+  UA_TYPES_EVENTFILTERRESULT = 139;
 
 (**
- * DeleteSubscriptionsResponse
+ * MonitoringParameters
+ * ^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoringParameters = record
+    clientHandle: UA_UInt32;
+    samplingInterval: UA_Double;
+    filter: UA_ExtensionObject;
+    queueSize: UA_UInt32;
+    discardOldest: UA_Boolean;
+  end;
+  PUA_MonitoringParameters = ^UA_MonitoringParameters;
+
+const
+  UA_TYPES_MONITORINGPARAMETERS = 140;
+
+(**
+ * MonitoredItemCreateRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoredItemCreateRequest = record
+    itemToMonitor: UA_ReadValueId;
+    monitoringMode: UA_MonitoringMode;
+    requestedParameters: UA_MonitoringParameters;
+  end;
+  PUA_MonitoredItemCreateRequest = ^UA_MonitoredItemCreateRequest;
+
+const
+  UA_TYPES_MONITOREDITEMCREATEREQUEST = 141;
+
+(**
+ * MonitoredItemCreateResult
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoredItemCreateResult = record
+    statusCode: UA_StatusCode;
+    monitoredItemId: UA_UInt32;
+    revisedSamplingInterval: UA_Double;
+    revisedQueueSize: UA_UInt32;
+    filterResult: UA_ExtensionObject;
+  end;
+  PUA_MonitoredItemCreateResult = ^UA_MonitoredItemCreateResult;
+
+const
+  UA_TYPES_MONITOREDITEMCREATERESULT = 142;
+
+(**
+ * CreateMonitoredItemsRequest
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_DeleteSubscriptionsResponse = record
+  UA_CreateMonitoredItemsRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionId: UA_UInt32;
+    timestampsToReturn: UA_TimestampsToReturn;
+    itemsToCreateSize: size_t;
+    itemsToCreate: PUA_MonitoredItemCreateRequest;
+  end;
+  PUA_CreateMonitoredItemsRequest = ^UA_CreateMonitoredItemsRequest;
+
+const
+  UA_TYPES_CREATEMONITOREDITEMSREQUEST = 143;
+
+(**
+ * CreateMonitoredItemsResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_CreateMonitoredItemsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_MonitoredItemCreateResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_CreateMonitoredItemsResponse = ^UA_CreateMonitoredItemsResponse;
+
+const
+  UA_TYPES_CREATEMONITOREDITEMSRESPONSE = 144;
+
+(**
+ * MonitoredItemModifyRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoredItemModifyRequest = record
+    monitoredItemId: UA_UInt32;
+    requestedParameters: UA_MonitoringParameters;
+  end;
+  PUA_MonitoredItemModifyRequest = ^UA_MonitoredItemModifyRequest;
+
+const
+  UA_TYPES_MONITOREDITEMMODIFYREQUEST = 145;
+
+(**
+ * MonitoredItemModifyResult
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoredItemModifyResult = record
+    statusCode: UA_StatusCode;
+    revisedSamplingInterval: UA_Double;
+    revisedQueueSize: UA_UInt32;
+    filterResult: UA_ExtensionObject;
+  end;
+  PUA_MonitoredItemModifyResult = ^UA_MonitoredItemModifyResult;
+
+const
+  UA_TYPES_MONITOREDITEMMODIFYRESULT = 146;
+
+(**
+ * ModifyMonitoredItemsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ModifyMonitoredItemsRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionId: UA_UInt32;
+    timestampsToReturn: UA_TimestampsToReturn;
+    itemsToModifySize: size_t;
+    itemsToModify: PUA_MonitoredItemModifyRequest;
+  end;
+  PUA_ModifyMonitoredItemsRequest = ^UA_ModifyMonitoredItemsRequest;
+
+const
+  UA_TYPES_MODIFYMONITOREDITEMSREQUEST = 147;
+
+(**
+ * ModifyMonitoredItemsResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ModifyMonitoredItemsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_MonitoredItemModifyResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_ModifyMonitoredItemsResponse = ^UA_ModifyMonitoredItemsResponse;
+
+const
+  UA_TYPES_MODIFYMONITOREDITEMSRESPONSE = 148;
+
+(**
+ * SetMonitoringModeRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_SetMonitoringModeRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionId: UA_UInt32;
+    monitoringMode: UA_MonitoringMode;
+    monitoredItemIdsSize: size_t;
+    monitoredItemIds: PUA_UInt32;
+  end;
+  PUA_SetMonitoringModeRequest = ^UA_SetMonitoringModeRequest;
+
+const
+  UA_TYPES_SETMONITORINGMODEREQUEST = 149;
+
+(**
+ * SetMonitoringModeResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_SetMonitoringModeResponse = record
     responseHeader: UA_ResponseHeader;
     resultsSize: size_t;
     results: PUA_StatusCode;
     diagnosticInfosSize: size_t;
     diagnosticInfos: PUA_DiagnosticInfo;
   end;
-  PUA_DeleteSubscriptionsResponse = ^UA_DeleteSubscriptionsResponse;
+  PUA_SetMonitoringModeResponse = ^UA_SetMonitoringModeResponse;
 
 const
-  UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 133;
+  UA_TYPES_SETMONITORINGMODERESPONSE = 150;
 
 (**
- * RegisterNodesRequest
+ * SetTriggeringRequest
  * ^^^^^^^^^^^^^^^^^^^^
- * Registers one or more nodes for repeated use within a session. *)
-type
-  UA_RegisterNodesRequest = record
-    requestHeader: UA_RequestHeader;
-    nodesToRegisterSize: size_t;
-    nodesToRegister: PUA_NodeId;
-  end;
-  PUA_RegisterNodesRequest = ^UA_RegisterNodesRequest;
-
-const
-  UA_TYPES_REGISTERNODESREQUEST = 134;
-
-(**
- * StructureDefinition
- * ^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_StructureDefinition = record
-    defaultEncodingId: UA_NodeId;
-    baseDataType: UA_NodeId;
-    structureType: UA_StructureType;
-    fieldsSize: size_t;
-    fields: PUA_StructureField;
-  end;
-  PUA_StructureDefinition = ^UA_StructureDefinition;
-
-const
-  UA_TYPES_STRUCTUREDEFINITION = 135;
-
-(**
- * MethodAttributes
- * ^^^^^^^^^^^^^^^^
- * The attributes for a method node. *)
-type
-  UA_MethodAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    executable: UA_Boolean;
-    userExecutable: UA_Boolean;
-  end;
-  PUA_MethodAttributes = ^UA_MethodAttributes;
-
-const
-  UA_TYPES_METHODATTRIBUTES = 136;
-
-(**
- * UserNameIdentityToken
- * ^^^^^^^^^^^^^^^^^^^^^
- * A token representing a user identified by a user name and password. *)
-type
-  UA_UserNameIdentityToken = record
-    policyId: UA_String;
-    userName: UA_String;
-    password: UA_ByteString;
-    encryptionAlgorithm: UA_String;
-  end;
-  PUA_UserNameIdentityToken = ^UA_UserNameIdentityToken;
-
-const
-  UA_TYPES_USERNAMEIDENTITYTOKEN = 137;
-
-(**
- * UnregisterNodesRequest
- * ^^^^^^^^^^^^^^^^^^^^^^
- * Unregisters one or more previously registered nodes. *)
-type
-  UA_UnregisterNodesRequest = record
+  UA_SetTriggeringRequest = record
     requestHeader: UA_RequestHeader;
-    nodesToUnregisterSize: size_t;
-    nodesToUnregister: PUA_NodeId;
+    subscriptionId: UA_UInt32;
+    triggeringItemId: UA_UInt32;
+    linksToAddSize: size_t;
+    linksToAdd: PUA_UInt32;
+    linksToRemoveSize: size_t;
+    linksToRemove: PUA_UInt32;
   end;
-  PUA_UnregisterNodesRequest = ^UA_UnregisterNodesRequest;
+  PUA_SetTriggeringRequest = ^UA_SetTriggeringRequest;
 
 const
-  UA_TYPES_UNREGISTERNODESREQUEST = 138;
-
-(**
- * OpenSecureChannelResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^
- * Creates a secure channel with a server. *)
-type
-  UA_OpenSecureChannelResponse = record
-    responseHeader: UA_ResponseHeader;
-    serverProtocolVersion: UA_UInt32;
-    securityToken: UA_ChannelSecurityToken;
-    serverNonce: UA_ByteString;
-  end;
-  PUA_OpenSecureChannelResponse = ^UA_OpenSecureChannelResponse;
-
-const
-  UA_TYPES_OPENSECURECHANNELRESPONSE = 139;
+  UA_TYPES_SETTRIGGERINGREQUEST = 151;
 
 (**
  * SetTriggeringResponse
@@ -2097,190 +2319,40 @@ type
   PUA_SetTriggeringResponse = ^UA_SetTriggeringResponse;
 
 const
-  UA_TYPES_SETTRIGGERINGRESPONSE = 140;
+  UA_TYPES_SETTRIGGERINGRESPONSE = 152;
 
 (**
- * SimpleAttributeOperand
- * ^^^^^^^^^^^^^^^^^^^^^^
+ * DeleteMonitoredItemsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_SimpleAttributeOperand = record
-    typeDefinitionId: UA_NodeId;
-    browsePathSize: size_t;
-    browsePath: PUA_QualifiedName;
-    attributeId: UA_UInt32;
-    indexRange: UA_String;
-  end;
-  PUA_SimpleAttributeOperand = ^UA_SimpleAttributeOperand;
-
-const
-  UA_TYPES_SIMPLEATTRIBUTEOPERAND = 141;
-
-(**
- * RepublishRequest
- * ^^^^^^^^^^^^^^^^
- *)
-type
-  UA_RepublishRequest = record
+  UA_DeleteMonitoredItemsRequest = record
     requestHeader: UA_RequestHeader;
     subscriptionId: UA_UInt32;
-    retransmitSequenceNumber: UA_UInt32;
+    monitoredItemIdsSize: size_t;
+    monitoredItemIds: PUA_UInt32;
   end;
-  PUA_RepublishRequest = ^UA_RepublishRequest;
+  PUA_DeleteMonitoredItemsRequest = ^UA_DeleteMonitoredItemsRequest;
 
 const
-  UA_TYPES_REPUBLISHREQUEST = 142;
+  UA_TYPES_DELETEMONITOREDITEMSREQUEST = 153;
 
 (**
- * RegisterNodesResponse
- * ^^^^^^^^^^^^^^^^^^^^^
- * Registers one or more nodes for repeated use within a session. *)
-type
-  UA_RegisterNodesResponse = record
-    responseHeader: UA_ResponseHeader;
-    registeredNodeIdsSize: size_t;
-    registeredNodeIds: PUA_NodeId;
-  end;
-  PUA_RegisterNodesResponse = ^UA_RegisterNodesResponse;
-
-const
-  UA_TYPES_REGISTERNODESRESPONSE = 143;
-
-(**
- * ModifyMonitoredItemsResponse
+ * DeleteMonitoredItemsResponse
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_ModifyMonitoredItemsResponse = record
+  UA_DeleteMonitoredItemsResponse = record
     responseHeader: UA_ResponseHeader;
     resultsSize: size_t;
-    results: PUA_MonitoredItemModifyResult;
+    results: PUA_StatusCode;
     diagnosticInfosSize: size_t;
     diagnosticInfos: PUA_DiagnosticInfo;
   end;
-  PUA_ModifyMonitoredItemsResponse = ^UA_ModifyMonitoredItemsResponse;
+  PUA_DeleteMonitoredItemsResponse = ^UA_DeleteMonitoredItemsResponse;
 
 const
-  UA_TYPES_MODIFYMONITOREDITEMSRESPONSE = 144;
-
-(**
- * DeleteSubscriptionsRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DeleteSubscriptionsRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionIdsSize: size_t;
-    subscriptionIds: PUA_UInt32;
-  end;
-  PUA_DeleteSubscriptionsRequest = ^UA_DeleteSubscriptionsRequest;
-
-const
-  UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 145;
-
-(**
- * RedundancySupport
- * ^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_RedundancySupport = (
-    UA_REDUNDANCYSUPPORT_NONE = 0,
-    UA_REDUNDANCYSUPPORT_COLD = 1,
-    UA_REDUNDANCYSUPPORT_WARM = 2,
-    UA_REDUNDANCYSUPPORT_HOT = 3,
-    UA_REDUNDANCYSUPPORT_TRANSPARENT = 4,
-    UA_REDUNDANCYSUPPORT_HOTANDMIRRORED = 5,
-    __UA_REDUNDANCYSUPPORT_FORCE32BIT = $7fffffff
-  );
-  PUA_RedundancySupport = ^UA_RedundancySupport;
-  {$IF sizeof(UA_RedundancySupport) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
-
-const
-  UA_TYPES_REDUNDANCYSUPPORT = 146;
-
-(**
- * BrowsePath
- * ^^^^^^^^^^
- * A request to translate a path into a node id. *)
-type
-  UA_BrowsePath = record
-    startingNode: UA_NodeId;
-    relativePath: UA_RelativePath;
-  end;
-  PUA_BrowsePath = ^UA_BrowsePath;
-
-const
-  UA_TYPES_BROWSEPATH = 147;
-
-(**
- * ObjectAttributes
- * ^^^^^^^^^^^^^^^^
- * The attributes for an object node. *)
-type
-  UA_ObjectAttributes = record
-    specifiedAttributes: UA_UInt32;
-    displayName: UA_LocalizedText;
-    description: UA_LocalizedText;
-    writeMask: UA_UInt32;
-    userWriteMask: UA_UInt32;
-    eventNotifier: UA_Byte;
-  end;
-  PUA_ObjectAttributes = ^UA_ObjectAttributes;
-
-const
-  UA_TYPES_OBJECTATTRIBUTES = 148;
-
-(**
- * PublishRequest
- * ^^^^^^^^^^^^^^
- *)
-type
-  UA_PublishRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionAcknowledgementsSize: size_t;
-    subscriptionAcknowledgements: PUA_SubscriptionAcknowledgement;
-  end;
-  PUA_PublishRequest = ^UA_PublishRequest;
-
-const
-  UA_TYPES_PUBLISHREQUEST = 149;
-
-(**
- * FindServersRequest
- * ^^^^^^^^^^^^^^^^^^
- * Finds the servers known to the discovery server. *)
-type
-  UA_FindServersRequest = record
-    requestHeader: UA_RequestHeader;
-    endpointUrl: UA_String;
-    localeIdsSize: size_t;
-    localeIds: PUA_String;
-    serverUrisSize: size_t;
-    serverUris: PUA_String;
-  end;
-  PUA_FindServersRequest = ^UA_FindServersRequest;
-
-const
-  UA_TYPES_FINDSERVERSREQUEST = 150;
-
-(**
- * ReferenceDescription
- * ^^^^^^^^^^^^^^^^^^^^
- * The description of a reference. *)
-type
-  UA_ReferenceDescription = record
-    referenceTypeId: UA_NodeId;
-    isForward: UA_Boolean;
-    nodeId: UA_ExpandedNodeId;
-    browseName: UA_QualifiedName;
-    displayName: UA_LocalizedText;
-    nodeClass: UA_NodeClass;
-    typeDefinition: UA_ExpandedNodeId;
-  end;
-  PUA_ReferenceDescription = ^UA_ReferenceDescription;
-
-const
-  UA_TYPES_REFERENCEDESCRIPTION = 151;
+  UA_TYPES_DELETEMONITOREDITEMSRESPONSE = 154;
 
 (**
  * CreateSubscriptionRequest
@@ -2299,71 +2371,180 @@ type
   PUA_CreateSubscriptionRequest = ^UA_CreateSubscriptionRequest;
 
 const
-  UA_TYPES_CREATESUBSCRIPTIONREQUEST = 152;
+  UA_TYPES_CREATESUBSCRIPTIONREQUEST = 155;
 
 (**
- * CallResponse
- * ^^^^^^^^^^^^
+ * CreateSubscriptionResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_CallResponse = record
+  UA_CreateSubscriptionResponse = record
     responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_CallMethodResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
+    subscriptionId: UA_UInt32;
+    revisedPublishingInterval: UA_Double;
+    revisedLifetimeCount: UA_UInt32;
+    revisedMaxKeepAliveCount: UA_UInt32;
   end;
-  PUA_CallResponse = ^UA_CallResponse;
+  PUA_CreateSubscriptionResponse = ^UA_CreateSubscriptionResponse;
 
 const
-  UA_TYPES_CALLRESPONSE = 153;
+  UA_TYPES_CREATESUBSCRIPTIONRESPONSE = 156;
 
 (**
- * DeleteNodesResponse
- * ^^^^^^^^^^^^^^^^^^^
- * Delete one or more nodes from the server address space. *)
+ * ModifySubscriptionRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
 type
-  UA_DeleteNodesResponse = record
+  UA_ModifySubscriptionRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionId: UA_UInt32;
+    requestedPublishingInterval: UA_Double;
+    requestedLifetimeCount: UA_UInt32;
+    requestedMaxKeepAliveCount: UA_UInt32;
+    maxNotificationsPerPublish: UA_UInt32;
+    priority: UA_Byte;
+  end;
+  PUA_ModifySubscriptionRequest = ^UA_ModifySubscriptionRequest;
+
+const
+  UA_TYPES_MODIFYSUBSCRIPTIONREQUEST = 157;
+
+(**
+ * ModifySubscriptionResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ModifySubscriptionResponse = record
+    responseHeader: UA_ResponseHeader;
+    revisedPublishingInterval: UA_Double;
+    revisedLifetimeCount: UA_UInt32;
+    revisedMaxKeepAliveCount: UA_UInt32;
+  end;
+  PUA_ModifySubscriptionResponse = ^UA_ModifySubscriptionResponse;
+
+const
+  UA_TYPES_MODIFYSUBSCRIPTIONRESPONSE = 158;
+
+(**
+ * SetPublishingModeRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_SetPublishingModeRequest = record
+    requestHeader: UA_RequestHeader;
+    publishingEnabled: UA_Boolean;
+    subscriptionIdsSize: size_t;
+    subscriptionIds: PUA_UInt32;
+  end;
+  PUA_SetPublishingModeRequest = ^UA_SetPublishingModeRequest;
+
+const
+  UA_TYPES_SETPUBLISHINGMODEREQUEST = 159;
+
+(**
+ * SetPublishingModeResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_SetPublishingModeResponse = record
     responseHeader: UA_ResponseHeader;
     resultsSize: size_t;
     results: PUA_StatusCode;
     diagnosticInfosSize: size_t;
     diagnosticInfos: PUA_DiagnosticInfo;
   end;
-  PUA_DeleteNodesResponse = ^UA_DeleteNodesResponse;
+  PUA_SetPublishingModeResponse = ^UA_SetPublishingModeResponse;
 
 const
-  UA_TYPES_DELETENODESRESPONSE = 154;
+  UA_TYPES_SETPUBLISHINGMODERESPONSE = 160;
 
 (**
- * ModifyMonitoredItemsRequest
+ * NotificationMessage
+ * ^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_NotificationMessage = record
+    sequenceNumber: UA_UInt32;
+    publishTime: UA_DateTime;
+    notificationDataSize: size_t;
+    notificationData: PUA_ExtensionObject;
+  end;
+  PUA_NotificationMessage = ^UA_NotificationMessage;
+
+const
+  UA_TYPES_NOTIFICATIONMESSAGE = 161;
+
+(**
+ * MonitoredItemNotification
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_MonitoredItemNotification = record
+    clientHandle: UA_UInt32;
+    value: UA_DataValue;
+  end;
+  PUA_MonitoredItemNotification = ^UA_MonitoredItemNotification;
+
+const
+  UA_TYPES_MONITOREDITEMNOTIFICATION = 162;
+
+(**
+ * EventFieldList
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_EventFieldList = record
+    clientHandle: UA_UInt32;
+    eventFieldsSize: size_t;
+    eventFields: PUA_Variant;
+  end;
+  PUA_EventFieldList = ^UA_EventFieldList;
+
+const
+  UA_TYPES_EVENTFIELDLIST = 163;
+
+(**
+ * StatusChangeNotification
+ * ^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_StatusChangeNotification = record
+    status: UA_StatusCode;
+    diagnosticInfo: UA_DiagnosticInfo;
+  end;
+  PUA_StatusChangeNotification = ^UA_StatusChangeNotification;
+
+const
+  UA_TYPES_STATUSCHANGENOTIFICATION = 164;
+
+(**
+ * SubscriptionAcknowledgement
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_ModifyMonitoredItemsRequest = record
-    requestHeader: UA_RequestHeader;
+  UA_SubscriptionAcknowledgement = record
     subscriptionId: UA_UInt32;
-    timestampsToReturn: UA_TimestampsToReturn;
-    itemsToModifySize: size_t;
-    itemsToModify: PUA_MonitoredItemModifyRequest;
+    sequenceNumber: UA_UInt32;
   end;
-  PUA_ModifyMonitoredItemsRequest = ^UA_ModifyMonitoredItemsRequest;
+  PUA_SubscriptionAcknowledgement = ^UA_SubscriptionAcknowledgement;
 
 const
-  UA_TYPES_MODIFYMONITOREDITEMSREQUEST = 155;
+  UA_TYPES_SUBSCRIPTIONACKNOWLEDGEMENT = 165;
 
 (**
- * ServiceFault
- * ^^^^^^^^^^^^
- * The response returned by all services when there is a service level error. *)
+ * PublishRequest
+ * ^^^^^^^^^^^^^^
+ *)
 type
-  UA_ServiceFault = record
-    responseHeader: UA_ResponseHeader;
+  UA_PublishRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionAcknowledgementsSize: size_t;
+    subscriptionAcknowledgements: PUA_SubscriptionAcknowledgement;
   end;
-  PUA_ServiceFault = ^UA_ServiceFault;
+  PUA_PublishRequest = ^UA_PublishRequest;
 
 const
-  UA_TYPES_SERVICEFAULT = 156;
+  UA_TYPES_PUBLISHREQUEST = 166;
 
 (**
  * PublishResponse
@@ -2385,125 +2566,200 @@ type
   PUA_PublishResponse = ^UA_PublishResponse;
 
 const
-  UA_TYPES_PUBLISHRESPONSE = 157;
+  UA_TYPES_PUBLISHRESPONSE = 167;
 
 (**
- * CreateMonitoredItemsRequest
+ * RepublishRequest
+ * ^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_RepublishRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionId: UA_UInt32;
+    retransmitSequenceNumber: UA_UInt32;
+  end;
+  PUA_RepublishRequest = ^UA_RepublishRequest;
+
+const
+  UA_TYPES_REPUBLISHREQUEST = 168;
+
+(**
+ * RepublishResponse
+ * ^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_RepublishResponse = record
+    responseHeader: UA_ResponseHeader;
+    notificationMessage: UA_NotificationMessage;
+  end;
+  PUA_RepublishResponse = ^UA_RepublishResponse;
+
+const
+  UA_TYPES_REPUBLISHRESPONSE = 169;
+
+(**
+ * TransferResult
+ * ^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferResult = record
+    statusCode: UA_StatusCode;
+    availableSequenceNumbersSize: size_t;
+    availableSequenceNumbers: PUA_UInt32;
+  end;
+  PUA_TransferResult = ^UA_TransferResult;
+
+const
+  UA_TYPES_TRANSFERRESULT = 170;
+
+(**
+ * TransferSubscriptionsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferSubscriptionsRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionIdsSize: size_t;
+    subscriptionIds: PUA_UInt32;
+    sendInitialValues: UA_Boolean;
+  end;
+  PUA_TransferSubscriptionsRequest = ^UA_TransferSubscriptionsRequest;
+
+const
+  UA_TYPES_TRANSFERSUBSCRIPTIONSREQUEST = 171;
+
+(**
+ * TransferSubscriptionsResponse
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_TransferSubscriptionsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_TransferResult;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
+  end;
+  PUA_TransferSubscriptionsResponse = ^UA_TransferSubscriptionsResponse;
+
+const
+  UA_TYPES_TRANSFERSUBSCRIPTIONSRESPONSE = 172;
+
+(**
+ * DeleteSubscriptionsRequest
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_DeleteSubscriptionsRequest = record
+    requestHeader: UA_RequestHeader;
+    subscriptionIdsSize: size_t;
+    subscriptionIds: PUA_UInt32;
+  end;
+  PUA_DeleteSubscriptionsRequest = ^UA_DeleteSubscriptionsRequest;
+
+const
+  UA_TYPES_DELETESUBSCRIPTIONSREQUEST = 173;
+
+(**
+ * DeleteSubscriptionsResponse
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *)
 type
-  UA_CreateMonitoredItemsRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionId: UA_UInt32;
-    timestampsToReturn: UA_TimestampsToReturn;
-    itemsToCreateSize: size_t;
-    itemsToCreate: PUA_MonitoredItemCreateRequest;
+  UA_DeleteSubscriptionsResponse = record
+    responseHeader: UA_ResponseHeader;
+    resultsSize: size_t;
+    results: PUA_StatusCode;
+    diagnosticInfosSize: size_t;
+    diagnosticInfos: PUA_DiagnosticInfo;
   end;
-  PUA_CreateMonitoredItemsRequest = ^UA_CreateMonitoredItemsRequest;
+  PUA_DeleteSubscriptionsResponse = ^UA_DeleteSubscriptionsResponse;
 
 const
-  UA_TYPES_CREATEMONITOREDITEMSREQUEST = 158;
+  UA_TYPES_DELETESUBSCRIPTIONSRESPONSE = 174;
 
 (**
- * OpenSecureChannelRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^
- * Creates a secure channel with a server. *)
-type
-  UA_OpenSecureChannelRequest = record
-    requestHeader: UA_RequestHeader;
-    clientProtocolVersion: UA_UInt32;
-    requestType: UA_SecurityTokenRequestType;
-    securityMode: UA_MessageSecurityMode;
-    clientNonce: UA_ByteString;
-    requestedLifetime: UA_UInt32;
-  end;
-  PUA_OpenSecureChannelRequest = ^UA_OpenSecureChannelRequest;
-
-const
-  UA_TYPES_OPENSECURECHANNELREQUEST = 159;
-
-(**
- * CloseSessionRequest
- * ^^^^^^^^^^^^^^^^^^^
- * Closes a session with the server. *)
-type
-  UA_CloseSessionRequest = record
-    requestHeader: UA_RequestHeader;
-    deleteSubscriptions: UA_Boolean;
-  end;
-  PUA_CloseSessionRequest = ^UA_CloseSessionRequest;
-
-const
-  UA_TYPES_CLOSESESSIONREQUEST = 160;
-
-(**
- * SetTriggeringRequest
- * ^^^^^^^^^^^^^^^^^^^^
+ * BuildInfo
+ * ^^^^^^^^^
  *)
 type
-  UA_SetTriggeringRequest = record
-    requestHeader: UA_RequestHeader;
-    subscriptionId: UA_UInt32;
-    triggeringItemId: UA_UInt32;
-    linksToAddSize: size_t;
-    linksToAdd: PUA_UInt32;
-    linksToRemoveSize: size_t;
-    linksToRemove: PUA_UInt32;
+  UA_BuildInfo = record
+    productUri: UA_String;
+    manufacturerName: UA_String;
+    productName: UA_String;
+    softwareVersion: UA_String;
+    buildNumber: UA_String;
+    buildDate: UA_DateTime;
   end;
-  PUA_SetTriggeringRequest = ^UA_SetTriggeringRequest;
+  PUA_BuildInfo = ^UA_BuildInfo;
 
 const
-  UA_TYPES_SETTRIGGERINGREQUEST = 161;
+  UA_TYPES_BUILDINFO = 175;
 
 (**
- * BrowseResult
- * ^^^^^^^^^^^^
- * The result of a browse operation. *)
+ * RedundancySupport
+ * ^^^^^^^^^^^^^^^^^
+ *)
 type
-  UA_BrowseResult = record
-    statusCode: UA_StatusCode;
-    continuationPoint: UA_ByteString;
-    referencesSize: size_t;
-    references: PUA_ReferenceDescription;
-  end;
-  PUA_BrowseResult = ^UA_BrowseResult;
+  UA_RedundancySupport = (
+    UA_REDUNDANCYSUPPORT_NONE = 0,
+    UA_REDUNDANCYSUPPORT_COLD = 1,
+    UA_REDUNDANCYSUPPORT_WARM = 2,
+    UA_REDUNDANCYSUPPORT_HOT = 3,
+    UA_REDUNDANCYSUPPORT_TRANSPARENT = 4,
+    UA_REDUNDANCYSUPPORT_HOTANDMIRRORED = 5,
+    __UA_REDUNDANCYSUPPORT_FORCE32BIT = $7fffffff
+  );
+  PUA_RedundancySupport = ^UA_RedundancySupport;
+  {$IF sizeof(UA_RedundancySupport) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_BROWSERESULT = 162;
+  UA_TYPES_REDUNDANCYSUPPORT = 176;
 
 (**
- * AddReferencesRequest
- * ^^^^^^^^^^^^^^^^^^^^
- * Adds one or more references to the server address space. *)
+ * ServerState
+ * ^^^^^^^^^^^
+ *)
 type
-  UA_AddReferencesRequest = record
-    requestHeader: UA_RequestHeader;
-    referencesToAddSize: size_t;
-    referencesToAdd: PUA_AddReferencesItem;
-  end;
-  PUA_AddReferencesRequest = ^UA_AddReferencesRequest;
+  UA_ServerState = (
+    UA_SERVERSTATE_RUNNING = 0,
+    UA_SERVERSTATE_FAILED = 1,
+    UA_SERVERSTATE_NOCONFIGURATION = 2,
+    UA_SERVERSTATE_SUSPENDED = 3,
+    UA_SERVERSTATE_SHUTDOWN = 4,
+    UA_SERVERSTATE_TEST = 5,
+    UA_SERVERSTATE_COMMUNICATIONFAULT = 6,
+    UA_SERVERSTATE_UNKNOWN = 7,
+    __UA_SERVERSTATE_FORCE32BIT = $7fffffff
+  );
+  PUA_ServerState = ^UA_ServerState;
+  {$IF sizeof(UA_ServerState) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
 
 const
-  UA_TYPES_ADDREFERENCESREQUEST = 163;
+  UA_TYPES_SERVERSTATE = 177;
 
 (**
- * AddNodesItem
- * ^^^^^^^^^^^^
- * A request to add a node to the server address space. *)
+ * ServerDiagnosticsSummaryDataType
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *)
 type
-  UA_AddNodesItem = record
-    parentNodeId: UA_ExpandedNodeId;
-    referenceTypeId: UA_NodeId;
-    requestedNewNodeId: UA_ExpandedNodeId;
-    browseName: UA_QualifiedName;
-    nodeClass: UA_NodeClass;
-    nodeAttributes: UA_ExtensionObject;
-    typeDefinition: UA_ExpandedNodeId;
+  UA_ServerDiagnosticsSummaryDataType = record
+    serverViewCount: UA_UInt32;
+    currentSessionCount: UA_UInt32;
+    cumulatedSessionCount: UA_UInt32;
+    securityRejectedSessionCount: UA_UInt32;
+    rejectedSessionCount: UA_UInt32;
+    sessionTimeoutCount: UA_UInt32;
+    sessionAbortCount: UA_UInt32;
+    currentSubscriptionCount: UA_UInt32;
+    cumulatedSubscriptionCount: UA_UInt32;
+    publishingIntervalCount: UA_UInt32;
+    securityRejectedRequestsCount: UA_UInt32;
+    rejectedRequestsCount: UA_UInt32;
   end;
-  PUA_AddNodesItem = ^UA_AddNodesItem;
+  PUA_ServerDiagnosticsSummaryDataType = ^UA_ServerDiagnosticsSummaryDataType;
 
 const
-  UA_TYPES_ADDNODESITEM = 164;
+  UA_TYPES_SERVERDIAGNOSTICSSUMMARYDATATYPE = 178;
 
 (**
  * ServerStatusDataType
@@ -2521,24 +2777,82 @@ type
   PUA_ServerStatusDataType = ^UA_ServerStatusDataType;
 
 const
-  UA_TYPES_SERVERSTATUSDATATYPE = 165;
+  UA_TYPES_SERVERSTATUSDATATYPE = 179;
 
 (**
- * BrowseNextResponse
- * ^^^^^^^^^^^^^^^^^^
- * Continues one or more browse operations. *)
+ * Range
+ * ^^^^^
+ *)
 type
-  UA_BrowseNextResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_BrowseResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
+  UA_Range = record
+    low: UA_Double;
+    high: UA_Double;
   end;
-  PUA_BrowseNextResponse = ^UA_BrowseNextResponse;
+  PUA_Range = ^UA_Range;
 
 const
-  UA_TYPES_BROWSENEXTRESPONSE = 166;
+  UA_TYPES_RANGE = 180;
+
+(**
+ * EUInformation
+ * ^^^^^^^^^^^^^
+ *)
+type
+  UA_EUInformation = record
+    namespaceUri: UA_String;
+    unitId: UA_Int32;
+    displayName: UA_LocalizedText;
+    description: UA_LocalizedText;
+  end;
+  PUA_EUInformation = ^UA_EUInformation;
+
+const
+  UA_TYPES_EUINFORMATION = 181;
+
+(**
+ * AxisScaleEnumeration
+ * ^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_AxisScaleEnumeration = (
+    UA_AXISSCALEENUMERATION_LINEAR = 0,
+    UA_AXISSCALEENUMERATION_LOG = 1,
+    UA_AXISSCALEENUMERATION_LN = 2,
+    __UA_AXISSCALEENUMERATION_FORCE32BIT = $7fffffff
+  );
+  PUA_AxisScaleEnumeration = ^UA_AxisScaleEnumeration;
+  {$IF sizeof(UA_AxisScaleEnumeration) <> sizeof(UA_Int32)}{$MESSAGE ERROR 'enum_must_be_32bit'}{$IFEND}
+
+const
+  UA_TYPES_AXISSCALEENUMERATION = 182;
+
+(**
+ * ComplexNumberType
+ * ^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_ComplexNumberType = record
+    real: UA_Float;
+    imaginary: UA_Float;
+  end;
+  PUA_ComplexNumberType = ^UA_ComplexNumberType;
+
+const
+  UA_TYPES_COMPLEXNUMBERTYPE = 183;
+
+(**
+ * DoubleComplexNumberType
+ * ^^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_DoubleComplexNumberType = record
+    real: UA_Double;
+    imaginary: UA_Double;
+  end;
+  PUA_DoubleComplexNumberType = ^UA_DoubleComplexNumberType;
+
+const
+  UA_TYPES_DOUBLECOMPLEXNUMBERTYPE = 184;
 
 (**
  * AxisInformation
@@ -2556,376 +2870,62 @@ type
   PUA_AxisInformation = ^UA_AxisInformation;
 
 const
-  UA_TYPES_AXISINFORMATION = 167;
+  UA_TYPES_AXISINFORMATION = 185;
 
 (**
- * ApplicationDescription
- * ^^^^^^^^^^^^^^^^^^^^^^
- * Describes an application and how to find it. *)
-type
-  UA_ApplicationDescription = record
-    applicationUri: UA_String;
-    productUri: UA_String;
-    applicationName: UA_LocalizedText;
-    applicationType: UA_ApplicationType;
-    gatewayServerUri: UA_String;
-    discoveryProfileUri: UA_String;
-    discoveryUrlsSize: size_t;
-    discoveryUrls: PUA_String;
-  end;
-  PUA_ApplicationDescription = ^UA_ApplicationDescription;
-
-const
-  UA_TYPES_APPLICATIONDESCRIPTION = 168;
-
-(**
- * ReadRequest
- * ^^^^^^^^^^^
+ * XVType
+ * ^^^^^^
  *)
 type
-  UA_ReadRequest = record
-    requestHeader: UA_RequestHeader;
-    maxAge: UA_Double;
-    timestampsToReturn: UA_TimestampsToReturn;
-    nodesToReadSize: size_t;
-    nodesToRead: PUA_ReadValueId;
+  UA_XVType = record
+    x: UA_Double;
+    value: UA_Float;
   end;
-  PUA_ReadRequest = ^UA_ReadRequest;
+  PUA_XVType = ^UA_XVType;
 
 const
-  UA_TYPES_READREQUEST = 169;
+  UA_TYPES_XVTYPE = 186;
 
 (**
- * ActivateSessionRequest
- * ^^^^^^^^^^^^^^^^^^^^^^
- * Activates a session with the server. *)
-type
-  UA_ActivateSessionRequest = record
-    requestHeader: UA_RequestHeader;
-    clientSignature: UA_SignatureData;
-    clientSoftwareCertificatesSize: size_t;
-    clientSoftwareCertificates: PUA_SignedSoftwareCertificate;
-    localeIdsSize: size_t;
-    localeIds: PUA_String;
-    userIdentityToken: UA_ExtensionObject;
-    userTokenSignature: UA_SignatureData;
-  end;
-  PUA_ActivateSessionRequest = ^UA_ActivateSessionRequest;
-
-const
-  UA_TYPES_ACTIVATESESSIONREQUEST = 170;
-
-(**
- * BrowsePathResult
- * ^^^^^^^^^^^^^^^^
- * The result of a translate opearation. *)
-type
-  UA_BrowsePathResult = record
-    statusCode: UA_StatusCode;
-    targetsSize: size_t;
-    targets: PUA_BrowsePathTarget;
-  end;
-  PUA_BrowsePathResult = ^UA_BrowsePathResult;
-
-const
-  UA_TYPES_BROWSEPATHRESULT = 171;
-
-(**
- * AddNodesRequest
- * ^^^^^^^^^^^^^^^
- * Adds one or more nodes to the server address space. *)
-type
-  UA_AddNodesRequest = record
-    requestHeader: UA_RequestHeader;
-    nodesToAddSize: size_t;
-    nodesToAdd: PUA_AddNodesItem;
-  end;
-  PUA_AddNodesRequest = ^UA_AddNodesRequest;
-
-const
-  UA_TYPES_ADDNODESREQUEST = 172;
-
-(**
- * BrowseRequest
- * ^^^^^^^^^^^^^
- * Browse the references for one or more nodes from the server address space. *)
-type
-  UA_BrowseRequest = record
-    requestHeader: UA_RequestHeader;
-    view: UA_ViewDescription;
-    requestedMaxReferencesPerNode: UA_UInt32;
-    nodesToBrowseSize: size_t;
-    nodesToBrowse: PUA_BrowseDescription;
-  end;
-  PUA_BrowseRequest = ^UA_BrowseRequest;
-
-const
-  UA_TYPES_BROWSEREQUEST = 173;
-
-(**
- * WriteRequest
- * ^^^^^^^^^^^^
- *)
-type
-  UA_WriteRequest = record
-    requestHeader: UA_RequestHeader;
-    nodesToWriteSize: size_t;
-    nodesToWrite: PUA_WriteValue;
-  end;
-  PUA_WriteRequest = ^UA_WriteRequest;
-
-const
-  UA_TYPES_WRITEREQUEST = 174;
-
-(**
- * AddNodesResponse
- * ^^^^^^^^^^^^^^^^
- * Adds one or more nodes to the server address space. *)
-type
-  UA_AddNodesResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_AddNodesResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_AddNodesResponse = ^UA_AddNodesResponse;
-
-const
-  UA_TYPES_ADDNODESRESPONSE = 175;
-
-(**
- * AttributeOperand
- * ^^^^^^^^^^^^^^^^
- *)
-type
-  UA_AttributeOperand = record
-    nodeId: UA_NodeId;
-    alias: UA_String;
-    browsePath: UA_RelativePath;
-    attributeId: UA_UInt32;
-    indexRange: UA_String;
-  end;
-  PUA_AttributeOperand = ^UA_AttributeOperand;
-
-const
-  UA_TYPES_ATTRIBUTEOPERAND = 176;
-
-(**
- * DataChangeFilter
- * ^^^^^^^^^^^^^^^^
- *)
-type
-  UA_DataChangeFilter = record
-    trigger: UA_DataChangeTrigger;
-    deadbandType: UA_UInt32;
-    deadbandValue: UA_Double;
-  end;
-  PUA_DataChangeFilter = ^UA_DataChangeFilter;
-
-const
-  UA_TYPES_DATACHANGEFILTER = 177;
-
-(**
- * EndpointDescription
- * ^^^^^^^^^^^^^^^^^^^
- * The description of a endpoint that can be used to access a server. *)
-type
-  UA_EndpointDescription = record
-    endpointUrl: UA_String;
-    server: UA_ApplicationDescription;
-    serverCertificate: UA_ByteString;
-    securityMode: UA_MessageSecurityMode;
-    securityPolicyUri: UA_String;
-    userIdentityTokensSize: size_t;
-    userIdentityTokens: PUA_UserTokenPolicy;
-    transportProfileUri: UA_String;
-    securityLevel: UA_Byte;
-  end;
-  PUA_EndpointDescription = ^UA_EndpointDescription;
-
-const
-  UA_TYPES_ENDPOINTDESCRIPTION = 178;
-
-(**
- * DeleteReferencesRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^
- * Delete one or more references from the server address space. *)
-type
-  UA_DeleteReferencesRequest = record
-    requestHeader: UA_RequestHeader;
-    referencesToDeleteSize: size_t;
-    referencesToDelete: PUA_DeleteReferencesItem;
-  end;
-  PUA_DeleteReferencesRequest = ^UA_DeleteReferencesRequest;
-
-const
-  UA_TYPES_DELETEREFERENCESREQUEST = 179;
-
-(**
- * TranslateBrowsePathsToNodeIdsRequest
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- * Translates one or more paths in the server address space. *)
-type
-  UA_TranslateBrowsePathsToNodeIdsRequest = record
-    requestHeader: UA_RequestHeader;
-    browsePathsSize: size_t;
-    browsePaths: PUA_BrowsePath;
-  end;
-  PUA_TranslateBrowsePathsToNodeIdsRequest = ^UA_TranslateBrowsePathsToNodeIdsRequest;
-
-const
-  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSREQUEST = 180;
-
-(**
- * FindServersResponse
- * ^^^^^^^^^^^^^^^^^^^
- * Finds the servers known to the discovery server. *)
-type
-  UA_FindServersResponse = record
-    responseHeader: UA_ResponseHeader;
-    serversSize: size_t;
-    servers: PUA_ApplicationDescription;
-  end;
-  PUA_FindServersResponse = ^UA_FindServersResponse;
-
-const
-  UA_TYPES_FINDSERVERSRESPONSE = 181;
-
-(**
- * CreateSessionRequest
- * ^^^^^^^^^^^^^^^^^^^^
- * Creates a new session with the server. *)
-type
-  UA_CreateSessionRequest = record
-    requestHeader: UA_RequestHeader;
-    clientDescription: UA_ApplicationDescription;
-    serverUri: UA_String;
-    endpointUrl: UA_String;
-    sessionName: UA_String;
-    clientNonce: UA_ByteString;
-    clientCertificate: UA_ByteString;
-    requestedSessionTimeout: UA_Double;
-    maxResponseMessageSize: UA_UInt32;
-  end;
-  PUA_CreateSessionRequest = ^UA_CreateSessionRequest;
-
-const
-  UA_TYPES_CREATESESSIONREQUEST = 182;
-
-(**
- * ContentFilterElement
- * ^^^^^^^^^^^^^^^^^^^^
- *)
-type
-  UA_ContentFilterElement = record
-    filterOperator: UA_FilterOperator;
-    filterOperandsSize: size_t;
-    filterOperands: PUA_ExtensionObject;
-  end;
-  PUA_ContentFilterElement = ^UA_ContentFilterElement;
-
-const
-  UA_TYPES_CONTENTFILTERELEMENT = 183;
-
-(**
- * TranslateBrowsePathsToNodeIdsResponse
- * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- * Translates one or more paths in the server address space. *)
-type
-  UA_TranslateBrowsePathsToNodeIdsResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_BrowsePathResult;
-    diagnosticInfosSize: size_t;
-    diagnosticInfos: PUA_DiagnosticInfo;
-  end;
-  PUA_TranslateBrowsePathsToNodeIdsResponse = ^UA_TranslateBrowsePathsToNodeIdsResponse;
-
-const
-  UA_TYPES_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE = 184;
-
-(**
- * BrowseResponse
+ * EnumDefinition
  * ^^^^^^^^^^^^^^
- * Browse the references for one or more nodes from the server address space. *)
+ *)
 type
-  UA_BrowseResponse = record
-    responseHeader: UA_ResponseHeader;
-    resultsSize: size_t;
-    results: PUA_BrowseResult;
+  UA_EnumDefinition = record
+    fieldsSize: size_t;
+    fields: PUA_EnumField;
+  end;
+  PUA_EnumDefinition = ^UA_EnumDefinition;
+
+const
+  UA_TYPES_ENUMDEFINITION = 187;
+
+(**
+ * DataChangeNotification
+ * ^^^^^^^^^^^^^^^^^^^^^^
+ *)
+type
+  UA_DataChangeNotification = record
+    monitoredItemsSize: size_t;
+    monitoredItems: PUA_MonitoredItemNotification;
     diagnosticInfosSize: size_t;
     diagnosticInfos: PUA_DiagnosticInfo;
   end;
-  PUA_BrowseResponse = ^UA_BrowseResponse;
+  PUA_DataChangeNotification = ^UA_DataChangeNotification;
 
 const
-  UA_TYPES_BROWSERESPONSE = 185;
+  UA_TYPES_DATACHANGENOTIFICATION = 188;
 
 (**
- * CreateSessionResponse
+ * EventNotificationList
  * ^^^^^^^^^^^^^^^^^^^^^
- * Creates a new session with the server. *)
-type
-  UA_CreateSessionResponse = record
-    responseHeader: UA_ResponseHeader;
-    sessionId: UA_NodeId;
-    authenticationToken: UA_NodeId;
-    revisedSessionTimeout: UA_Double;
-    serverNonce: UA_ByteString;
-    serverCertificate: UA_ByteString;
-    serverEndpointsSize: size_t;
-    serverEndpoints: PUA_EndpointDescription;
-    serverSoftwareCertificatesSize: size_t;
-    serverSoftwareCertificates: PUA_SignedSoftwareCertificate;
-    serverSignature: UA_SignatureData;
-    maxRequestMessageSize: UA_UInt32;
-  end;
-  PUA_CreateSessionResponse = ^UA_CreateSessionResponse;
-
-const
-  UA_TYPES_CREATESESSIONRESPONSE = 186;
-
-(**
- * ContentFilter
- * ^^^^^^^^^^^^^
  *)
 type
-  UA_ContentFilter = record
-    elementsSize: size_t;
-    elements: PUA_ContentFilterElement;
+  UA_EventNotificationList = record
+    eventsSize: size_t;
+    events: PUA_EventFieldList;
   end;
-  PUA_ContentFilter = ^UA_ContentFilter;
+  PUA_EventNotificationList = ^UA_EventNotificationList;
 
 const
-  UA_TYPES_CONTENTFILTER = 187;
-
-(**
- * GetEndpointsResponse
- * ^^^^^^^^^^^^^^^^^^^^
- * Gets the endpoints used by the server. *)
-type
-  UA_GetEndpointsResponse = record
-    responseHeader: UA_ResponseHeader;
-    endpointsSize: size_t;
-    endpoints: PUA_EndpointDescription;
-  end;
-  PUA_GetEndpointsResponse = ^UA_GetEndpointsResponse;
-
-const
-  UA_TYPES_GETENDPOINTSRESPONSE = 188;
-
-(**
- * EventFilter
- * ^^^^^^^^^^^
- *)
-type
-  UA_EventFilter = record
-    selectClausesSize: size_t;
-    selectClauses: PUA_SimpleAttributeOperand;
-    whereClause: UA_ContentFilter;
-  end;
-  PUA_EventFilter = ^UA_EventFilter;
-
-const
-  UA_TYPES_EVENTFILTER = 189;
+  UA_TYPES_EVENTNOTIFICATIONLIST = 189;

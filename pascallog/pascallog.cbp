@@ -22,7 +22,9 @@
 		</Build>
 		<Compiler>
 			<Add option="-g" />
-			<Add directory="D:/open62541/open62541-win32/include" />
+			<Add directory="D:/open62541-1.2.2/include" />
+			<Add directory="D:/open62541-1.2.2/build/src_generated" />
+			<Add directory="D:/open62541-1.2.2/arch" />
 		</Compiler>
 		<Unit filename="pascallog.c">
 			<Option compilerVar="CC" />
