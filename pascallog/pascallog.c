@@ -56,7 +56,7 @@ Initializes a logger that stores the callback function and the original
 context in a struct, then uses UA_Log_Pascal_log to dispatch the messages
 */
 SYM_EXPORT UA_Logger UA_Pascal_logger(void *context, pascal_log_t func) {
-        PascalLogTrampoline *trampoline=malloc(sizeof(trampoline));
+        PascalLogTrampoline *trampoline=malloc(sizeof(PascalLogTrampoline));
         trampoline->context = context;
         trampoline->func = func;
         UA_Logger logger = {UA_Log_Pascal_log, (void *)trampoline, UA_Log_Pascal_clear};
