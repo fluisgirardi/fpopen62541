@@ -1,0 +1,119 @@
+name: Open62541 v1.3.3 libraries for windows and linux 32/64 bits
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Install prerequisites
+      run: |
+        sudo apt-get -q update
+        sudo apt-get install -y gcc-multilib g++-multilib libc6-dev-i386
+        
+    - name: checkout
+      run: |
+        git clone https://github.com/open62541/open62541.git
+        cd open62541
+        git checkout tags/v1.3.3
+        # see https://github.com/open62541/open62541/pull/4753 and https://github.com/olivluca/open62541/commit/fb85aa3a5e25351107f56d7309bb656d4ef77c76
+        # curl -o tools/nodeset_compiler/type_parser.py https://raw.githubusercontent.com/olivluca/open62541/master/tools/nodeset_compiler/type_parser.py
+      
+    - name: build 32bits release
+      run: |
+        cd open62541
+        cmake -S . -B build32_release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
+        cmake --build build32_release --config Release
+        
+    - name: build 32bits debug
+      run: |
+        cd open62541
+        cmake -S . -B build32_debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
+        cmake --build build32_debug --config Debug
+
+    - name: build 64bits release
+      run: |
+        cd open62541
+        cmake -S . -B build64_release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
+        cmake --build build64_release --config Release
+        
+    - name: build 64bits debug
+      run: |
+        cd open62541
+        cmake -S . -B build64_debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1
+        cmake --build build64_debug --config Debug
+
+    - uses: actions/Upload-artifact@v2
+      with:
+        name: v1.3.3 libraries linux
+        path: |
+          #config.h to check the options used for generating the library
+          open62541/build32_release/src_generated/open62541/config.h 
+          #types_generated.h to check it's the same on both windows and linux
+          open62541/build32_release/src_generated/open62541/types_generated.h  
+          open62541/build32_release/bin/
+          open62541/build32_debug/bin/
+          open62541/build64_release/bin/
+          open62541/build64_debug/bin/
+          
+    - uses: actions/Upload-artifact@v2
+      with:
+        name: v1.3.3 tools directory (for generate_fpc)
+        path: open62541/tools
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+    
+    - name: checkout
+      run: |
+        git clone https://github.com/open62541/open62541.git
+        cd open62541
+        git checkout tags/v1.3.3
+        # see https://github.com/open62541/open62541/pull/4753 and https://github.com/olivluca/open62541/commit/fb85aa3a5e25351107f56d7309bb656d4ef77c76
+        # curl -o tools/nodeset_compiler/type_parser.py https://raw.githubusercontent.com/olivluca/open62541/master/tools/nodeset_compiler/type_parser.py
+      
+    - name: build 32bits release
+      run: |
+        cd open62541
+        cmake -A Win32 -S . -B build32_release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
+        cmake --build build32_release --config Release
+        Rename-Item build32_release/bin/Release/open62541.dll libopen62541.dll
+        
+        
+    - name: build 32bits debug
+      run: |
+        cd open62541
+        cmake -A Win32 -S . -B build32_debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1
+        cmake --build build32_debug --config Debug
+        Rename-Item build32_debug/bin/Debug/open62541.dll libopen62541.dll
+
+    - name: build 64bits release
+      run: |
+        cd open62541
+        cmake -A x64 -S . -B build64_release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
+        cmake --build build64_release --config Release
+        Rename-Item build64_release/bin/Release/open62541.dll libopen62541.dll
+
+        
+    - name: build 64bits debug
+      run: |
+        cd open62541
+        cmake -A x64 -S . -B build64_debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1
+        cmake --build build64_debug --config Debug
+        Rename-Item build64_debug/bin/Debug/open62541.dll libopen62541.dll
+
+    - uses: actions/Upload-artifact@v2
+      with:
+        name: v1.3.3 libraries windows
+        path: |
+          #config.h to check the options used for generating the library
+          open62541/build32_release/src_generated/open62541/config.h 
+          #types_generated.h to check it's the same on both windows and linux
+          open62541/build32_release/src_generated/open62541/types_generated.h  
+          open62541/build32_release/bin/
+          open62541/build32_debug/bin/
+          open62541/build64_release/bin/
+          open62541/build64_debug/bin/
