@@ -1448,6 +1448,7 @@ function UA_Variant_hasScalarType(const v: PUA_Variant; const _type: PUA_DataTyp
 (* Returns true if the variant contains an array of the given type. *)
 function UA_Variant_hasArrayType(const v: PUA_Variant; const _type: PUA_DataType): Boolean;
 
+function UA_Variant_getFloat(var v: UA_Variant): single;
 function UA_Variant_getDouble(var v: UA_Variant): double;
 function UA_Variant_getByte(var v: UA_Variant): Byte;
 function UA_Variant_getSmallint(var v: UA_Variant): Smallint;
@@ -1455,6 +1456,7 @@ function UA_Variant_getInteger(var v: UA_Variant): Integer;
 function UA_Variant_getInt64(var v: UA_Variant): Int64;
 function UA_Variant_getString(var v: UA_Variant): AnsiString; overload;
 function UA_Variant_getString(var v: UA_Variant; arrayIndex: DWord): AnsiString; overload;
+procedure UA_Variant_setFloat(out v: UA_Variant; f: single);
 procedure UA_Variant_setDouble(out v: UA_Variant; d: double);
 procedure UA_Variant_setByte(out v: UA_Variant; i: Byte);
 procedure UA_Variant_setSmallint(out v: UA_Variant; i: Smallint);
@@ -1994,6 +1996,10 @@ begin
   Result := (not UA_Variant_isScalar(v)) and (_type = v^._type);
 end;
 
+function UA_Variant_getFloat(var v: UA_Variant): single;
+begin
+  Result := PUA_Float(v.data)^;
+end;
 function UA_Variant_getDouble(var v: UA_Variant): double;
 begin
   Result := PUA_Double(v.data)^;
@@ -2026,6 +2032,10 @@ begin
     Result := '';
 end;
 
+procedure UA_Variant_setFloat(out v: UA_Variant; f: single);
+begin
+  UA_Variant_setScalarCopy(@v, @f, @UA_TYPES[UA_TYPES_FLOAT]);
+end;
 procedure UA_Variant_setDouble(out v: UA_Variant; d: double);
 begin
   UA_Variant_setScalarCopy(@v, @d, @UA_TYPES[UA_TYPES_DOUBLE]);
