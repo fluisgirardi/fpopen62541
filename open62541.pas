@@ -1456,12 +1456,16 @@ function UA_Variant_getInteger(var v: UA_Variant): Integer;
 function UA_Variant_getInt64(var v: UA_Variant): Int64;
 function UA_Variant_getString(var v: UA_Variant): AnsiString; overload;
 function UA_Variant_getString(var v: UA_Variant; arrayIndex: DWord): AnsiString; overload;
+procedure UA_Variant_setBoolean(out v: UA_Variant; b: bytebool);
 procedure UA_Variant_setFloat(out v: UA_Variant; f: single);
 procedure UA_Variant_setDouble(out v: UA_Variant; d: double);
 procedure UA_Variant_setByte(out v: UA_Variant; i: Byte);
 procedure UA_Variant_setSmallint(out v: UA_Variant; i: Smallint);
+procedure UA_Variant_setUInt16(out v: UA_Variant; i: UInt16);
 procedure UA_Variant_setInteger(out v: UA_Variant; i: Integer);
+procedure UA_Variant_setUInt32(out v: UA_Variant; i: UInt32);
 procedure UA_Variant_setInt64(out v: UA_Variant; i: Int64);
+procedure UA_Variant_setUInt64(out v: UA_Variant; i: UInt64);
 procedure UA_Variant_setString(out v: UA_Variant; const s: AnsiString);
 
 (* The following functions are shorthand for creating NodeIds. *)
@@ -2032,6 +2036,10 @@ begin
     Result := '';
 end;
 
+procedure UA_Variant_setBoolean(out v: UA_Variant; b: bytebool);
+begin
+  UA_Variant_setScalarCopy(@v, @b, @UA_TYPES[UA_TYPES_BOOLEAN]);
+end;
 procedure UA_Variant_setFloat(out v: UA_Variant; f: single);
 begin
   UA_Variant_setScalarCopy(@v, @f, @UA_TYPES[UA_TYPES_FLOAT]);
@@ -2048,13 +2056,25 @@ procedure UA_Variant_setSmallint(out v: UA_Variant; i: Smallint);
 begin
   UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_INT16]);
 end;
+procedure UA_Variant_setUInt16(out v: UA_Variant; i: UInt16);
+begin
+  UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_UINT16]);
+end;
 procedure UA_Variant_setInteger(out v: UA_Variant; i: Integer);
 begin
   UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_INT32]);
 end;
+procedure UA_Variant_setUInt32(out v: UA_Variant; i: UInt32);
+begin
+  UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_UINT32]);
+end;
 procedure UA_Variant_setInt64(out v: UA_Variant; i: Int64);
 begin
   UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_INT64]);
+end;
+procedure UA_Variant_setUInt64(out v: UA_Variant; i: UInt64);
+begin
+  UA_Variant_setScalarCopy(@v, @i, @UA_TYPES[UA_TYPES_UINT64]);
 end;
 procedure UA_Variant_setString(out v: UA_Variant; const s: AnsiString);
 var uas: UA_STRING;
