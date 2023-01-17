@@ -450,6 +450,32 @@ type
    * Specializations, such as ``UA_Int32_new()`` are derived from the generic
    * type operations as static inline functions. *)
 
+   {$IFDEF UA_VER1_3}
+   UA_DataTypeMember = bitpacked record
+      {$ifdef UA_ENABLE_TYPEDESCRIPTION}
+       memberName: PAnsiChar;
+      {$endif}
+      memberType : PUA_DataType;
+      padding : 0..63;               (* How much padding is there before this
+                                        member element? For arrays this is the
+                                        padding before the size_t length member.
+                                        (No padding between size_t and the
+                                        following ptr.) *)
+      isArray : 0..1;
+      isOptional : 0..1;
+      fill : UA_Byte;
+      fill1 : UA_Byte;
+      fill2 : UA_Byte;
+
+       {namespaceZero: UA_Boolean:1;}  (* The type of the member is defined in
+                                        namespace zero. In this implementation,
+                                        types from custom namespace may contain
+                                        members from the same namespace or
+                                        namespace zero only.*)
+       {isArray: UA_Boolean:1;}        (* The member is an array *)
+       {isOptional: UA_Boolean:1;}     (* The member is an optional field *)
+   end;
+   {$ELSE}
    UA_DataTypeMember = record
        memberTypeIndex: UA_UInt16;   (* Index of the member in the array of data
                                         types *)
@@ -470,6 +496,7 @@ type
        memberName: PAnsiChar;
      {$endif}
    end;
+   {$ENDIF}
 
    (* The DataType "kind" is an internal type classification. It is used to
     * dispatch handling to the correct routines. *)
