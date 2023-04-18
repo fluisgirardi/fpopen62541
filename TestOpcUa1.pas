@@ -247,20 +247,34 @@ const
   );
 
   MyStructTypeName: array[0..15] of AnsiChar = 'MyStructTypeName';
+  {$IF UA_VER = 1.2}
   MyStructType: UA_DataType = (
     typeId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_STRING; identifier:(_string:(length:Length(MyStructTypeName);data:{$IFDEF FPC}@MyStructTypeName{$ELSE}nil{$ENDIF}))); (* .typeId *) // MUST BE ONLY "UA_NODEIDTYPE_NUMERIC"
     binaryEncodingId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_NUMERIC; identifier:(numeric:0));
     memSize: SizeOf(MyStruct);
     typeIndex: 0;                            (* .typeIndex, in the array of custom types *)
-    flags: ord(UA_DATATYPEKIND_STRUCTURE) +  (* .typeKind:6 *)
-           0 shl 6 +                         (* .pointerFree:1 *)
-           0 shl 7 +                         (* .overlayable:1 (depends on endianness and
-                                                 the absence of padding) *)
-           3 shl 8;                          (* .membersSize:8 *)
+    typeKind: Ord(UA_DATATYPEKIND_STRUCTURE);
+    pointerFree: 0;
+    overlayable: 0;
+    membersSize: 3;
     {!!! works only if binaryEncodingId==identifier.numeric !!!}
     members: @MyStructMembers;
     typeName: 'MyStructType';
   );
+  {$ELSE}
+  MyStructType: UA_DataType = (
+    typeName: 'MyStructType';
+    typeId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_STRING; identifier:(_string:(length:Length(MyStructTypeName);data:{$IFDEF FPC}@MyStructTypeName{$ELSE}nil{$ENDIF}))); (* .typeId *) // MUST BE ONLY "UA_NODEIDTYPE_NUMERIC"
+    binaryEncodingId: (namespaceIndex:3; identifierType:UA_NODEIDTYPE_NUMERIC; identifier:(numeric:0));
+    memSize: SizeOf(MyStruct);
+    typeKind: Ord(UA_DATATYPEKIND_STRUCTURE);
+    pointerFree: 0;
+    overlayable: 0;
+    membersSize: 3;
+    {!!! works only if binaryEncodingId==identifier.numeric !!!}
+    members: @MyStructMembers;
+  );
+  {$IFEND}
 
   MyCustomDataTypes: UA_DataTypeArray = (
     next: nil;
@@ -537,7 +551,11 @@ begin
       raise Exception.CreateFmt('Error reading value of variable "%s"! (%s)', [eNodeId.Text, AnsiString(UA_StatusCode_name(res))]);
   end;
 
+  {$IF UA_VER = 1.2}
   Memo1.Lines.Append(Format('Node "%s" read value: %s (Size=%d, Type=%s (typeId=%s,typeIndex=%d); Result=%x)', [eNodeId.Text, eNodeValue.Text, value._type^.memSize, value._type^.typeName, UA_NodeIdToStr(value._type^.typeId), value._type^.typeIndex, res]));
+  {$ELSE}
+  Memo1.Lines.Append(Format('Node "%s" read value: %s (Size=%d, Type=%s (typeId=%s,typeKind=%d); Result=%x)', [eNodeId.Text, eNodeValue.Text, value._type^.memSize, value._type^.typeName, UA_NodeIdToStr(value._type^.typeId), value._type^.typeKind, res]));
+  {$IFEND}
   //pDataType := value._type;
   //Memo1.Lines.Append(Format('Data Type: typeName=%s, typeId=%s, memSize=%d, typeIndex=%d, flags=%d, binaryEncodingId=%d, members=%p', [pDataType^.typeName, UA_NodeIdToStr(pDataType^.typeId), pDataType^.memSize, pDataType^.typeIndex, pDataType^.flags, pDataType^.binaryEncodingId, pDataType^.members]));
 
@@ -562,7 +580,7 @@ begin
   if UA_Client_readDataTypeAttribute(client, nodeId, dataType) = UA_STATUSCODE_GOOD then begin
     pDataType := UA_findDataType(@dataType);
     if pDataType <> nil then begin
-      case pDataType^.typeIndex of
+      case {$IF UA_VER = 1.2}pDataType^.typeIndex{$ELSE}pDataType^.typeKind{$IFEND} of
         UA_TYPES_BYTE:
           UA_Variant_setByte(value, Byte(StrToInt(eNodeValue.Text)));
         UA_TYPES_INT16:
