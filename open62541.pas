@@ -466,6 +466,9 @@ type
       fill : UA_Byte;
       fill1 : UA_Byte;
       fill2 : UA_Byte;
+      {$ifdef CPU64}
+      fill3 : UA_UInt32;
+      {$endif}
 
        {namespaceZero: UA_Boolean:1;}  (* The type of the member is defined in
                                         namespace zero. In this implementation,
@@ -548,7 +551,12 @@ type
                                          * pointers that need to be freed *)
        overlayable : 0..1;              (* The type has the identical memory layout
                                          * in memory and on the binary stream. *)
+       {$ifdef CPU64}
+       membersSize : UA_UInt32;           (* How many members does the type have? *)
+       filler : UA_Byte;
+       {$else}
        membersSize : UA_Byte;           (* How many members does the type have? *)
+       {$endif}
        members: ^UA_DataTypeMember;
    end;
    {$ELSE}
