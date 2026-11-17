@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this 
@@ -14,11 +14,13 @@ parser.add_argument('statuscodes', help='path/to/Opc.Ua.StatusCodes.csv')
 parser.add_argument('outfile', help='outfile w/o extension')
 args = parser.parse_args()
 
+import csv
+import os
 rows = []
 with open(args.statuscodes, mode="rt") as f:
-    lines = f.readlines()
-    for l in lines:
-        rows.append(tuple(l.strip().split(',')))
+    for row in csv.reader(f):
+        if len(row) >= 2:
+            rows.append((row[0], row[1], row[2] if len(row) > 2 else ''))
 
 fh = open(args.outfile + ".inc", "wt", encoding='utf8')
 def printh(string):
@@ -50,9 +52,15 @@ printh(u'''  (*---------------------------------------------------------
   UA_STATUSCODE_GOOD = $00;
   UA_STATUSCODE_INFOTYPE_DATAVALUE = $00000400;
   UA_STATUSCODE_INFOBITS_OVERFLOW = $00000080;
-''' % (args.statuscodes, sys.argv[0]))
+''' % (os.path.basename(args.statuscodes), os.path.basename(sys.argv[0])))
 
+# open62541 >= 1.4 lists Good/Uncertain/Bad in the csv too: declare every name once
+seen = {u'GOOD', u'INFOTYPE_DATAVALUE', u'INFOBITS_OVERFLOW'}
 for row in rows:
-    printh(u"  UA_STATUSCODE_%s = %s; (* %s *)" % (row[0].upper(), row[1].replace(u'0x',u'$'), row[2]))
+    name = row[0].upper()
+    if name in seen:
+        continue
+    seen.add(name)
+    printh(u"  UA_STATUSCODE_%s = %s; (* %s *)" % (name, row[1].replace(u'0x',u'$'), row[2].replace(u'*)', u'* )')))
 
 fh.close()

@@ -1,2 +1,10 @@
 
 *.bak
+lib/
+backup/
+*.res
+*.o
+*.ppu
+*.compiled
+TestOpcUa
+TestOpcUa.exe
