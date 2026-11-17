@@ -732,6 +732,10 @@ var
   UA_NodeId_isNull: function(const p: PUA_NodeId): UA_Boolean; cdecl;
   UA_NodeId_print: function(const id: PUA_NodeId; output: PUA_String): UA_StatusCode; cdecl;
   UA_NodeId_parse: function(id: PUA_NodeId; str: UA_String): UA_StatusCode; cdecl;
+  (* printf of the library: besides the C formats, %S is a UA_String* and %N a UA_NodeId*.
+     With str^.length > 0 it writes into str^.data (truncated, BadEncodingLimitsExceeded if
+     it does not fit), with length 0 it allocates (UA_String_clear afterwards). *)
+  UA_String_vformat: function(str: PUA_String; format: PAnsiChar; args: Pointer): UA_StatusCode; cdecl;
   UA_ExpandedNodeId_print: function(const id: PUA_ExpandedNodeId; output: PUA_String): UA_StatusCode; cdecl;
   UA_ExpandedNodeId_parse: function(id: PUA_ExpandedNodeId; str: UA_String): UA_StatusCode; cdecl;
   UA_NumericRange_parse: function(range: PUA_NumericRange; str: UA_String): UA_StatusCode; cdecl;
@@ -923,7 +927,9 @@ function UA_DataTypeToStr(typeId: UA_NodeId): AnsiString;
 function UA_StrToNodeId(const s: AnsiString; out id: UA_NodeId): UA_StatusCode;
 function UA_NodeId_equal(const n1, n2: UA_NodeId): Boolean;
 function UA_String_equal(const s1, s2: PUA_String): Boolean;
-(* Formats the message of a log callback (msg/args as received from the library) *)
+(* Formats the message of a log callback (msg/args as received from the library). The
+   library uses formats of its own (%S UA_String, %N NodeId) that the C vsnprintf does not
+   know: they are formatted by UA_String_vformat. *)
 function UA_FormatLogMessage(msg: PAnsiChar; args: Pointer): AnsiString;
 
 function UA_DateTime_toUnixTime(date: UA_DateTime): Int64; inline;
@@ -1010,11 +1016,6 @@ implementation
 uses
   SysUtils, DynLibs{$IFDEF MSWINDOWS}, Windows{$ENDIF};
 
-{$IFDEF MSWINDOWS}
-function _vsnprintf(buf: PAnsiChar; size: size_t; fmt: PAnsiChar; args: Pointer): Integer; cdecl; external 'msvcrt.dll';
-{$ELSE}
-function vsnprintf(buf: PAnsiChar; size: size_t; fmt: PAnsiChar; args: Pointer): Integer; cdecl; external 'c';
-{$ENDIF}
 
 var
   open62541LibHandle: TLibHandle = NilHandle;
@@ -1049,6 +1050,7 @@ begin
   Add('UA_NodeId_isNull', @@UA_NodeId_isNull);
   Add('UA_NodeId_print', @@UA_NodeId_print);
   Add('UA_NodeId_parse', @@UA_NodeId_parse);
+  Add('UA_String_vformat', @@UA_String_vformat);
   Add('UA_ExpandedNodeId_print', @@UA_ExpandedNodeId_print);
   Add('UA_ExpandedNodeId_parse', @@UA_ExpandedNodeId_parse);
   Add('UA_NumericRange_parse', @@UA_NumericRange_parse);
@@ -1438,17 +1440,15 @@ end;
 function UA_FormatLogMessage(msg: PAnsiChar; args: Pointer): AnsiString;
 var
   buf: array[0..1023] of AnsiChar;
-  n: Integer;
+  str: UA_String;
 begin
-  {$IFDEF MSWINDOWS}
-  n := _vsnprintf(@buf[0], SizeOf(buf)-1, msg, args);
-  {$ELSE}
-  n := vsnprintf(@buf[0], SizeOf(buf), msg, args);
-  {$ENDIF}
-  if n < 0 then n := StrLen(PAnsiChar(@buf[0]));
-  if n > SizeOf(buf)-1 then n := SizeOf(buf)-1;
-  buf[n] := #0;
-  SetString(Result, PAnsiChar(@buf[0]), n);
+  buf[0] := #0;
+  (* written into buf (no allocation); a longer message is cut, still ending in #0 *)
+  str.length := SizeOf(buf);
+  str.data := @buf[0];
+  UA_String_vformat(@str, msg, args);
+  buf[High(buf)] := #0;
+  Result := PAnsiChar(@buf[0]);
 end;
 
 function UA_DateTime_toUnixTime(date: UA_DateTime): Int64;
