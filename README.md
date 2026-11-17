@@ -46,6 +46,11 @@ cmake -S open62541 -B open62541/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_
 cmake --build open62541/build -j
 ```
 
+The GitHub Actions workflow `.github/workflows/BuildOpen62541v1.5.yml` (run it manually, it accepts
+the open62541 tag) builds these libraries for Linux (x86_64/i386, on Ubuntu 22.04) and Windows
+(x64/Win32, OpenSSL linked statically from vcpkg), Release and Debug. On Linux x86_64 it also runs
+`tools/check_layout` and loads the libraries with `tools/load_test.pas`.
+
 Keep the default type selection (`UA_ENABLE_DATATYPES_ALL=ON`) and `UA_ENABLE_TYPEDESCRIPTION=ON`.
 Without `UA_ENABLE_ENCRYPTION`, undefine `UA_ENABLE_ENCRYPTION` in `open62541.pas`.
 
