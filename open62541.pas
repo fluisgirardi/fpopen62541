@@ -847,6 +847,15 @@ var
   UA_Client_readValueAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outValue: PUA_Variant): UA_StatusCode; cdecl;
   UA_Client_writeValueAttribute: function(client: PUA_Client; nodeId: UA_NodeId; const newValue: PUA_Variant): UA_StatusCode; cdecl;
   UA_Client_readArrayDimensionsAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outArrayDimensionsSize: Psize_t; outArrayDimensions: PPUA_UInt32): UA_StatusCode; cdecl;
+  UA_Client_readNodeClassAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outNodeClass: PUA_NodeClass): UA_StatusCode; cdecl;
+  UA_Client_readBrowseNameAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outBrowseName: PUA_QualifiedName): UA_StatusCode; cdecl;
+  UA_Client_readDisplayNameAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outDisplayName: PUA_LocalizedText): UA_StatusCode; cdecl;
+  UA_Client_readDescriptionAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outDescription: PUA_LocalizedText): UA_StatusCode; cdecl;
+  UA_Client_readDataTypeAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outDataType: PUA_NodeId): UA_StatusCode; cdecl;
+  UA_Client_readValueRankAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outValueRank: PUA_Int32): UA_StatusCode; cdecl;
+  UA_Client_readAccessLevelAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outAccessLevel: PUA_Byte): UA_StatusCode; cdecl;
+  UA_Client_readUserAccessLevelAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outUserAccessLevel: PUA_Byte): UA_StatusCode; cdecl;
+  UA_Client_readMinimumSamplingIntervalAttribute: function(client: PUA_Client; nodeId: UA_NodeId; outMinSamplingInterval: PUA_Double): UA_StatusCode; cdecl;
   UA_Client_writeArrayDimensionsAttribute: function(client: PUA_Client; nodeId: UA_NodeId; newArrayDimensionsSize: size_t; const newArrayDimensions: PUA_UInt32): UA_StatusCode; cdecl;
   {$IFDEF UA_ENABLE_METHODCALLS}
   UA_Client_call: function(client: PUA_Client; objectId, methodId: UA_NodeId; inputSize: size_t; const input: PUA_Variant; outputSize: Psize_t; output: PPUA_Variant): UA_StatusCode; cdecl;
@@ -1205,6 +1214,15 @@ begin
   Add('UA_Client_readValueAttribute', @@UA_Client_readValueAttribute);
   Add('UA_Client_writeValueAttribute', @@UA_Client_writeValueAttribute);
   Add('UA_Client_readArrayDimensionsAttribute', @@UA_Client_readArrayDimensionsAttribute);
+  Add('UA_Client_readNodeClassAttribute', @@UA_Client_readNodeClassAttribute);
+  Add('UA_Client_readBrowseNameAttribute', @@UA_Client_readBrowseNameAttribute);
+  Add('UA_Client_readDisplayNameAttribute', @@UA_Client_readDisplayNameAttribute);
+  Add('UA_Client_readDescriptionAttribute', @@UA_Client_readDescriptionAttribute);
+  Add('UA_Client_readDataTypeAttribute', @@UA_Client_readDataTypeAttribute);
+  Add('UA_Client_readValueRankAttribute', @@UA_Client_readValueRankAttribute);
+  Add('UA_Client_readAccessLevelAttribute', @@UA_Client_readAccessLevelAttribute);
+  Add('UA_Client_readUserAccessLevelAttribute', @@UA_Client_readUserAccessLevelAttribute);
+  Add('UA_Client_readMinimumSamplingIntervalAttribute', @@UA_Client_readMinimumSamplingIntervalAttribute);
   Add('UA_Client_writeArrayDimensionsAttribute', @@UA_Client_writeArrayDimensionsAttribute);
   {$IFDEF UA_ENABLE_METHODCALLS}
   Add('UA_Client_call', @@UA_Client_call);
