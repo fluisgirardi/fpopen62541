@@ -205,6 +205,13 @@ procedure TTestOpcUaForm.SelfTest(data: PtrInt);
 
 begin
   Step('server start', @btnServerStartClick);
+  // issue #12: the server must keep running until it is stopped
+  Sleep(3000);
+  Application.ProcessMessages;
+  if Assigned(FServer) and not FServer.Finished then
+    Memo1.Lines.Add('server still running after 3 s')
+  else
+    Memo1.Lines.Add('FAIL: the server stopped by itself');
   cbServerNS.Text := '1';
   eServerVariableName.Text := 'the.answer';
   eServerVariableValue.Text := '42';
@@ -229,6 +236,10 @@ begin
   cbNS.Text := '0';
   eNodeId.Text := IntToStr(UA_NS0ID_SERVER_SERVERSTATUS_STATE);
   Step('read ns=0;i=2259 (ServerState)', @btnReadVariableClick);
+  if Assigned(FServer) and not FServer.Finished then
+    Memo1.Lines.Add('server still running before stop')
+  else
+    Memo1.Lines.Add('FAIL: the server stopped by itself');
   Step('server stop', @btnServerStartClick);
   WriteLn(Memo1.Lines.Text);
   WriteLn('--- memo2');
