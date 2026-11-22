@@ -1077,7 +1077,40 @@ function UA_Server_addMethodNode(server: PUA_Server; const requestedNewNodeId, p
 implementation
 
 uses
-  SysUtils, DynLibs{$IFDEF MSWINDOWS}, Windows{$ENDIF};
+  SysUtils{$IFDEF FPC}, DynLibs{$ENDIF}{$IFDEF MSWINDOWS}, Windows{$ENDIF};
+
+{$IFNDEF FPC}
+(* Delphi (Windows): the DynLibs functions used here, on top of the Windows API *)
+type
+  TLibHandle = HMODULE;
+
+const
+  NilHandle = 0;
+
+function GetProcedureAddress(Lib: TLibHandle; const ProcName: AnsiString): Pointer;
+begin
+  Result := GetProcAddress(Lib, PAnsiChar(ProcName));
+end;
+
+function UnloadLibrary(Lib: TLibHandle): Boolean;
+begin
+  Result := FreeLibrary(Lib);
+end;
+
+function GetLoadErrorStr: string;
+begin
+  Result := SysErrorMessage(GetLastError);
+end;
+{$ENDIF}
+
+function LoadDynLibrary(const Name: string): TLibHandle;
+begin
+  {$IFDEF FPC}
+  Result := DynLibs.LoadLibrary(Name);
+  {$ELSE}
+  Result := Windows.LoadLibrary(PChar(Name));
+  {$ENDIF}
+end;
 
 
 var
@@ -1270,7 +1303,7 @@ begin
     LoadedLibName := LibName
   else
     LoadedLibName := libopen62541;
-  open62541LibHandle := DynLibs.LoadLibrary(LoadedLibName);
+  open62541LibHandle := LoadDynLibrary(LoadedLibName);
   if open62541LibHandle = NilHandle then begin
     RefCount := 0;
     raise EInOutError.CreateFmt('Can not load library "%s". Check your installation.'+sLineBreak+'%s',
