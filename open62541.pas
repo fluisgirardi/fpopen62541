@@ -838,6 +838,8 @@ var
                                  outPrivateKey, outCertificate: PUA_ByteString): UA_StatusCode; cdecl;
   UA_CertificateUtils_getExpirationDate: function(certificate: PUA_ByteString; expiryDateTime: PUA_DateTime): UA_StatusCode; cdecl;
   UA_CertificateUtils_getSubjectName: function(certificate: PUA_ByteString; subjectName: PUA_String): UA_StatusCode; cdecl;
+  (* GOOD when the certificate has applicationUri in its subject alternative name *)
+  UA_CertificateUtils_verifyApplicationUri: function(const certificate: PUA_ByteString; const applicationUri: PUA_String): UA_StatusCode; cdecl;
   {$ENDIF}
   UA_CertificateGroup_AcceptAll: procedure(certGroup: PUA_CertificateGroup); cdecl;
 
@@ -1209,6 +1211,7 @@ begin
   Add('UA_CreateCertificate', @@UA_CreateCertificate);
   Add('UA_CertificateUtils_getExpirationDate', @@UA_CertificateUtils_getExpirationDate);
   Add('UA_CertificateUtils_getSubjectName', @@UA_CertificateUtils_getSubjectName);
+  Add('UA_CertificateUtils_verifyApplicationUri', @@UA_CertificateUtils_verifyApplicationUri);
   {$ENDIF}
   Add('UA_CertificateGroup_AcceptAll', @@UA_CertificateGroup_AcceptAll);
   Add('UA_Client_readValueAttribute', @@UA_Client_readValueAttribute);
