@@ -3,6 +3,8 @@ name: Open62541 v1.5 libraries for windows, linux 32/64 bits and freebsd amd64
 # Builds libopen62541 the way fpopen62541 expects it: shared library,
 # UA_ENABLE_DATATYPES_ALL=ON, UA_ENABLE_TYPEDESCRIPTION=ON and encryption
 # (OpenSSL), matching the UA_ENABLE_ENCRYPTION define of open62541.pas.
+# UA_ENABLE_DEBUG_SANITIZER=OFF: with clang (FreeBSD) the Debug build would
+# otherwise use -fsanitize=address and need the ASan runtime in the program.
 # On linux x86_64 it also runs tools/check_layout (C vs Pascal record layout)
 # and loads every 64 bit library with LoadOpen62541 (tools/load_test.pas).
 # FreeBSD amd64 is built in a FreeBSD VM (vmactions/freebsd-vm) against the
@@ -36,6 +38,7 @@ env:
     -DUA_ENABLE_TYPEDESCRIPTION=ON
     -DUA_BUILD_EXAMPLES=OFF
     -DUA_BUILD_UNIT_TESTS=OFF
+    -DUA_ENABLE_DEBUG_SANITIZER=OFF
 
 jobs:
   build_linux:
